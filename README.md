@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <em>"秉烛夜读，荧荧微光亦照亮一方天地。"</em>
+  
 </p>
 
 <p align="center">
