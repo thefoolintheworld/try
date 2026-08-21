@@ -1,0 +1,1008 @@
+/**pages/checkin/checkin.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 160rpx;
+}
+
+/* ===== 连续天数卡（核心仪式感，顶部最显眼）===== */
+.streak-card {
+  margin-top: @sp-6;
+  background: linear-gradient(135deg, @color-accent 0%, @color-accent-dark 100%);
+  border-radius: @radius-card;
+  padding: @sp-8 @sp-7 @sp-7;
+  text-align: center;
+  box-shadow: @shadow-cta;
+  color: #FFFFFF;
+}
+.streak-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  line-height: 1;
+}
+.streak-num {
+  font-family: var(--font-numeric);
+  font-size: 120rpx;
+  font-weight: 200;
+  line-height: 1;
+  /* 数字主角，用大字号 + 细字重制造仪式感 */
+}
+.streak-unit {
+  margin-left: @sp-2;
+  font-size: @fs-lg;
+  opacity: 0.9;
+}
+.streak-label {
+  margin-top: @sp-2;
+  font-size: @fs-base;
+  opacity: 0.9;
+  letter-spacing: 2rpx;
+}
+.streak-meta {
+  margin-top: @sp-4;
+  font-size: @fs-s;
+  opacity: 0.8;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.streak-meta-dot {
+  margin: 0 @sp-3;
+  opacity: 0.6;
+}
+
+/* 衰减式 Habit Score + 保护券状态：第二行指标（在 streak-card 内部，白底 accent 渐变背景） */
+.habit-row {
+  margin-top: @sp-6;
+  padding-top: @sp-6;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @sp-4;
+}
+.habit-score-block {
+  display: flex;
+  align-items: baseline;
+  gap: @sp-4;
+  /* 数字主显示 + 等级文案 */
+}
+.habit-score-num {
+  font-family: var(--font-numeric);
+  font-size: @fs-xxl;
+  font-weight: 300;
+  line-height: 1;
+  /* color 由内联 style 注入（等级配色） */
+}
+.habit-score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+  text-align: left;
+}
+.habit-score-label {
+  font-size: @fs-xs;
+  opacity: 0.7;
+  letter-spacing: 1rpx;
+}
+.habit-score-grade {
+  font-size: @fs-sm;
+  font-weight: 600;
+  /* color 由内联 style 注入（等级配色） */
+}
+.freebie-block {
+  display: flex;
+  align-items: center;
+  gap: @sp-2;
+  padding: @sp-3 @sp-5;
+  border-radius: @radius-pill;
+  background: rgba(255, 255, 255, 0.18);
+  /* 半透明药丸：保护券的"盾牌感" */
+}
+.freebie-icon {
+  font-size: @fs-sm;
+  line-height: 1;
+}
+.freebie-text {
+  font-size: @fs-s;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5rpx;
+}
+/* 已解锁的连续打卡勋章：横向小图标条 */
+.streak-medals {
+  margin-top: @sp-5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: @sp-4;
+  flex-wrap: wrap;
+}
+/* 已解锁：圆形图标章 */
+.streak-medal {
+  min-width: 56rpx;
+  height: 56rpx;
+  padding: 0 @sp-2;
+  border-radius: @radius-poster;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: @sp-2;
+  background: color-mix(in srgb, @color-card 15%, transparent);
+  opacity: 0.55;
+}
+.streak-medal.unlocked {
+  background: color-mix(in srgb, @color-card 95%, transparent);
+  opacity: 1;
+  box-shadow: @shadow-subtle;
+}
+.streak-medal-icon {
+  font-size: @fs-m;
+  line-height: 1;
+}
+/* A5 未解锁时的进度角标：图标后的「N/target」小字 */
+.streak-medal-progress {
+  font-size: 18rpx;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ===== 今日打卡区（v7 多分类）===== */
+.today-card {
+  margin-top: @sp-5;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+}
+.today-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  margin-bottom: @sp-5;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.today-title-sub {
+  font-size: @fs-s;
+  font-weight: 400;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+/* 今日分类列表（每分类一行） */
+.today-cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-3;
+}
+.today-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: @sp-5 @sp-6;
+  background: @color-card-soft;
+  border-radius: @radius-card-sm;
+  border: 2rpx solid transparent;
+}
+.today-cat-item.active {
+  /* 选中的待打卡分类：accent 描边 */
+  border-color: var(--color-accent, #D97A4A);
+  background: color-mix(in srgb, @color-accent 10%, transparent);
+}
+.today-cat-item.checked {
+  /* 已打卡：浅绿底 + 勾 */
+  background: color-mix(in srgb, @color-book 12%, transparent);
+}
+.today-cat-item.new-cat {
+  border: 2rpx dashed @color-divider;
+  background: transparent;
+}
+.today-cat-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.today-cat-icon {
+  font-size: 36rpx;
+  line-height: 1;
+  margin-right: @sp-4;
+  flex-shrink: 0;
+}
+.today-cat-info {
+  flex: 1;
+  min-width: 0;
+}
+.today-cat-label {
+  font-size: @fs-m;
+  font-weight: 500;
+  color: @color-text-primary;
+  line-height: 1.3;
+}
+.today-cat-note {
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* P2-C：该分类独立连胜文案——强调色小字，区别于普通 note 的次要灰 */
+.today-cat-streak {
+  margin-top: @sp-1;
+  font-size: @fs-xs;
+  color: @color-accent;
+  line-height: 1.4;
+  letter-spacing: 1rpx;
+}
+.today-cat-mark {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: var(--color-book, #6B8E5A);
+  flex-shrink: 0;
+  margin-left: @sp-4;
+}
+.today-cat-mark.add {
+  color: var(--color-accent, #D97A4A);
+  font-weight: 400;
+}
+/* 选中分类后的输入区 */
+.today-input-area {
+  margin-top: @sp-5;
+  padding-top: @sp-5;
+  border-top: 1rpx solid @color-divider;
+}
+.today-note {
+  width: 100%;
+  box-sizing: border-box;
+  padding: @sp-5 @sp-6;
+  background: @color-card-soft;
+  border-radius: @radius-card-xs;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.5;
+  min-height: 80rpx;
+}
+.today-note-ph {
+  color: @color-text-secondary;
+  opacity: 0.5;
+}
+.today-input-btns {
+  display: flex;
+  gap: @sp-4;
+  margin-top: @sp-4;
+}
+.today-input-btn {
+  flex: 1;
+  text-align: center;
+  padding: @sp-5;
+  border-radius: @radius-pill;
+  font-size: @fs-m;
+  line-height: 1;
+}
+.today-input-btn.ghost {
+  background: @color-card-soft;
+  color: @color-text-secondary;
+}
+.today-input-btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+  box-shadow: @shadow-cta;
+}
+
+/* 分类 chip（编辑 sheet 内复用） */
+.cat-chip {
+  display: inline-block;
+  padding: @sp-3 @sp-5;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+}
+.cat-chip.active {
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+
+/* ===== 本月日历 ===== */
+.cal-card {
+  margin-top: @sp-5;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @sp-4;
+}
+.cal-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.cal-tip {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: @sp-2;
+}
+.cal-weekday {
+  text-align: center;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  padding: @sp-2 0;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: @sp-2;
+}
+.cal-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  background: @color-card-soft;
+}
+.cal-cell.out {
+  background: transparent;
+  color: @color-text-secondary;
+  opacity: 0.25;
+}
+.cal-cell.checked {
+  background: color-mix(in srgb, @color-accent 14%, transparent);
+  color: @color-text-primary;
+}
+.cal-cell.today {
+  /* 今天加描边（即使已打卡也再加一圈白底外环） */
+  box-shadow: 0 0 0 3rpx @color-bg, 0 0 0 5rpx var(--color-accent, #D97A4A);
+}
+.cal-day {
+  line-height: 1;
+}
+/* 该日已打卡分类图标（v7 多分类：一格可能多个图标） */
+.cal-cat-icons {
+  position: absolute;
+  bottom: 4rpx;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rpx;
+  line-height: 1;
+}
+.cal-cat-icon {
+  font-size: 14rpx;
+}
+/* 溢出标记「+N」：比真实图标更小更淡，视觉上提示「还有更多」而不喧宾夺主 */
+.cal-cat-more {
+  font-size: 10rpx;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  margin-left: 1rpx;
+}
+
+/* ===== 历史打卡列表 ===== */
+.history-card {
+  margin-top: @sp-5;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @sp-4;
+}
+.history-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.history-tip {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.history-list {
+  /* 列表项之间用细分隔线 */
+}
+.history-item {
+  display: flex;
+  align-items: flex-start;
+  padding: @sp-5 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.history-item:last-child {
+  border-bottom: none;
+}
+.history-date-col {
+  width: 120rpx;
+  flex-shrink: 0;
+}
+.history-date-main {
+  display: block;
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.3;
+}
+.history-date-sub {
+  display: block;
+  margin-top: 2rpx;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+.history-body {
+  flex: 1;
+  min-width: 0;
+  padding-right: @sp-4;
+}
+.history-cat {
+  display: flex;
+  align-items: center;
+}
+.history-cat-icon {
+  font-size: @fs-s;
+  margin-right: @sp-2;
+  line-height: 1;
+}
+.history-cat-label {
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.history-note {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  overflow: hidden;
+  /* 长一句话截断到两行 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.history-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: @sp-2;
+  flex-shrink: 0;
+}
+.history-action {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  padding: 2rpx @sp-1;
+}
+.history-action.convert {
+  color: var(--color-accent, #D97A4A);
+}
+.history-action.danger {
+  color: var(--color-danger, #C04A4A);
+}
+
+/* ===== 空状态 ===== */
+/* ===== 编辑 sheet（底部弹层）===== */
+.sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.edit-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: @radius-poster 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+.edit-sheet.show {
+  transform: translateY(0);
+}
+.sheet-handle {
+  width: 64rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: @color-divider;
+  margin: 0 auto @sp-5;
+}
+.sheet-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  margin-bottom: @sp-5;
+}
+.sheet-section-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin: @sp-4 0 @sp-3;
+}
+.sheet-cat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+}
+.sheet-note {
+  width: 100%;
+  box-sizing: border-box;
+  padding: @sp-5 @sp-6;
+  background: @color-card-soft;
+  border-radius: @radius-card-xs;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.5;
+  min-height: 80rpx;
+}
+.sheet-note-ph {
+  color: @color-text-secondary;
+  opacity: 0.5;
+}
+.sheet-btn-row {
+  display: flex;
+  gap: @sp-4;
+  margin-top: @sp-7;
+}
+.sheet-btn {
+  flex: 1;
+  text-align: center;
+  padding: @sp-6;
+  border-radius: @radius-pill;
+  font-size: @fs-m;
+  line-height: 1;
+}
+.sheet-btn.ghost {
+  background: @color-card-soft;
+  color: @color-text-secondary;
+}
+.sheet-btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+  box-shadow: @shadow-cta;
+}
+
+/* ===== 新建分类 sheet ===== */
+.newcat-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: @radius-poster 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+.newcat-sheet.show {
+  transform: translateY(0);
+}
+.newcat-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: @sp-5 @sp-6;
+  background: @color-card-soft;
+  border-radius: @radius-card-xs;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.5;
+  min-height: 80rpx;
+}
+.newcat-input-ph {
+  color: @color-text-secondary;
+  opacity: 0.5;
+}
+.newcat-icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+}
+.newcat-icon {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: @color-card-soft;
+  font-size: @fs-lg;
+  line-height: 1;
+  border: 2rpx solid transparent;
+}
+.newcat-icon.active {
+  background: color-mix(in srgb, @color-accent 14%, transparent);
+  border-color: var(--color-accent, #D97A4A);
+}
+
+/* ===== P3 全打卡彩蛋（纯 CSS 动效，无新数据）===== */
+.egg-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(60, 53, 48, 0.55);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+.egg-mask.show {
+  opacity: 1;
+  visibility: visible;
+}
+.egg-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-9 @sp-10;
+  background: @color-card;
+  border-radius: @radius-card;
+  box-shadow: @shadow-elevated;
+  animation: egg-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+}
+.egg-emoji {
+  font-size: @fs-display;
+  line-height: 1;
+  animation: egg-bounce 1.2s ease-in-out infinite;
+}
+.egg-title {
+  font-size: @fs-xl;
+  font-weight: 600;
+  color: @color-accent;
+  letter-spacing: 2rpx;
+}
+.egg-sub {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+}
+
+/* 礼花散落层：6 个 emoji 从顶部四周散落 */
+.egg-confetti-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.egg-confetti {
+  position: absolute;
+  top: -60rpx;
+  font-size: 48rpx;
+  opacity: 0;
+}
+.egg-mask.show .egg-confetti {
+  animation: egg-fall 2.6s ease-in forwards;
+}
+.egg-confetti.c1 { left: 12%; animation-delay: 0s; }
+.egg-confetti.c2 { left: 28%; animation-delay: 0.2s; }
+.egg-confetti.c3 { left: 44%; animation-delay: 0.1s; }
+.egg-confetti.c4 { left: 60%; animation-delay: 0.35s; }
+.egg-confetti.c5 { left: 76%; animation-delay: 0.15s; }
+.egg-confetti.c6 { left: 88%; animation-delay: 0.3s; }
+
+@keyframes egg-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes egg-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16rpx); }
+}
+@keyframes egg-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(120vh) rotate(540deg); opacity: 0; }
+}
+
+/* ===== 第二批功能 1：今日打卡行目标进度 + 「⋯」菜单按钮 ===== */
+.today-cat-goal {
+  margin-top: @sp-1;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  line-height: 1.4;
+  letter-spacing: 0.5rpx;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.today-cat-goal.goal-done {
+  color: var(--color-book, #6B8E5A);
+  font-weight: 600;
+}
+.today-cat-menu {
+  flex-shrink: 0;
+  margin-left: @sp-2;
+  padding: 0 @sp-2;
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+/* ===== 第二批功能 3：总记录卡 ===== */
+.total-card {
+  margin-top: @sp-5;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7;
+  box-shadow: @shadow-card;
+}
+.total-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: @sp-5;
+}
+.total-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.total-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: @sp-3;
+  margin-bottom: @sp-5;
+}
+.total-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: @sp-1;
+  padding: @sp-4 0;
+  background: @color-card-soft;
+  border-radius: @radius-card-sm;
+}
+.total-num {
+  font-family: var(--font-numeric);
+  font-size: @fs-xl;
+  font-weight: 300;
+  line-height: 1;
+  color: @color-text-primary;
+  font-variant-numeric: tabular-nums;
+}
+.total-cell-label {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+}
+.total-span-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: @sp-3 0;
+  border-top: 1rpx solid @color-divider;
+}
+.total-span-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.total-span-val {
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.total-upgrade-btn {
+  margin-top: @sp-5;
+  padding: @sp-5 @sp-6;
+  border-radius: @radius-pill;
+  background: color-mix(in srgb, @color-accent 10%, transparent);
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+}
+.total-upgrade-icon {
+  font-size: @fs-m;
+  line-height: 1;
+}
+.total-upgrade-text {
+  flex: 1;
+  font-size: @fs-m;
+  font-weight: 600;
+  color: var(--color-accent, #D97A4A);
+}
+.total-upgrade-arrow {
+  font-size: @fs-m;
+  color: var(--color-accent, #D97A4A);
+  opacity: 0.6;
+}
+
+/* 历史行内「升级」按钮降为次要样式（主入口已移到总记录卡） */
+.history-action.convert-minor {
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== 第二批功能：通用底部 sheet（菜单/目标设置/升级选择共用）===== */
+.bottom-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: @radius-poster 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.bottom-sheet.show {
+  transform: translateY(0);
+}
+
+/* 分类菜单 sheet 的行 */
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-5 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.menu-row.danger .menu-row-label {
+  color: var(--color-danger, #C04A4A);
+}
+.menu-row-icon {
+  font-size: @fs-l;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.menu-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+.menu-row-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.menu-row-sub {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+}
+.menu-row-arrow {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  opacity: 0.5;
+}
+
+/* 目标设置 sheet：频率 chip 行 + 次数 stepper */
+.freq-row {
+  display: flex;
+  gap: @sp-3;
+}
+.freq-chip {
+  flex: 1;
+  text-align: center;
+  padding: @sp-4 @sp-2;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+}
+.freq-chip.active {
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+}
+.stepper-btn {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: @color-card-soft;
+  font-size: @fs-xl;
+  color: @color-text-primary;
+  line-height: 1;
+  font-weight: 300;
+}
+.stepper-val {
+  min-width: 80rpx;
+  text-align: center;
+  font-size: @fs-xxl;
+  font-weight: 300;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.stepper-hint {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin-left: @sp-2;
+}
+
+/* 升级分类选择 sheet */
+.upgrade-sheet {
+  max-height: 70vh;
+}
+.upgrade-list {
+  margin: @sp-3 0;
+}
+.upgrade-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-5 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.upgrade-row:last-child {
+  border-bottom: none;
+}
+.upgrade-row-icon {
+  font-size: @fs-l;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.upgrade-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+.upgrade-row-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.upgrade-row-meta {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.upgrade-row-arrow {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  opacity: 0.5;
+}

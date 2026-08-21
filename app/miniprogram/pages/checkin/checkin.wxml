@@ -1,0 +1,360 @@
+<!--pages/checkin/checkin.wxml-->
+<!-- 每日打卡（v7 多分类）：一天可分别打卡多个分类，核心价值是连续天数的仪式感。 -->
+<navigation-bar title="每日打卡" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 连续天数卡：全局口径（任意分类打卡算进） -->
+  <view class="streak-card">
+    <view class="streak-main">
+      <text class="streak-num">{{currentStreak}}</text>
+      <text class="streak-unit">天</text>
+    </view>
+    <view class="streak-label">当前连续打卡</view>
+    <view class="streak-meta">
+      <text>历史最长 {{longestStreak}} 天</text>
+      <text class="streak-meta-dot">·</text>
+      <text>累计 {{totalDays}} 天</text>
+    </view>
+
+    <!-- 衰减式习惯强度 + 保护券状态 -->
+    <view class="habit-row" wx:if="{{protectionOn}}">
+      <view class="habit-score-block">
+        <view class="habit-score-num" style="color:{{habitScoreColor}};">{{habitScore}}</view>
+        <view class="habit-score-meta">
+          <text class="habit-score-label">习惯强度</text>
+          <text class="habit-score-grade" style="color:{{habitScoreColor}};">{{habitScoreLabel}}</text>
+        </view>
+      </view>
+      <view class="freebie-block">
+        <text class="freebie-icon">🛡️</text>
+        <text class="freebie-text">{{freebieText}}</text>
+      </view>
+    </view>
+
+    <!-- 已解锁的连续打卡勋章：横向小图标条；未解锁的显示进度角标 -->
+    <view class="streak-medals" wx:if="{{streakMedals.length > 0}}">
+      <view
+        class="streak-medal {{item.unlocked ? 'unlocked' : ''}}"
+        wx:for="{{streakMedals}}"
+        wx:key="id"
+      >
+        <text class="streak-medal-icon">{{item.icon}}</text>
+        <text class="streak-medal-progress" wx:if="{{!item.unlocked && item.progressText}}">{{item.progressText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日打卡区（v7 多分类）：每个分类独立一行，分别打卡 -->
+  <view class="today-card">
+    <view class="today-title">
+      <text>今日打卡</text>
+      <text class="today-title-sub" wx:if="{{todayDoneCount > 0}}">已打 {{todayDoneCount}} 项</text>
+    </view>
+    <view class="today-cat-list">
+      <view
+        class="today-cat-item tap-feedback {{item.checked ? 'checked' : ''}} {{activeNewCategory === item.id ? 'active' : ''}}"
+        wx:for="{{todayCatRows}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onTapTodayCat"
+      >
+        <view class="today-cat-left">
+          <text class="today-cat-icon">{{item.icon}}</text>
+          <view class="today-cat-info">
+            <view class="today-cat-label">{{item.label}}</view>
+            <view class="today-cat-note" wx:if="{{item.note}}">{{item.note}}</view>
+            <!-- P2-C：该分类独立连胜文案（>0 天才显示） -->
+            <view class="today-cat-streak" wx:if="{{item.streakText}}">🔥 {{item.streakText}}</view>
+            <!-- 第二批功能 1：目标完成进度「本周 3/5」；达成时 goal-done 类绿色高亮 -->
+            <view class="today-cat-goal {{item.goalDone ? 'goal-done' : ''}}" wx:if="{{item.goalText}}">🎯 {{item.goalText}}</view>
+          </view>
+        </view>
+        <!-- 第二批功能 1/2：「⋯」打开分类菜单（设置目标 / 隐藏）；catchtap 阻止冒泡到 onTapTodayCat -->
+        <text class="today-cat-menu" data-id="{{item.id}}" catchtap="onOpenCatMenu">⋯</text>
+        <text class="today-cat-mark" wx:if="{{item.checked}}">✓</text>
+        <text class="today-cat-mark add" wx:else>＋</text>
+      </view>
+
+      <!-- 新建分类入口 -->
+      <view class="today-cat-item new-cat" bindtap="onOpenNewCatSheet">
+        <view class="today-cat-left">
+          <text class="today-cat-icon">＋</text>
+          <view class="today-cat-info">
+            <view class="today-cat-label">新建分类</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 当前选中分类的输入态：note 输入 + 确认打卡 -->
+    <view class="today-input-area" wx:if="{{activeNewCategory}}">
+      <textarea
+        class="today-note"
+        placeholder="今天这个分类做了什么？（可选）"
+        placeholder-class="today-note-ph"
+        value="{{inputNote}}"
+        bindinput="onNoteInput"
+        maxlength="100"
+        auto-height
+      ></textarea>
+      <view class="today-input-btns">
+        <view class="today-input-btn ghost" bindtap="onCancelSelectedCat">取消</view>
+        <view class="today-input-btn primary" bindtap="onCheckinSelectedCat">完成打卡</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 第二批功能 3：总记录卡（首次/末次/总天数/总次数/最长连胜）+ 升级打卡为成就入口 -->
+  <view class="total-card" wx:if="{{totalRecord.hasRecord}}">
+    <view class="total-head">
+      <text class="total-title">总记录</text>
+    </view>
+    <view class="total-grid">
+      <view class="total-cell">
+        <text class="total-num">{{totalRecord.totalDays}}</text>
+        <text class="total-cell-label">打卡天数</text>
+      </view>
+      <view class="total-cell">
+        <text class="total-num">{{totalRecord.totalCount}}</text>
+        <text class="total-cell-label">打卡次数</text>
+      </view>
+      <view class="total-cell">
+        <text class="total-num">{{totalRecord.longestStreak}}</text>
+        <text class="total-cell-label">最长连胜</text>
+      </view>
+    </view>
+    <view class="total-span-row" wx:if="{{totalRecord.firstDate}}">
+      <text class="total-span-label">首次打卡</text>
+      <text class="total-span-val">{{totalRecord.firstDate}}</text>
+    </view>
+    <view class="total-span-row" wx:if="{{totalRecord.lastDate}}">
+      <text class="total-span-label">最近打卡</text>
+      <text class="total-span-val">{{totalRecord.lastDate}}</text>
+    </view>
+    <!-- 升级入口（主入口）：把某分类的坚持度升级成一条成就 -->
+    <view class="total-upgrade-btn" bindtap="onOpenUpgradeSheet">
+      <text class="total-upgrade-icon">🏅</text>
+      <text class="total-upgrade-text">升级打卡为成就</text>
+      <text class="total-upgrade-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 本月日历：每个 cell 显示该日已打卡的分类图标 -->
+  <view class="cal-card">
+    <view class="cal-head">
+      <text class="cal-title">{{calMonthLabel}}</text>
+      <text class="cal-tip">已打卡 {{totalDays}} 天</text>
+    </view>
+    <view class="cal-weekdays">
+      <text class="cal-weekday" wx:for="{{calWeekdays}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="cal-grid">
+      <view
+        class="cal-cell {{!item.inMonth ? 'out' : ''}} {{item.checkedCats.length > 0 ? 'checked' : ''}} {{item.isToday ? 'today' : ''}}"
+        wx:for="{{calCells}}"
+        wx:key="date"
+        data-date="{{item.date}}"
+        data-cats="{{item.checkedCats}}"
+        bindtap="onTapCalendarCell"
+      >
+        <text wx:if="{{item.day > 0}}" class="cal-day">{{item.day}}</text>
+        <view class="cal-cat-icons" wx:if="{{item.checkedCats.length > 0}}">
+          <text class="cal-cat-icon" wx:for="{{item.checkedCatsTop}}" wx:for-item="ci" wx:key="*this">{{ci}}</text>
+          <!-- 超出 3 个的溢出标记：用 +N 提示还有更多，区别于真实图标（更小更淡）-->
+          <text class="cal-cat-icon cal-cat-more" wx:if="{{item.checkedCatsOverflow > 0}}">+{{item.checkedCatsOverflow}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史打卡列表：最近 30 条 -->
+  <view class="history-card" wx:if="{{recentList.length > 0}}">
+    <view class="history-head">
+      <text class="history-title">打卡记录</text>
+      <text class="history-tip" wx:if="{{hasMore}}">最近 30 条</text>
+    </view>
+    <view class="history-list">
+      <view class="history-item" wx:for="{{recentList}}" wx:key="id">
+        <view class="history-date-col">
+          <text class="history-date-main">{{item.dateLabel}}</text>
+          <text class="history-date-sub">{{item.date}}</text>
+        </view>
+        <view class="history-body">
+          <view class="history-cat">
+            <text class="history-cat-icon">{{item.categoryIcon}}</text>
+            <text class="history-cat-label">{{item.categoryLabel}}</text>
+          </view>
+          <view class="history-note" wx:if="{{item.note}}">{{item.note}}</view>
+        </view>
+        <view class="history-actions">
+          <text class="history-action" data-id="{{item.id}}" bindtap="onEditCheckin">编辑</text>
+          <!-- 逐条升级保留（次要入口）；主入口已移到「总记录」卡的汇总升级按钮 -->
+          <text class="history-action convert-minor" data-id="{{item.id}}" bindtap="onConvertToAchievement">升级</text>
+          <text class="history-action danger" data-id="{{item.id}}" bindtap="onDeleteCheckin">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态：完全没有打卡记录时 -->
+  <empty-state wx:if="{{totalDays === 0 && todayDoneCount === 0}}" icon="🔥" title="连续打卡，养成习惯" desc="每天点一下，记录坚持的力量。支持每天打卡多个分类（运动、阅读…）" />
+</scroll-view>
+
+<!-- 编辑 sheet：编辑某条打卡的分类+一句话 -->
+<view class="sheet-mask {{showEditSheet ? 'show' : ''}}" bindtap="onCloseEditSheet"></view>
+<view class="edit-sheet {{showEditSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">编辑打卡 · {{editDate}}</view>
+  <view class="sheet-section-label">分类</view>
+  <view class="sheet-cat-row">
+    <view
+      class="cat-chip {{editCategory === item.id ? 'active' : ''}}"
+      wx:for="{{categoryOptions}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onPickEditCategory"
+    >{{item.icon}} {{item.label}}</view>
+  </view>
+  <view class="sheet-section-label">一句话（可选）</view>
+  <textarea
+    class="sheet-note"
+    placeholder="今天做了什么……"
+    placeholder-class="sheet-note-ph"
+    value="{{editNote}}"
+    bindinput="onEditNoteInput"
+    maxlength="100"
+    auto-height
+  ></textarea>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onCloseEditSheet">取消</view>
+    <view class="sheet-btn primary" bindtap="onSaveEditCheckin">保存</view>
+  </view>
+</view>
+
+<!-- 新建分类 sheet -->
+<view class="sheet-mask {{showNewCatSheet ? 'show' : ''}}" bindtap="onCloseNewCatSheet"></view>
+<view class="newcat-sheet {{showNewCatSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">新建打卡分类</view>
+  <view class="sheet-section-label">名称</view>
+  <textarea
+    class="newcat-input"
+    placeholder="如：早起、背单词……（最多 8 字）"
+    placeholder-class="newcat-input-ph"
+    value="{{newCatLabel}}"
+    bindinput="onNewCatLabelInput"
+    maxlength="8"
+    auto-height
+  ></textarea>
+  <view class="sheet-section-label">图标</view>
+  <view class="newcat-icon-row">
+    <view
+      class="newcat-icon {{newCatIcon === item ? 'active' : ''}}"
+      wx:for="{{newCatIconOptions}}"
+      wx:key="*this"
+      data-icon="{{item}}"
+      bindtap="onPickNewCatIcon"
+    >{{item}}</view>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onCloseNewCatSheet">取消</view>
+    <view class="sheet-btn primary" bindtap="onSaveNewCat">添加</view>
+  </view>
+</view>
+
+<!-- P3 全打卡彩蛋：所有分类都打过卡时全屏庆祝动画（纯 CSS，点遮罩可提前关闭） -->
+<view class="egg-mask {{showAllCheckedEgg ? 'show' : ''}}" bindtap="triggerAllCheckedEggClose">
+  <view class="egg-confetti-layer">
+    <text class="egg-confetti c1">🎉</text>
+    <text class="egg-confetti c2">✨</text>
+    <text class="egg-confetti c3">🎊</text>
+    <text class="egg-confetti c4">⭐</text>
+    <text class="egg-confetti c5">💫</text>
+    <text class="egg-confetti c6">🌟</text>
+  </view>
+  <view class="egg-content animate-pop">
+    <text class="egg-emoji">🏅</text>
+    <text class="egg-title">全勤达成！</text>
+    <text class="egg-sub">今天的每个分类都打卡了，了不起</text>
+  </view>
+</view>
+
+<!-- 第二批功能 1/2：分类菜单 sheet（设置目标 / 隐藏分类） -->
+<view class="sheet-mask {{showCatMenuSheet ? 'show' : ''}}" bindtap="onCloseCatMenu"></view>
+<view class="bottom-sheet {{showCatMenuSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">{{menuTargetLabel}}</view>
+  <view class="menu-row" bindtap="onOpenGoalSheet">
+    <text class="menu-row-icon">🎯</text>
+    <view class="menu-row-body">
+      <text class="menu-row-label">设置打卡目标</text>
+      <text class="menu-row-sub">每日 / 每周几次 / 每月几次</text>
+    </view>
+    <text class="menu-row-arrow">›</text>
+  </view>
+  <view class="menu-row danger" bindtap="onHideCategory">
+    <text class="menu-row-icon">🙈</text>
+    <view class="menu-row-body">
+      <text class="menu-row-label">隐藏该分类</text>
+      <text class="menu-row-sub">从今日打卡移除，记录保留，可恢复</text>
+    </view>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onCloseCatMenu">关闭</view>
+  </view>
+</view>
+
+<!-- 第二批功能 1：目标设置 sheet（频率选择 + 次数 stepper） -->
+<view class="sheet-mask {{showGoalSheet ? 'show' : ''}}" bindtap="onCloseGoalSheet"></view>
+<view class="bottom-sheet {{showGoalSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">打卡目标 · {{goalCatLabel}}</view>
+  <view class="sheet-section-label">频率</view>
+  <view class="freq-row">
+    <view
+      class="freq-chip {{goalFrequency === item.value ? 'active' : ''}}"
+      wx:for="{{frequencyOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="onPickFrequency"
+    >{{item.label}}</view>
+  </view>
+  <view class="sheet-section-label">次数</view>
+  <view class="stepper-row">
+    <view class="stepper-btn" bindtap="onGoalTimesMinus">−</view>
+    <view class="stepper-val">{{goalTimes}}</view>
+    <view class="stepper-btn" bindtap="onGoalTimesPlus">＋</view>
+    <text class="stepper-hint">次 / {{goalFrequency === 'daily' ? '日' : goalFrequency === 'weekly' ? '周' : '月'}}</text>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onClearGoal">清除目标</view>
+    <view class="sheet-btn primary" bindtap="onSaveGoal">保存</view>
+  </view>
+</view>
+
+<!-- 第二批功能 3：升级分类选择 sheet（列出有打卡记录的分类） -->
+<view class="sheet-mask {{showUpgradeSheet ? 'show' : ''}}" bindtap="onCloseUpgradeSheet"></view>
+<view class="bottom-sheet upgrade-sheet {{showUpgradeSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">升级哪个分类？</view>
+  <view class="upgrade-list">
+    <view
+      class="upgrade-row"
+      wx:for="{{upgradeCatRows}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onUpgradePickCat"
+    >
+      <text class="upgrade-row-icon">{{item.icon}}</text>
+      <view class="upgrade-row-body">
+        <text class="upgrade-row-label">{{item.label}}</text>
+        <text class="upgrade-row-meta">{{item.meta}}</text>
+      </view>
+      <text class="upgrade-row-arrow">›</text>
+    </view>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onCloseUpgradeSheet">取消</view>
+  </view>
+</view>

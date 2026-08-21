@@ -1,0 +1,215 @@
+/**pages/search/search.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 顶部搜索框 ===== */
+.search-bar {
+  padding: @sp-4 0 @sp-3;
+}
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-pill;
+  padding: @sp-4 @sp-7;
+  box-shadow: @shadow-card;
+}
+.search-icon {
+  font-size: @fs-m;
+  margin-right: @sp-4;
+  opacity: 0.7;
+}
+.search-input {
+  flex: 1;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.4;
+  min-width: 0;
+}
+.search-placeholder {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.search-clear {
+  font-size: @fs-l;
+  color: @color-text-secondary;
+  padding: 0 @sp-2;
+  opacity: 0.7;
+}
+
+/* ===== 分组 tab ===== */
+.filter-bar {
+  margin-top: @sp-2;
+  white-space: nowrap;
+  width: 100%;
+}
+.filter-chip {
+  display: inline-block;
+  padding: @sp-3 @sp-6;
+  margin-right: @sp-3;
+  border-radius: @radius-poster;
+  background: @color-card;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+  box-shadow: @shadow-card;
+}
+.filter-chip.active {
+  background: rgba(217, 122, 74, 0.12);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+
+/* ===== 结果滚动区 ===== */
+.result-scroll {
+  flex: 1;
+  margin-top: @sp-4;
+}
+.result-group {
+  margin-top: @sp-6;
+}
+.result-group:first-child {
+  margin-top: @sp-3;
+}
+.group-header {
+  display: flex;
+  align-items: center;
+  padding: 0 @sp-1 @sp-3;
+}
+.group-icon {
+  font-size: @fs-base;
+  margin-right: @sp-2;
+}
+.group-title {
+  font-size: @fs-sm;
+  font-weight: 600;
+  color: @color-text-secondary;
+}
+.group-count {
+  margin-left: auto;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== 单条结果卡片 ===== */
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-3;
+}
+.result-card {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-6 @sp-6;
+  box-shadow: @shadow-card;
+}
+.result-card-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: @color-card-soft;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-lg;
+  flex-shrink: 0;
+  margin-right: @sp-5;
+}
+.result-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.result-card-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+.result-card-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.85;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+.result-card-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.4;
+  margin-left: @sp-3;
+  flex-shrink: 0;
+}
+
+/* ===== 空状态 ===== */
+/* ===== 未输入态：历史 + 引导 ===== */
+.hint-block {
+  margin-top: @sp-7;
+}
+.hint-header {
+  display: flex;
+  align-items: center;
+  padding: 0 @sp-1 @sp-4;
+}
+.hint-title {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-secondary;
+}
+.hint-clear {
+  margin-left: auto;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+.history-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+}
+.history-chip {
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-pill;
+  background: @color-card;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  box-shadow: @shadow-card;
+  line-height: 1.4;
+}
+.hint-list {
+  margin-top: @sp-2;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.hint-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-5 @sp-6;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  box-shadow: @shadow-card;
+  line-height: 1.5;
+}
+.hint-item-icon {
+  margin-right: @sp-4;
+  font-size: @fs-m;
+}

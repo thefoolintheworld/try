@@ -1,0 +1,205 @@
+/* pages/medals/medals.less */
+/* 勋章墙独立页：卡片网格 + 进度条；配色统一走 design-tokens（@color-* 变量）*/
+
+.page {
+  height: calc(100vh - 44px - env(safe-area-inset-top));
+  background: @color-bg;
+}
+.page-inner {
+  padding: @sp-6 @sp-7 @sp-11;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 顶部摘要 ===== */
+.medals-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: @sp-7 0 @sp-8;
+}
+.summary-num {
+  display: flex;
+  align-items: baseline;
+}
+.summary-unlocked {
+  font-size: 72rpx;
+  font-weight: 600;
+  color: @color-accent;
+  line-height: 1;
+}
+.summary-divider {
+  font-size: @fs-xl;
+  color: @color-text-secondary;
+  margin: 0 @sp-2;
+}
+.summary-total {
+  font-size: @fs-xl;
+  color: @color-text-secondary;
+  line-height: 1;
+}
+.summary-label {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+}
+
+/* ===== 分组标签 ===== */
+.group-label {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+  margin: @sp-4 0 @sp-5;
+  font-family: var(--font-title);
+}
+.locked-group-label {
+  color: @color-text-secondary;
+  margin-top: @sp-8;
+}
+
+/* ===== 勋章卡片网格（2 列）=====
+   用 CSS Grid 替代 flex wrap——Grid 在真机 WebView 上比 flex wrap 更可靠
+   渲染成 2 列（flex 在某些机型因盒模型计算差异会塌成单列）。*/
+.medal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @sp-5;
+}
+.medal-card {
+  /* grid 下不需要显式 width，卡片自动占一格；保留 min-width 防极端窄屏 */
+  min-width: 0;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-5 @sp-5;
+  box-shadow: @shadow-card;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  border: 2rpx solid transparent;
+}
+
+/* 已解锁：accent 边框 + 柔和高亮 */
+.medal-card.unlocked {
+  border-color: @color-accent;
+  background: linear-gradient(160deg, @color-card 0%, color-mix(in srgb, @color-accent 6%, transparent) 100%);
+}
+/* 未解锁：灰度降低，视觉弱化 */
+.medal-card.locked {
+  opacity: 0.92;
+}
+.medal-card.locked .medal-card-icon {
+  filter: grayscale(0.6);
+  opacity: 0.65;
+}
+
+/* 限量勋章：无论解锁与否都带金色角标底色 */
+.medal-card.limited {
+  background: linear-gradient(160deg, @color-card 0%, color-mix(in srgb, @color-star 8%, transparent) 100%);
+}
+
+/* ===== 卡片内部 ===== */
+.medal-card-icon-wrap {
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: @sp-3;
+}
+.medal-card-icon {
+  font-size: @fs-xxl;
+  line-height: 1;
+}
+.medal-card-limited-tag {
+  position: absolute;
+  top: -6rpx;
+  right: -10rpx;
+  font-size: 16rpx;
+  color: #FFFFFF;
+  background: @color-star;
+  padding: 2rpx @sp-2;
+  border-radius: @radius-xs;
+  line-height: 1.4;
+}
+.medal-card-label {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+  margin-bottom: @sp-2;
+}
+.medal-card-desc {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  text-align: center;
+  line-height: 1.5;
+  min-height: 60rpx;   /* 保证不同长度描述对齐 */
+}
+.medal-card-done {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-accent;
+  letter-spacing: 1rpx;
+}
+.medal-card-window {
+  margin-top: @sp-2;
+  font-size: @fs-xs;
+  color: @color-star;
+}
+
+/* ===== 进度条（未解锁时）===== */
+.medal-progress {
+  width: 100%;
+  margin-top: @sp-3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: @sp-1;
+}
+.medal-progress-track {
+  width: 100%;
+  height: 8rpx;
+  background: @color-divider;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.medal-progress-fill {
+  height: 100%;
+  background: @color-accent;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+.medal-progress-text {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+}
+
+
+/* ===== 页脚提示 ===== */
+.footer-tip {
+  margin-top: @sp-9;
+  text-align: center;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== 上拉加载更多 ===== */
+.load-more,
+.load-end {
+  text-align: center;
+  padding: @sp-6 @sp-4;
+}
+.load-more-text,
+.load-end-text {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.load-end-text {
+  opacity: 0.6;
+}

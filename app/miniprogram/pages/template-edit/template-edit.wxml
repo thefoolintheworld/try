@@ -1,0 +1,135 @@
+<!--pages/template-edit/template-edit.wxml-->
+<navigation-bar title="{{isReadOnly ? '查看模板' : (isNew ? '新建模板' : '编辑模板')}}" back="{{true}}" color="{{navColor}}" background="{{navBg}}" bindback="onBack"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list" wx:if="{{cards.length > 0 || !template}}">
+
+  <!-- 只读提示 -->
+  <view class="readonly-tip" wx:if="{{isReadOnly}}">
+    这是内置模板，不能直接修改。如需定制，请复制一份为你所用。
+  </view>
+
+  <!-- 模板元信息 -->
+  <view class="meta-block">
+    <view class="meta-label">模板名称</view>
+    <input
+      class="meta-input"
+      placeholder="给模板起个名字"
+      value="{{name}}"
+      bindinput="onNameInput"
+      maxlength="20"
+      disabled="{{isReadOnly}}"
+    />
+    <view class="meta-label">模板描述</view>
+    <input
+      class="meta-input"
+      placeholder="一句话描述这个模板的风格"
+      value="{{description}}"
+      bindinput="onDescInput"
+      maxlength="40"
+      disabled="{{isReadOnly}}"
+    />
+  </view>
+
+  <!-- 卡片定义列表 -->
+  <view class="cards-block">
+    <view class="block-title">卡片定义（{{cards.length}} 张）</view>
+
+    <view class="card-def" wx:for="{{cards}}" wx:key="_key">
+      <view class="card-def-header">
+        <view class="card-type-tag">{{item.typeLabel}}</view>
+        <view class="card-type-label">{{item.type}}</view>
+        <view class="card-def-ops" wx:if="{{!isReadOnly}}">
+          <view class="op-arrow" data-index="{{index}}" bindtap="onMoveUp">↑</view>
+          <view class="op-arrow" data-index="{{index}}" bindtap="onMoveDown">↓</view>
+          <view class="op-del" data-index="{{index}}" bindtap="onDeleteCard">✕</view>
+        </view>
+      </view>
+
+      <view class="field-row">
+        <view class="field-label">标题模板</view>
+        <input
+          class="field-input"
+          placeholder="如 这一年"
+          value="{{item.titleTemplate}}"
+          data-index="{{index}}"
+          bindinput="onCardTitleInput"
+          maxlength="30"
+          disabled="{{isReadOnly}}"
+        />
+      </view>
+
+      <view class="field-row">
+        <view class="field-label">
+          正文模板
+          <text class="var-tip" data-index="{{index}}" bindtap="onShowVars">可用变量 ›</text>
+        </view>
+        <textarea
+          class="field-textarea"
+          placeholder="含 {变量} 占位符，如 这一年读了 {bookCount} 本书"
+          value="{{item.contentTemplate}}"
+          data-index="{{index}}"
+          bindinput="onCardContentInput"
+          maxlength="500"
+          auto-height
+          disabled="{{isReadOnly}}"
+        />
+      </view>
+    </view>
+
+    <!-- 添加卡片按钮 -->
+    <view class="add-card-btn" bindtap="onOpenAddSheet" wx:if="{{!isReadOnly}}">
+      ＋ 添加一张卡片
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-bar">
+    <view class="save-btn" bindtap="onSave">
+      {{isReadOnly ? '返回' : '保存模板'}}
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 添加卡片弹层 -->
+<view class="sheet-mask {{showAddSheet ? 'show' : ''}}" bindtap="onCloseAddSheet"></view>
+<view class="sheet {{showAddSheet ? 'show' : ''}}">
+  <view class="sheet-header">
+    <view class="sheet-title">添加一张卡片</view>
+    <view class="sheet-close" bindtap="onCloseAddSheet">✕</view>
+  </view>
+  <view class="sheet-list">
+    <view
+      class="sheet-item"
+      wx:for="{{cardTypeLabels}}"
+      wx:key="type"
+      data-type="{{item.type}}"
+      bindtap="onAddCardByType"
+    >
+      <view class="sheet-item-label">{{item.label}}</view>
+      <view class="sheet-item-arrow">＋</view>
+    </view>
+  </view>
+</view>
+
+<!-- 变量提示弹层 -->
+<view class="sheet-mask {{showVarSheet ? 'show' : ''}}" bindtap="onCloseVars"></view>
+<view class="sheet sheet-vars {{showVarSheet ? 'show' : ''}}">
+  <view class="sheet-header">
+    <view class="sheet-title">可用变量 · 点击插入</view>
+    <view class="sheet-close" bindtap="onCloseVars">✕</view>
+  </view>
+  <view class="vars-tip">点击变量名，会自动插入到当前卡片正文的末尾</view>
+  <view class="vars-grid" wx:if="{{!isReadOnly}}">
+    <view
+      class="var-chip"
+      wx:for="{{availableVars}}"
+      wx:for-item="v"
+      wx:key="*this"
+      data-var="{{v}}"
+      bindtap="onInsertVar"
+    >{{v}}</view>
+  </view>
+  <view class="vars-grid readonly-vars" wx:else>
+    <view class="var-chip" wx:for="{{availableVars}}" wx:for-item="v" wx:key="*this">{{v}}</view>
+  </view>
+</view>

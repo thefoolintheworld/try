@@ -1,0 +1,85 @@
+<!-- pages/medals/medals.wxml -->
+<!-- 勋章墙独立页：集中展示所有勋章，已解锁高亮 + 未解锁带进度。
+     只读展示页，编辑目标跳回 settings 页。 -->
+<navigation-bar title="勋章墙" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list" bindscrolltolower="onLoadMore" lower-threshold="100">
+  <view class="page-inner">
+
+    <!-- 首屏加载骨架 -->
+    <loading-skeleton wx:if="{{loading}}" type="card" count="6" />
+
+    <!-- 顶部摘要：已解锁 / 总数 -->
+    <view class="medals-summary" wx:if="{{!loading && hasData}}">
+      <view class="summary-num">
+        <text class="summary-unlocked">{{unlockedCount}}</text>
+        <text class="summary-divider">/</text>
+        <text class="summary-total">{{totalCount}}</text>
+      </view>
+      <text class="summary-label">枚勋章已点亮</text>
+    </view>
+
+    <!-- 空态：一条成就都没有 -->
+    <empty-state wx:if="{{!loading && !hasData}}" icon="🏅" title="还没有可解锁的勋章" desc="先去记录几条成就或打个卡，勋章会自动点亮。" btnText="＋ 去记录成就" bind:btntap="onTapAdd" />
+
+    <!-- 已解锁组：高亮展示 -->
+    <block wx:if="{{!loading && unlocked.length > 0}}">
+      <view class="group-label">已点亮 · {{unlocked.length}}</view>
+      <view class="medal-grid animate-fade-up">
+        <view
+          class="medal-card unlocked animate-pop {{item.limitedEdition ? 'limited' : ''}}"
+          wx:for="{{unlocked}}"
+          wx:key="id"
+        >
+          <view class="medal-card-icon-wrap">
+            <text class="medal-card-icon">{{item.icon}}</text>
+            <text class="medal-card-limited-tag" wx:if="{{item.limitedEdition}}">限量</text>
+          </view>
+          <text class="medal-card-label">{{item.label}}</text>
+          <text class="medal-card-desc">{{item.desc}}</text>
+          <text class="medal-card-done">✓ 已达成</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 未解锁组：带进度条 -->
+    <block wx:if="{{!loading && locked.length > 0}}">
+      <view class="group-label locked-group-label">待点亮 · {{locked.length}}</view>
+      <view class="medal-grid">
+        <view
+          class="medal-card locked {{item.limitedEdition ? 'limited' : ''}}"
+          wx:for="{{locked}}"
+          wx:key="id"
+        >
+          <view class="medal-card-icon-wrap">
+            <text class="medal-card-icon">{{item.icon}}</text>
+            <text class="medal-card-limited-tag" wx:if="{{item.limitedEdition}}">限量</text>
+          </view>
+          <text class="medal-card-label">{{item.label}}</text>
+          <text class="medal-card-desc">{{item.desc}}</text>
+          <!-- 限量勋章窗口期提示 -->
+          <text class="medal-card-window" wx:if="{{item.windowHint}}">{{item.windowHint}}</text>
+          <!-- 进度条 -->
+          <view class="medal-progress" wx:if="{{item.progress}}">
+            <view class="medal-progress-track">
+              <view class="medal-progress-fill" style="width: {{item.progress.percent}}%"></view>
+            </view>
+            <text class="medal-progress-text">{{item.progress.current}}/{{item.progress.target}}</text>
+          </view>
+        </view>
+      </view>
+      <!-- 上拉加载更多 locked 勋章 -->
+      <view class="load-more" wx:if="{{hasMore}}">
+        <text class="load-more-text">{{loadingMore ? '加载中…' : '上拉加载更多'}}</text>
+      </view>
+      <view class="load-end" wx:if="{{!hasMore && locked.length >= 20}}">
+        <text class="load-end-text">— 已展示全部待点亮 —</text>
+      </view>
+    </block>
+
+    <view class="footer-tip" wx:if="{{!loading && hasData}}">
+      <text>想改目标？去「设置 · 勋章目标」里调整</text>
+    </view>
+
+  </view>
+</scroll-view>

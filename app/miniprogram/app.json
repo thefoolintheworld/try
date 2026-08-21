@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/list/list",
+    "pages/edit/edit",
+    "pages/report/report",
+    "pages/report-edit/report-edit",
+    "pages/reports/reports",
+    "pages/poster/poster",
+    "pages/templates/templates",
+    "pages/template-edit/template-edit",
+    "pages/about/about",
+    "pages/settings/settings",
+    "pages/privacy/privacy",
+    "pages/wishlist/wishlist",
+    "pages/inspiration/inspiration",
+    "pages/checkin/checkin",
+    "pages/stats/stats",
+    "pages/search/search",
+    "pages/on-this-day/on-this-day",
+    "pages/wrapped/wrapped",
+    "pages/trash/trash",
+    "pages/author/author",
+    "pages/profile/profile",
+    "pages/graph/graph",
+    "pages/quotes/quotes",
+    "pages/medals/medals",
+    "pages/tree/tree",
+    "pages/reading-guide/reading-guide"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于将报告海报保存到你的相册"
+    }
+  }
+}

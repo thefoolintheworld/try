@@ -1,0 +1,196 @@
+<!--pages/inspiration/inspiration.wxml-->
+<!-- 灵感抽屉：自由记录闪念想法（带分类标签 + 自由标签的轻量笔记）。
+     与许愿星隔离——这里是纯记录，无「转化成成就」的概念。
+     P2-A：支持自定义分类（＋新建分类入口）+ tags 自由标签 + 搜索范围扩展（内容/分类/标签）。 -->
+<navigation-bar title="灵感抽屉" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 顶部说明 -->
+  <view class="intro">
+    <view class="intro-title">🌱 闪念收集站</view>
+    <view class="intro-sub">脑子里冒出来的想法，随手记下来，别让它溜走。</view>
+  </view>
+
+  <!-- 搜索 + 日期筛选条（有数据时显示） -->
+  <view class="search-area" wx:if="{{inspirations.length > 0}}">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索内容 / 分类 / 标签"
+        placeholder-class="search-placeholder"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">✕</text>
+    </view>
+    <view class="date-filter-row">
+      <picker mode="date" value="{{dateFrom}}" bindchange="onPickDateFrom">
+        <view class="date-chip {{dateFrom ? 'active' : ''}}">{{dateFrom || '开始日期'}}</view>
+      </picker>
+      <text class="date-sep">—</text>
+      <picker mode="date" value="{{dateTo}}" bindchange="onPickDateTo">
+        <view class="date-chip {{dateTo ? 'active' : ''}}">{{dateTo || '结束日期'}}</view>
+      </picker>
+      <view class="date-clear" wx:if="{{dateFrom || dateTo}}" bindtap="onClearDateFilters">清除</view>
+    </view>
+  </view>
+
+  <!-- 分类筛选条 -->
+  <scroll-view class="filter-bar" scroll-x wx:if="{{inspirations.length > 0}}">
+    <view
+      class="filter-chip {{activeCategory === item.id ? 'active' : ''}}"
+      wx:for="{{categoryFilters}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onSwitchCategory"
+    >{{item.icon}} {{item.label}} {{item.count}}</view>
+  </scroll-view>
+
+  <!-- 筛选无结果提示（有数据但筛后为空） -->
+  <empty-state wx:if="{{inspirations.length > 0 && filteredInspirations.length === 0}}" icon="🔎" title="没有匹配的灵感" desc="换个关键词或日期范围试试" />
+
+  <!-- 添加灵感行：内容输入 + 分类选择（含＋新建分类）+ 标签 + 添加按钮 -->
+  <view class="add-card">
+    <textarea
+      class="add-textarea"
+      placeholder="这一刻在想什么……"
+      value="{{addContent}}"
+      bindinput="onAddContentInput"
+      maxlength="500"
+      auto-height
+    />
+    <view class="add-row">
+      <view class="add-cat-chips">
+        <view
+          class="cat-chip {{addCategory === item.id ? 'active' : ''}}"
+          wx:for="{{categoryOptions}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onPickAddCategory"
+        >{{item.icon}} {{item.label}}</view>
+        <!-- ＋新建分类：打开底部 sheet 让用户起名 + 选 emoji -->
+        <view class="cat-chip new-cat" bindtap="onOpenNewCatSheet">＋ 新建分类</view>
+      </view>
+      <view class="add-btn {{addContent ? '' : 'disabled'}}" bindtap="onAddInspiration">记下</view>
+    </view>
+    <!-- 标签输入：一行输入框 + 「＋」提交，下方展示已加标签（可点删） -->
+    <view class="tag-row">
+      <input
+        class="tag-input"
+        type="text"
+        placeholder="加个标签，如「写作」领域"
+        placeholder-class="search-placeholder"
+        value="{{addTagInput}}"
+        bindinput="onAddTagInput"
+        bindconfirm="onAddTagConfirm"
+        maxlength="8"
+      />
+      <view class="tag-add-btn {{addTagInput ? '' : 'disabled'}}" bindtap="onAddTagConfirm">＋</view>
+    </view>
+    <view class="tag-list" wx:if="{{addTags.length > 0}}">
+      <view class="tag-pill" wx:for="{{addTags}}" wx:key="*this" data-tag="{{item}}" bindtap="onRemoveAddTag">
+        <text class="tag-pill-text">#{{item}}</text>
+        <text class="tag-pill-x">✕</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 灵感列表 -->
+  <view class="note-list animate-fade-up" wx:if="{{filteredInspirations.length > 0}}">
+    <view class="note-card" wx:for="{{filteredInspirations}}" wx:key="id">
+      <view class="note-card-head">
+        <text class="note-cat-tag" style="background: {{item.categoryColor}};">{{item.categoryIcon}} {{item.categoryLabel}}</text>
+        <text class="note-date">{{item.createdAtText}}</text>
+      </view>
+      <view class="note-content">{{item.content}}</view>
+      <!-- 卡片底部标签条（有标签才显示） -->
+      <view class="note-tags" wx:if="{{item.tags.length > 0}}">
+        <text class="note-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">#{{tag}}</text>
+      </view>
+      <view class="note-actions">
+        <view class="note-action" data-id="{{item.id}}" bindtap="onEditInspiration">编辑</view>
+        <view class="note-action danger" data-id="{{item.id}}" bindtap="onDeleteInspiration">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <empty-state wx:if="{{inspirations.length === 0}}" icon="🌱" title="灵感抽屉还空着" desc="第一个闪念，从上面开始记" />
+
+  <!-- 编辑 sheet（点「编辑」弹出；内联编辑） -->
+  <view class="sheet-mask {{showEditSheet ? 'show' : ''}}" bindtap="onCloseEditSheet"></view>
+  <view class="edit-sheet {{showEditSheet ? 'show' : ''}}">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">编辑灵感</view>
+    <textarea class="sheet-textarea" placeholder="这一刻在想什么……" value="{{editContent}}" bindinput="onEditContentInput" maxlength="500" auto-height />
+    <view class="sheet-cat-row">
+      <view
+        class="cat-chip {{editCategory === item.id ? 'active' : ''}}"
+        wx:for="{{categoryOptions}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onPickEditCategory"
+      >{{item.icon}} {{item.label}}</view>
+      <view class="cat-chip new-cat" bindtap="onOpenNewCatSheet">＋ 新建分类</view>
+    </view>
+    <!-- 编辑行标签输入 -->
+    <view class="tag-row">
+      <input
+        class="tag-input"
+        type="text"
+        placeholder="加个标签"
+        placeholder-class="search-placeholder"
+        value="{{editTagInput}}"
+        bindinput="onEditTagInput"
+        bindconfirm="onEditTagConfirm"
+        maxlength="8"
+      />
+      <view class="tag-add-btn {{editTagInput ? '' : 'disabled'}}" bindtap="onEditTagConfirm">＋</view>
+    </view>
+    <view class="tag-list" wx:if="{{editTags.length > 0}}">
+      <view class="tag-pill" wx:for="{{editTags}}" wx:key="*this" data-tag="{{item}}" bindtap="onRemoveEditTag">
+        <text class="tag-pill-text">#{{item}}</text>
+        <text class="tag-pill-x">✕</text>
+      </view>
+    </view>
+    <view class="sheet-btn-row">
+      <view class="sheet-btn ghost" bindtap="onCloseEditSheet">取消</view>
+      <view class="sheet-btn primary" bindtap="onSaveEditInspiration">保存</view>
+    </view>
+  </view>
+
+  <!-- 新建分类 sheet（P2-A） -->
+  <view class="sheet-mask {{showNewCatSheet ? 'show' : ''}}" bindtap="onCloseNewCatSheet"></view>
+  <view class="newcat-sheet {{showNewCatSheet ? 'show' : ''}}">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">新建分类</view>
+    <input
+      class="newcat-input"
+      type="text"
+      placeholder="分类名称（≤8 字）"
+      placeholder-class="search-placeholder"
+      value="{{newCatLabel}}"
+      bindinput="onNewCatLabelInput"
+      maxlength="8"
+    />
+    <view class="newcat-icon-label">选一个图标</view>
+    <view class="newcat-icon-grid">
+      <view
+        class="newcat-icon-cell {{newCatIcon === icon ? 'active' : ''}}"
+        wx:for="{{categoryIconChoices}}"
+        wx:for-item="icon"
+        wx:key="*this"
+        data-icon="{{icon}}"
+        bindtap="onPickNewCatIcon"
+      >{{icon}}</view>
+    </view>
+    <view class="sheet-btn-row">
+      <view class="sheet-btn ghost" bindtap="onCloseNewCatSheet">取消</view>
+      <view class="sheet-btn primary {{newCatLabel ? '' : 'disabled'}}" bindtap="onConfirmNewCat">创建</view>
+    </view>
+  </view>
+
+</scroll-view>

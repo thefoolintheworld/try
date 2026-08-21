@@ -1,0 +1,41 @@
+<!-- 骨架屏：灰条占位 + shimmer 扫光。type 决定形状，count 决定条数 -->
+<view class="skeleton skeleton-{{type}}">
+
+  <!-- 列表项骨架：封面方块 + 两行文字 -->
+  <block wx:if="{{type === 'list'}}">
+    <view class="sk-row" wx:for="{{items}}" wx:key="*this">
+      <view class="sk-box sk-cover"></view>
+      <view class="sk-lines">
+        <view class="sk-line sk-title"></view>
+        <view class="sk-line sk-sub"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 卡片网格骨架：两列圆角卡 -->
+  <block wx:elif="{{type === 'card'}}">
+    <view class="sk-grid">
+      <view class="sk-card" wx:for="{{items}}" wx:key="*this">
+        <view class="sk-box sk-card-cover"></view>
+        <view class="sk-line sk-card-line"></view>
+        <view class="sk-line sk-card-line short"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 统计页骨架：大数字 + 标签 + 图表占位 -->
+  <block wx:elif="{{type === 'stats'}}">
+    <view class="sk-stats-hero">
+      <view class="sk-box sk-big-num"></view>
+      <view class="sk-line sk-stats-label"></view>
+    </view>
+    <view class="sk-grid sk-stats-grid">
+      <view class="sk-stats-cell" wx:for="{{[0,1,2,3]}}" wx:key="*this">
+        <view class="sk-box sk-stats-num"></view>
+        <view class="sk-line sk-stats-cell-label"></view>
+      </view>
+    </view>
+    <view class="sk-box sk-chart"></view>
+  </block>
+
+</view>

@@ -1,0 +1,149 @@
+/**pages/trash/trash.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== 顶部说明 ===== */
+.intro {
+  padding: @sp-6 0 @sp-2;
+}
+.intro-title {
+  font-family: var(--font-title);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.intro-sub {
+  margin-top: @sp-3;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+/* ===== 全局操作条 ===== */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: @sp-6;
+  padding: 0 @sp-2;
+}
+.bulk-count {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.bulk-btn {
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-card-md;
+  font-size: @fs-sm;
+  line-height: 1.4;
+}
+.bulk-btn.danger {
+  color: var(--color-danger, #C05650);
+  background: var(--color-danger-bg, rgba(192, 86, 80, 0.10));
+}
+
+/* ===== 回收站列表 ===== */
+.trash-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+  margin-top: @sp-5;
+}
+.trash-card {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-6;
+  box-shadow: @shadow-card;
+  /* 左边一道灰边，传递"待清理"的视觉信号（区别于其它列表卡片） */
+  border-left: 6rpx solid var(--color-divider, #E8E0D5);
+  padding-left: @sp-6;
+}
+.trash-card-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: @sp-3;
+}
+.trash-icon {
+  font-size: @fs-lg;
+  margin-right: @sp-4;
+  opacity: 0.85;
+  line-height: 1;
+}
+.trash-card-meta {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-width: 0;
+}
+.trash-type-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-weight: 600;
+}
+.trash-days-left {
+  font-size: @fs-xs;
+  color: var(--color-danger, #C05650);
+  opacity: 0.85;
+}
+.trash-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+.trash-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.trash-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: @sp-4;
+  margin-top: @sp-5;
+  padding-top: @sp-4;
+  border-top: 1rpx solid @color-divider;
+}
+.trash-action {
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-card-md;
+  font-size: @fs-sm;
+  line-height: 1.4;
+}
+.trash-action.restore {
+  color: var(--color-accent, #D97A4A);
+  background: rgba(217, 122, 74, 0.10);
+}
+.trash-action.danger {
+  color: var(--color-danger, #C05650);
+  background: var(--color-danger-bg, rgba(192, 86, 80, 0.10));
+}
+
+/* ===== 底部小字 ===== */
+.footer-tip {
+  margin-top: @sp-9;
+  text-align: center;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  letter-spacing: 2rpx;
+}
+
+/* ===== 空状态 ===== */

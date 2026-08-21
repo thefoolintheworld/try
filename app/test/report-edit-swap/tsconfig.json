@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./.tmp-build",
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "declaration": false,
+    "sourceMap": false,
+    "rootDir": "../.."
+  },
+  "include": [
+    "./**/*.ts",
+    "../../typings/index.d.ts",
+    "../../miniprogram/pages/report-edit/report-edit.ts",
+    "../../miniprogram/utils/storage.ts",
+    "../../miniprogram/utils/util.ts",
+    "../../miniprogram/utils/design-tokens.ts",
+    "../../miniprogram/utils/theme.ts",
+    "../../miniprogram/utils/error-boundary.ts",
+    "../../miniprogram/utils/data-dirty.ts"
+  ],
+  "exclude": []
+}

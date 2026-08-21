@@ -1,0 +1,60 @@
+<!--pages/trash/trash.wxml-->
+<!-- 回收站：软删除条目的 30 天缓冲区。
+     每条可"恢复"（写回原表）或"彻底删除"（不可恢复）。
+     所有 6 类实体（成就/愿望/灵感/打卡/报告/模板）共用一张表，按删除时间倒序。 -->
+<navigation-bar title="回收站" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 顶部说明 -->
+  <view class="intro">
+    <view class="intro-title">🗑️ 回收站</view>
+    <view class="intro-sub">
+      删除的记录会在这里保留 30 天，到期自动彻底清理。
+    </view>
+  </view>
+
+  <!-- 有内容：分组/扁平列表 -->
+  <block wx:if="{{entries.length > 0}}">
+
+    <!-- 全局操作：清空全部 -->
+    <view class="bulk-actions">
+      <text class="bulk-count">共 {{entries.length}} 条</text>
+      <view class="bulk-btn danger" bindtap="onClearAll">清空全部</view>
+    </view>
+
+    <!-- 列表：按删除时间倒序 -->
+    <view class="trash-list">
+      <view class="trash-card" wx:for="{{entries}}" wx:key="key">
+        <view class="trash-card-head">
+          <text class="trash-icon">{{item.typeIcon}}</text>
+          <view class="trash-card-meta">
+            <text class="trash-type-label">{{item.typeLabel}}</text>
+            <text class="trash-days-left">还剩 {{item.daysLeft}} 天</text>
+          </view>
+        </view>
+        <view class="trash-title">{{item.title}}</view>
+        <view class="trash-sub" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+        <view class="trash-actions">
+          <view
+            class="trash-action restore"
+            data-type="{{item.type}}"
+            data-id="{{item.id}}"
+            bindtap="onRestore"
+          >恢复</view>
+          <view
+            class="trash-action danger"
+            data-type="{{item.type}}"
+            data-id="{{item.id}}"
+            bindtap="onPurge"
+          >彻底删除</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-tip">— 到期后无法恢复 —</view>
+  </block>
+
+  <!-- 空状态 -->
+  <empty-state wx:else icon="🗑️" title="回收站是空的" desc="这里会临时保存你删除的记录，30 天内可以一键恢复" />
+</scroll-view>

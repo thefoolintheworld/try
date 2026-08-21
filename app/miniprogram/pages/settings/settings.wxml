@@ -1,0 +1,343 @@
+<!--pages/settings/settings.wxml-->
+<navigation-bar title="设置" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 主题模式 -->
+  <view class="section-label">外观 <text class="section-tip">即时生效，所有页面跟随</text></view>
+  <view class="card-group">
+    <view
+      class="option-row {{themeMode === item.id ? 'active' : ''}}"
+      wx:for="{{themeOptions}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onPickTheme"
+    >
+      <view class="option-swatch" style="background: {{item.swatch}};">
+        <text class="option-swatch-icon">{{item.icon}}</text>
+      </view>
+      <view class="option-main">
+        <view class="option-title">{{item.label}}</view>
+        <view class="option-desc">{{item.desc}}</view>
+      </view>
+      <view class="option-check" wx:if="{{themeMode === item.id}}">✓</view>
+    </view>
+  </view>
+
+  <!-- 暗色子方案（仅当前生效为暗色时显示） -->
+  <block wx:if="{{isDarkActive}}">
+    <view class="section-label">暗色风格 <text class="section-tip">选一种最顺眼的暗色底</text></view>
+    <view class="card-group">
+      <view
+        class="option-row {{darkVariant === item.id ? 'active' : ''}}"
+        wx:for="{{darkVariantOptions}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onPickDarkVariant"
+      >
+        <view class="option-swatch dark-swatch" style="background: {{item.swatch}};"></view>
+        <view class="option-main">
+          <view class="option-title">{{item.label}}</view>
+          <view class="option-desc">{{item.desc}}</view>
+        </view>
+        <view class="option-check" wx:if="{{darkVariant === item.id}}">✓</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 标题字体 -->
+  <view class="section-label">标题字体 <text class="section-tip">影响全局标题（正文不变）</text></view>
+  <view class="card-group">
+    <view
+      class="option-row {{titleFont === item.id ? 'active' : ''}}"
+      wx:for="{{fontOptions}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onPickFont"
+    >
+      <view class="option-swatch font-swatch" style="background: {{item.swatch}};">
+        <text class="option-swatch-icon {{item.previewClass}}">Aa</text>
+      </view>
+      <view class="option-main">
+        <view class="option-title {{item.previewClass}}">{{item.label}}</view>
+        <view class="option-desc">{{item.desc}}</view>
+      </view>
+      <view class="option-check" wx:if="{{titleFont === item.id}}">✓</view>
+    </view>
+  </view>
+
+  <!-- 年度目标：按分类设今年想达成多少条 -->
+  <view class="section-label">{{goalYear}} 年度目标 <text class="section-tip">设了才显示进度；留空表示不追踪</text></view>
+  <view class="card-group goal-group">
+    <view class="goal-row" wx:for="{{goalRows}}" wx:key="id">
+      <text class="goal-icon">{{item.icon}}</text>
+      <text class="goal-label">{{item.label}}</text>
+      <input
+        class="goal-input"
+        type="number"
+        placeholder="—"
+        data-id="{{item.id}}"
+        value="{{item.value}}"
+        bindinput="onGoalInput"
+        bindblur="onGoalBlur"
+      />
+      <text class="goal-unit">条</text>
+    </view>
+  </view>
+
+  <!-- 年度关键词：用户手动改写优先；为空时由算法推导回填首页 hero -->
+  <view class="section-label">年度关键词 <text class="section-tip">首页 hero 显示；空则自动生成</text></view>
+  <view class="card-group keyword-group">
+    <input
+      class="keyword-input"
+      placeholder="例：沉淀 / 探索 / 突破"
+      value="{{annualKeywordInput}}"
+      bindinput="onKeywordInput"
+      bindblur="onKeywordBlur"
+      maxlength="12"
+    />
+    <view class="keyword-candidates" wx:if="{{keywordCandidates.length > 0}}">
+      <text class="keyword-candidates-tip">算法推荐：</text>
+      <view
+        class="keyword-cand-chip"
+        wx:for="{{keywordCandidates}}"
+        wx:key="*this"
+        data-kw="{{item}}"
+        bindtap="onPickKeyword"
+      >{{item}}</view>
+    </view>
+  </view>
+
+  <!-- 系统勋章：用户可改每枚勋章的目标值；已解锁的显示「✓ 已达成」。
+       P2-6 限量勋章带「限量」角标 + 窗口期提示，目标值固定不可改。 -->
+  <view class="section-label">系统勋章 <text class="section-tip">达成目标自动解锁；改目标随时生效</text></view>
+  <view class="card-group medal-group">
+    <view class="medal-setting-row {{item.unlocked ? 'unlocked' : ''}} {{item.limitedEdition ? 'limited' : ''}}" wx:for="{{medalRows}}" wx:key="id">
+      <text class="medal-setting-icon">{{item.icon}}</text>
+      <view class="medal-setting-main">
+        <view class="medal-setting-head">
+          <text class="medal-setting-label">{{item.label}}</text>
+          <text class="medal-setting-tag" wx:if="{{item.limitedEdition}}">限量</text>
+          <text class="medal-setting-done" wx:if="{{item.unlocked}}">✓ 已达成</text>
+        </view>
+        <text class="medal-setting-desc">{{item.desc}}</text>
+        <text class="medal-setting-window" wx:if="{{item.windowHint}}">{{item.windowHint}}</text>
+        <!-- A5 进度型成就：未解锁时显示 current/target 进度条 -->
+        <view class="medal-setting-progress" wx:if="{{item.progress}}">
+          <view class="medal-setting-progress-track">
+            <view class="medal-setting-progress-fill" style="width: {{item.progress.percent}}%"></view>
+          </view>
+          <text class="medal-setting-progress-text">{{item.progress.current}}/{{item.progress.target}}</text>
+        </view>
+      </view>
+      <!-- 限量勋章目标固定不可改；普通勋章保留输入框 -->
+      <block wx:if="{{item.editable}}">
+        <input
+          class="medal-setting-input"
+          type="number"
+          data-id="{{item.id}}"
+          value="{{item.value}}"
+          bindinput="onMedalTargetInput"
+          bindblur="onMedalTargetBlur"
+        />
+        <text class="medal-setting-unit">本</text>
+      </block>
+      <text class="medal-setting-locked" wx:else>限定</text>
+    </view>
+  </view>
+
+  <!-- 习惯保护：连胜保护券 + 衰减式 Habit Score 开关（打卡页第二指标）-->
+  <view class="section-label">习惯保护 <text class="section-tip">缓解"断一天归零"的挫败</text></view>
+  <view class="card-group protection-card">
+    <view class="protection-row" bindtap="onToggleProtection">
+      <text class="protection-icon">🛡️</text>
+      <view class="protection-main">
+        <view class="protection-title">连胜保护券</view>
+        <view class="protection-desc">
+          <text wx:if="{{protectionEnabled}}">{{protectionDescOn}}</text>
+          <text wx:else>已关闭。打卡页将不再显示习惯强度与保护券</text>
+        </view>
+      </view>
+      <view class="toggle {{protectionEnabled ? 'on' : 'off'}}">
+        <view class="toggle-knob"></view>
+      </view>
+    </view>
+    <!-- 连胜保护详情入口：开了保护才显示；断了用券保住全局/分类连胜 -->
+    <view class="protection-detail-entry" wx:if="{{protectionEnabled}}" bindtap="onOpenProtectionSheet">
+      <view class="protection-detail-text">
+        <view class="protection-detail-title">连胜保护详情</view>
+        <view class="protection-detail-sub">
+          <block wx:if="{{protectionSheetBrokenCount > 0}}">{{protectionSheetBrokenCount}} 个连胜待保护 · 剩 {{protectionSheetFreebies}} 张</block>
+          <block wx:else>各连胜状态良好 · 剩 {{protectionSheetFreebies}} 张</block>
+        </view>
+      </view>
+      <text class="protection-detail-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 第二批功能 2：打卡管理（恢复被隐藏的分类 / 设置频率目标入口） -->
+  <view class="section-label">打卡管理 <text class="section-tip">隐藏的分类可在此恢复</text></view>
+  <view class="card-group checkin-mgmt-card" bindtap="onOpenCheckinMgmt">
+    <text class="checkin-mgmt-icon">📋</text>
+    <view class="checkin-mgmt-text">
+      <view class="checkin-mgmt-title">打卡分类与目标</view>
+      <view class="checkin-mgmt-sub">{{checkinMgmtSummary}}</view>
+    </view>
+    <text class="checkin-mgmt-arrow">›</text>
+  </view>
+
+  <!-- 回收站：软删除条目 30 天缓冲区；入口显示当前条数 -->
+  <view class="section-label">数据安全</view>
+  <view class="card-group trash-entry" bindtap="onTapTrash">
+    <text class="trash-entry-icon">🗑️</text>
+    <view class="trash-entry-text">
+      <view class="trash-entry-title">回收站</view>
+      <view class="trash-entry-sub" wx:if="{{trashCount > 0}}">{{trashCount}} 条记录可恢复（30 天内）</view>
+      <view class="trash-entry-sub" wx:else>删除的记录会保留 30 天</view>
+    </view>
+    <text class="trash-entry-arrow">›</text>
+  </view>
+
+  <!-- 备份与恢复：所有本地数据的导出/导入，避免换机/清缓存后不可恢复 -->
+  <view class="section-label">备份与恢复 <text class="section-tip">换机/清缓存前请先备份</text></view>
+  <view class="card-group backup-group">
+    <!-- 当前数据计数 -->
+    <view class="backup-summary">
+      <text class="backup-summary-icon">📦</text>
+      <view class="backup-summary-main">
+        <view class="backup-summary-title">本机数据</view>
+        <view class="backup-summary-detail">{{backupSummary.achievements}}成就 · {{backupSummary.reports}}报告 · {{backupSummary.wishes}}愿望 · {{backupSummary.inspirations}}灵感 · {{backupSummary.checkins}}打卡</view>
+      </view>
+    </view>
+
+    <!-- 导出按钮 -->
+    <view class="backup-actions">
+      <view class="backup-btn primary {{backupBusy ? 'disabled' : ''}}" bindtap="onTapExport">
+        <text class="backup-btn-icon">⬆</text>
+        <text>导出备份</text>
+      </view>
+      <view class="backup-hint">
+        把所有数据复制到剪贴板（可粘贴到备忘录/文件传输助手留存）；可选另存为文件。
+      </view>
+    </view>
+
+    <!-- 导入区 -->
+    <view class="backup-import">
+      <view class="backup-import-label">粘贴备份内容以恢复</view>
+      <textarea
+        class="backup-import-textarea"
+        value="{{importInput}}"
+        bindinput="onImportInput"
+        bindblur="onImportBlur"
+        placeholder="把之前导出的整段 JSON 粘贴到这里"
+        placeholder-class="backup-import-placeholder"
+        maxlength="-1"
+        auto-height
+        disabled="{{backupBusy}}"
+      ></textarea>
+      <view class="backup-import-preview" wx:if="{{importPreview}}">{{importPreview}}</view>
+      <view class="backup-import-row">
+        <view class="backup-btn danger {{backupBusy ? 'disabled' : ''}}" bindtap="onTapImport">
+          <text class="backup-btn-icon">⬇</text>
+          <text>恢复</text>
+        </view>
+        <view class="backup-btn ghost {{backupBusy ? 'disabled' : ''}}" bindtap="onTapClearImport" wx:if="{{importInput}}">
+          <text>清空</text>
+        </view>
+      </view>
+      <view class="backup-hint">
+        恢复会覆盖当前所有数据，不可撤销。建议先导出当前数据再恢复。
+      </view>
+    </view>
+  </view>
+
+  <!-- 说明 -->
+  <view class="note">
+    所有设置仅保存在本机。报告导出始终保持亮色（分享给他人时阅读体验更好），不受此处影响。
+  </view>
+</scroll-view>
+
+<!-- 第二批功能 2：打卡管理 sheet（列出全部分类，可隐藏/恢复 + 设置频率目标） -->
+<view class="sheet-mask {{showCheckinMgmt ? 'show' : ''}}" bindtap="onCloseCheckinMgmt"></view>
+<view class="mgmt-sheet {{showCheckinMgmt ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">打卡分类与目标</view>
+  <view class="mgmt-list">
+    <view class="mgmt-row" wx:for="{{checkinMgmtRows}}" wx:key="id" data-id="{{item.id}}">
+      <text class="mgmt-row-icon">{{item.icon}}</text>
+      <view class="mgmt-row-body">
+        <view class="mgmt-row-label-line">
+          <text class="mgmt-row-label">{{item.label}}</text>
+          <text class="mgmt-row-tag" wx:if="{{item.disabled}}">已隐藏</text>
+        </view>
+        <text class="mgmt-row-goal" wx:if="{{item.goalText}}">🎯 {{item.goalText}}</text>
+        <text class="mgmt-row-goal none" wx:else>未设目标</text>
+      </view>
+      <view class="mgmt-row-actions">
+        <text class="mgmt-action" data-id="{{item.id}}" catchtap="onMgmtToggleGoal">目标</text>
+        <text class="mgmt-action {{item.disabled ? 'restore' : 'hide'}}" data-id="{{item.id}}" catchtap="onMgmtToggleHide">{{item.disabled ? '恢复' : '隐藏'}}</text>
+      </view>
+    </view>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn primary" bindtap="onCloseCheckinMgmt">完成</view>
+  </view>
+</view>
+
+<!-- 目标设置 sheet（与打卡页共用交互：频率 chip + 次数 stepper） -->
+<view class="sheet-mask {{showMgmtGoal ? 'show' : ''}}" bindtap="onCloseMgmtGoal"></view>
+<view class="mgmt-goal-sheet {{showMgmtGoal ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">打卡目标 · {{mgmtGoalLabel}}</view>
+  <view class="sheet-section-label">频率</view>
+  <view class="freq-row">
+    <view
+      class="freq-chip {{mgmtGoalFreq === item.value ? 'active' : ''}}"
+      wx:for="{{mgmtFreqOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="onMgmtPickFreq"
+    >{{item.label}}</view>
+  </view>
+  <view class="sheet-section-label">次数</view>
+  <view class="stepper-row">
+    <view class="stepper-btn" bindtap="onMgmtGoalMinus">−</view>
+    <view class="stepper-val">{{mgmtGoalTimes}}</view>
+    <view class="stepper-btn" bindtap="onMgmtGoalPlus">＋</view>
+    <text class="stepper-hint">次 / {{mgmtGoalFreq === 'daily' ? '日' : mgmtGoalFreq === 'weekly' ? '周' : '月'}}</text>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn ghost" bindtap="onMgmtClearGoal">清除目标</view>
+    <view class="sheet-btn primary" bindtap="onMgmtSaveGoal">保存</view>
+  </view>
+</view>
+
+<!-- 连胜保护详情 sheet：列出全局 + 各分类连胜状态，断了的行可手动用券保住 -->
+<view class="sheet-mask {{showProtectionSheet ? 'show' : ''}}" bindtap="onCloseProtectionSheet"></view>
+<view class="protection-sheet {{showProtectionSheet ? 'show' : ''}}">
+  <view class="sheet-handle"></view>
+  <view class="sheet-title">连胜保护详情</view>
+  <view class="protection-subtitle">剩 {{protectionSheetFreebies}} 张保护券 · 断掉的连胜可手动用券保住</view>
+  <view class="protection-list">
+    <view class="protection-status-row" wx:for="{{streakStatuses}}" wx:key="scope" data-scope="{{item.scope}}">
+      <view class="protection-status-info">
+        <view class="protection-status-label">{{item.label}}</view>
+        <!-- 没断：显示当前连胜 -->
+        <view class="protection-status-streak" wx:if="{{!item.isBroken}}">连续 {{item.protectedStreak}} 天 ✓</view>
+        <!-- 断了但已用券保护过：显示保住后的连胜 + 已保护标记 -->
+        <view class="protection-status-streak protected" wx:elif="{{item.hasProtected}}">已保住 · 连续 {{item.protectedStreak}} 天</view>
+        <!-- 断了且券 > 0：可点用券按钮 -->
+        <view class="protection-status-streak broken" wx:elif="{{item.canProtect}}">断了！{{item.brokenDate}}</view>
+        <!-- 断了但券 = 0：灰显 -->
+        <view class="protection-status-streak broken" wx:else>断了 · 保护券已用完</view>
+      </view>
+      <view class="protection-use-btn {{(!item.isBroken || item.hasProtected || !item.canProtect) ? 'disabled' : ''}}"
+            wx:if="{{item.isBroken && !item.hasProtected}}"
+            data-scope="{{item.scope}}"
+            catchtap="onUseFreebie">{{item.canProtect ? '🛡️ 用券保住' : '券已用完'}}</view>
+    </view>
+  </view>
+  <view class="sheet-btn-row">
+    <view class="sheet-btn primary" bindtap="onCloseProtectionSheet">完成</view>
+  </view>
+</view>

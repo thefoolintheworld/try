@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "heatmap": "/components/heatmap/heatmap",
+    "empty-state": "/components/empty-state/empty-state",
+    "loading-skeleton": "/components/loading-skeleton/loading-skeleton"
+  }
+}

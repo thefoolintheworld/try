@@ -1,0 +1,136 @@
+<!--pages/wishlist/wishlist.wxml-->
+<!-- 许愿星（原灵感抽屉/愿望清单）：独立存储，与成就墙完全隔离。
+     愿望可标记完成（跳 edit 页带 wishId 预填）、编辑、删除。 -->
+<navigation-bar title="许愿星" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 顶部说明 -->
+  <view class="wishlist-intro">
+    <view class="wishlist-intro-title">⭐ 想读 · 想做 · 想达成</view>
+    <view class="wishlist-intro-sub">把还没实现的念头存到这里。准备好了就标记完成，它会自动变成一条成就。</view>
+  </view>
+
+  <!-- 添加愿望行：标题输入 + 分类选择 + 添加按钮 -->
+  <view class="add-card">
+    <input
+      class="add-input"
+      placeholder="想读什么、想学什么、想去哪里…"
+      value="{{addTitle}}"
+      bindinput="onAddTitleInput"
+      confirm-type="done"
+      bindconfirm="onAddWish"
+    />
+    <view class="add-row">
+      <view class="add-cat-scroll" scroll-x enable-flex>
+        <view
+          class="add-cat-chip {{addCategory === item.id ? 'active' : ''}}"
+          wx:for="{{categoryOptions}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onPickAddCategory"
+        >{{item.icon}} {{item.label}}</view>
+        <!-- ＋新建分类：打开底部 sheet 起名 + 选 emoji（P2-B） -->
+        <view class="add-cat-chip new-cat" bindtap="onOpenNewCatSheet">＋ 新建分类</view>
+      </view>
+      <view class="add-btn {{addTitle ? '' : 'disabled'}}" bindtap="onAddWish">添加</view>
+    </view>
+  </view>
+
+  <!-- 「显示已达成」开关：有已达成愿望时出现；点切换是否在列表里显示已完成的 -->
+  <view class="done-toggle-row" wx:if="{{doneCount > 0}}">
+    <view class="done-toggle {{showDone ? 'on' : ''}}" bindtap="onToggleShowDone">
+      <text class="done-toggle-icon">{{showDone ? '👁️' : '👁️‍🗨️'}}</text>
+      <text class="done-toggle-text">{{showDone ? '隐藏' : '显示'}}已达成</text>
+      <text class="done-toggle-count">({{doneCount}})</text>
+    </view>
+  </view>
+
+  <!-- 愿望列表 -->
+  <view class="wish-list animate-fade-up" wx:if="{{filteredWishes.length > 0}}">
+    <view
+      class="wish-card {{item.done ? 'done' : ''}}"
+      wx:for="{{filteredWishes}}"
+      wx:key="id"
+    >
+      <view class="wish-badge" style="background: {{item.categoryColor}}22; color: {{item.categoryColor}};">
+        <text class="wish-badge-icon">{{item.done ? '✓' : item.categoryIcon}}</text>
+      </view>
+      <view class="wish-main">
+        <view class="wish-title">{{item.title}}</view>
+        <view class="wish-meta" wx:if="{{item.metaText}}">{{item.metaText}}</view>
+        <view class="wish-note" wx:if="{{item.note}}">"{{item.note}}"</view>
+        <view class="wish-footer">
+          <text class="wish-cat-tag">{{item.categoryLabel}}</text>
+          <text class="wish-date"> · 添加于 {{item.createdAtText}}</text>
+          <text class="wish-done-tag" wx:if="{{item.done}}"> · 已达成</text>
+        </view>
+      </view>
+      <view class="wish-actions">
+        <view class="wish-action primary" wx:if="{{!item.done}}" data-id="{{item.id}}" bindtap="onMarkComplete">完成</view>
+        <view class="wish-action" data-id="{{item.id}}" bindtap="onEditWish">编辑</view>
+        <view class="wish-action danger" data-id="{{item.id}}" bindtap="onDeleteWish">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态：完全没有愿望 -->
+  <empty-state wx:if="{{wishes.length === 0}}" icon="⭐" title="许愿星还空着" desc="把想读、想做、想达成的事记下来" />
+  <!-- 空状态：有待办但当前过滤后为空（已达成全隐藏时） -->
+  <empty-state wx:if="{{wishes.length > 0 && filteredWishes.length === 0}}" icon="🎉" title="待办清单空了" desc="全部 {{doneCount}} 个愿望已达成，点上方开关回看" />
+
+  <!-- 编辑愿望 sheet（点「编辑」弹出；轻量内联编辑，不跳页） -->
+  <view class="sheet-mask {{showEditSheet ? 'show' : ''}}" bindtap="onCloseEditSheet"></view>
+  <view class="edit-sheet {{showEditSheet ? 'show' : ''}}">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">编辑愿望</view>
+    <input class="sheet-input" placeholder="标题" value="{{editTitle}}" bindinput="onEditTitleInput" />
+    <textarea class="sheet-textarea" placeholder="为什么想？（选填）" value="{{editNote}}" bindinput="onEditNoteInput" maxlength="200" auto-height />
+    <view class="sheet-cat-row">
+      <view
+        class="add-cat-chip {{editCategory === item.id ? 'active' : ''}}"
+        wx:for="{{categoryOptions}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onPickEditCategory"
+      >{{item.icon}} {{item.label}}</view>
+      <view class="add-cat-chip new-cat" bindtap="onOpenNewCatSheet">＋ 新建分类</view>
+    </view>
+    <view class="sheet-btn-row">
+      <view class="sheet-btn ghost" bindtap="onCloseEditSheet">取消</view>
+      <view class="sheet-btn primary" bindtap="onSaveEditWish">保存</view>
+    </view>
+  </view>
+
+  <!-- 新建分类 sheet（P2-B） -->
+  <view class="sheet-mask {{showNewCatSheet ? 'show' : ''}}" bindtap="onCloseNewCatSheet"></view>
+  <view class="newcat-sheet {{showNewCatSheet ? 'show' : ''}}">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">新建分类</view>
+    <input
+      class="newcat-input"
+      type="text"
+      placeholder="分类名称（≤8 字）"
+      placeholder-class="sheet-placeholder"
+      value="{{newCatLabel}}"
+      bindinput="onNewCatLabelInput"
+      maxlength="8"
+    />
+    <view class="newcat-icon-label">选一个图标</view>
+    <view class="newcat-icon-grid">
+      <view
+        class="newcat-icon-cell {{newCatIcon === icon ? 'active' : ''}}"
+        wx:for="{{categoryIconChoices}}"
+        wx:for-item="icon"
+        wx:key="*this"
+        data-icon="{{icon}}"
+        bindtap="onPickNewCatIcon"
+      >{{icon}}</view>
+    </view>
+    <view class="sheet-btn-row">
+      <view class="sheet-btn ghost" bindtap="onCloseNewCatSheet">取消</view>
+      <view class="sheet-btn primary {{newCatLabel ? '' : 'disabled'}}" bindtap="onConfirmNewCat">创建</view>
+    </view>
+  </view>
+
+</scroll-view>

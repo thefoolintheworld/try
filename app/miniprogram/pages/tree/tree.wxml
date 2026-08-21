@@ -1,0 +1,59 @@
+<!-- pages/tree/tree.wxml -->
+<!-- P3-1 成就养成树：静态垂直树布局（中心=总成就 / 分支=分类 / 叶子=具体成就）。
+     canvas 2D 绘制，点击节点 toast 显示信息。数据 <5 显示空态。 -->
+<navigation-bar title="养成树" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+  <view class="page-inner">
+
+    <!-- 顶部说明 -->
+    <view class="tree-intro" wx:if="{{hasData}}">
+      <text class="tree-intro-title">你的成长养成树</text>
+      <text class="tree-intro-sub">每一片叶子都是你记录过的一个成就</text>
+    </view>
+
+    <!-- 空态 -->
+    <empty-state wx:if="{{!hasData}}" icon="🌱" title="养成树还在沉睡" desc="{{emptyHint}}" />
+
+    <!-- canvas 树图 -->
+    <block wx:if="{{hasData}}">
+      <!-- 绘制失败：显示重试入口（而非永久空白） -->
+      <empty-state wx:if="{{canvasState === 'failed'}}" icon="🌳" title="树图加载失败" desc="绘图组件未就绪，点下方按钮重试" btnText="重新加载" bind:btntap="onRetryCanvas" />
+
+      <!-- 绘制中 / 完成：canvas + loading 蒙层 -->
+      <block wx:else>
+        <canvas
+          type="2d"
+          id="tree-canvas"
+          class="tree-canvas"
+          style="width: {{canvasW}}px; height: {{canvasH}}px;"
+          bindtap="onCanvasTap"
+        ></canvas>
+
+        <!-- loading 蒙层：canvas 节点就绪/绘制期间盖在上面，避免空白洞 -->
+        <view class="canvas-loading" wx:if="{{canvasState === 'drawing'}}">
+          <view class="canvas-loading-spinner"></view>
+          <text class="canvas-loading-text">正在生成养成树…</text>
+        </view>
+
+        <!-- 图例：分类配色 -->
+        <view class="legend" wx:if="{{categoryLegend.length > 0}}">
+          <view class="legend-item" wx:for="{{categoryLegend}}" wx:key="label">
+            <view class="legend-dot" style="background: {{item.color}};"></view>
+            <text class="legend-label">{{item.label}}</text>
+            <text class="legend-count">{{item.count}}</text>
+          </view>
+        </view>
+
+        <!-- 里程碑说明 -->
+        <view class="milestone-hint">
+          <view class="milestone-dot"></view>
+          <text class="milestone-text">金环节点 = 里程碑成就</text>
+        </view>
+
+        <view class="footer-tip">点节点查看详情 · 树形布局静态生成</view>
+      </block>
+    </block>
+
+  </view>
+</scroll-view>

@@ -1,0 +1,87 @@
+<!--pages/privacy/privacy.wxml-->
+<navigation-bar title="隐私政策" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+  <view class="doc">
+    <view class="update-date">最后更新：{{updateDate}}</view>
+
+    <view class="section-block">
+      <view class="block-title">一、前言</view>
+      <view class="block-text">
+        感谢您使用「阅观年度」（以下简称"本应用"）。我们非常重视您的隐私。本政策说明我们如何收集、使用和保护您的信息。
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">二、我们收集哪些信息</view>
+      <view class="block-text">
+        本应用是一个纯本地记录工具，<text class="highlight">所有数据仅存储在您的设备本地</text>，包括：
+      </view>
+      <view class="block-list">
+        <view class="list-item">· 您录入的成就记录：标题、分类、日期、短评，以及阅读/观影类下的作者、类型、评分等</view>
+        <view class="list-item">· 您填写的阅读地点、情境心境、个人理解、金句摘录</view>
+        <view class="list-item">· 您生成的报告、自定义的报告模板与卡片样式</view>
+        <view class="list-item">· 您选择作为报告背景或插入正文的图片（仅本地处理，详见第五条）</view>
+      </view>
+      <view class="block-text">
+        我们<text class="highlight">不会</text>收集您的个人信息、设备信息、位置信息，也不会上传您的任何数据到服务器。
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">三、信息如何被使用</view>
+      <view class="block-list">
+        <view class="list-item">· 仅用于在本应用内生成报告和导出图片</view>
+        <view class="list-item">· 仅您本人可见，不会与其他用户共享</view>
+        <view class="list-item">· 不会用于任何商业用途</view>
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">四、信息存储与安全</view>
+      <view class="block-text">
+        您的全部数据通过微信小程序的本地存储机制（wx.setStorageSync）保存在您的设备上。
+      </view>
+      <view class="block-list">
+        <view class="list-item">· 数据不会上传到云端或任何服务器</view>
+        <view class="list-item">· 卸载小程序或清除小程序缓存将删除全部数据，请谨慎操作</view>
+        <view class="list-item">· 您可以随时在「列表页」删除任意一条记录</view>
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">五、相册权限与图片</view>
+      <view class="block-text">
+        当您点击"保存到相册"时，本应用会请求您的相册写入权限，仅用于将生成的报告图片（单张或长图）保存到您的设备相册。
+      </view>
+      <view class="block-text">
+        在编辑报告时，您可以选择设备中的图片，用作<text class="highlight">卡片背景</text>或<text class="highlight">插入卡片正文</text>。这些功能仅在<text class="highlight">您的设备本地</text>处理：
+      </view>
+      <view class="block-list">
+        <view class="list-item">· 所选图片仅在生成报告图片时被读取并绘制，不会上传到任何服务器</view>
+        <view class="list-item">· 图片的本地路径仅保存在您设备的本地存储中，用于下次打开报告时还原</view>
+        <view class="list-item">· 若您清除小程序缓存或卸载小程序，相关本地路径将一并删除</view>
+        <view class="list-item">· 您可以随时在编辑中"清除背景图"或删除已插入的图片以解除关联</view>
+      </view>
+      <view class="block-text">
+        此外，应用内置若干程序生成的背景纹理（如纸纹、网格、水彩等），不涉及任何外部图片资源。
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">六、未成年人保护</view>
+      <view class="block-text">
+        本应用不针对未成年人，也无任何不适合未成年人的内容。如您是未成年人，请在监护人指导下使用。
+      </view>
+    </view>
+
+    <view class="section-block">
+      <view class="block-title">七、政策更新</view>
+      <view class="block-text">
+        如本政策有更新，我们会在本页面发布修订后的版本，并更新"最后更新"日期。
+      </view>
+    </view>
+
+    <view class="footer">— 本应用由个人开发者维护，力求简洁、纯净、不打扰 —</view>
+  </view>
+</scroll-view>

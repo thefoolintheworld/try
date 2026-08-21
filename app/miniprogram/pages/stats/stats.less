@@ -1,0 +1,528 @@
+/**pages/stats/stats.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 160rpx;
+  position: relative;
+}
+
+/* ===== 年份切换条 ===== */
+.year-bar {
+  white-space: nowrap;
+  width: 100%;
+  padding: @sp-4 0 @sp-2;
+}
+.year-chip {
+  display: inline-block;
+  padding: @sp-3 @sp-7;
+  margin-right: @sp-4;
+  border-radius: @radius-pill;
+  background: @color-card;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+  box-shadow: @shadow-card;
+}
+.year-chip.active {
+  background: rgba(217, 122, 74, 0.12);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+  font-weight: 600;
+}
+
+/* ===== 通用 section ===== */
+.section {
+  margin-top: @sp-7;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+}
+.section-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  margin-bottom: @sp-5;
+  font-family: var(--font-title);
+}
+.peak-hint {
+  font-size: @fs-sm;
+  color: var(--color-accent, #D97A4A);
+  margin-top: -10rpx;
+  margin-bottom: @sp-4;
+}
+
+/* ===== 0. 热力图（全年活动）===== */
+.heatmap-section {
+  /* 格子墙可能比卡片更宽，允许内容横向溢出而不撑破卡片 */
+  overflow: hidden;
+}
+
+/* ===== 1. 总览仪表盘 ===== */
+.overview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.overview-cell {
+  flex: 1;
+  min-width: 120rpx;
+  background: @color-bg;
+  border-radius: @radius-card-sm;
+  padding: @sp-5 @sp-3;
+  text-align: center;
+}
+.overview-icon {
+  display: block;
+  font-size: 36rpx;
+  line-height: 1;
+  margin-bottom: @sp-2;
+}
+.overview-value {
+  display: block;
+  font-size: @fs-xl;
+  font-weight: 700;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.overview-label {
+  display: block;
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.avg-row {
+  margin-top: @sp-5;
+  padding-top: @sp-5;
+  border-top: 1rpx solid @color-divider;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.avg-label {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+.avg-stars {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-star;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 2. 月度柱状图 ===== */
+.month-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: @sp-3;
+  height: 280rpx;
+  padding: @sp-3 @sp-1 0;
+}
+.month-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.month-bar-wrap {
+  width: 100%;
+  height: 240rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.month-bar {
+  width: 70%;
+  min-height: 8rpx;
+  border-radius: @radius-xs 8rpx 0 0;
+  background: @color-divider;
+  position: relative;
+  transition: height 0.3s ease;
+}
+.month-bar.peak {
+  background: var(--color-accent, #D97A4A);
+}
+.month-bar-count {
+  position: absolute;
+  top: -32rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  white-space: nowrap;
+}
+.month-label {
+  margin-top: @sp-3;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+
+/* ===== 3. 评分分布 ===== */
+.rating-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-3 0;
+  gap: @sp-4;
+}
+.rating-label {
+  width: 100rpx;
+  font-size: @fs-sm;
+  color: @color-star;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.rating-track {
+  flex: 1;
+  height: 24rpx;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  overflow: hidden;
+  min-width: 0;
+}
+.rating-fill {
+  height: 100%;
+  border-radius: @radius-sm;
+  background: @color-star;
+  transition: width 0.3s ease;
+}
+.rating-count {
+  width: 60rpx;
+  text-align: right;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ===== 4. 体裁偏好 ===== */
+.genre-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-3 0;
+  gap: @sp-4;
+}
+.genre-name {
+  width: 140rpx;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.genre-track {
+  flex: 1;
+  height: 20rpx;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  overflow: hidden;
+  min-width: 0;
+}
+.genre-fill {
+  height: 100%;
+  border-radius: @radius-sm;
+  background: @color-accent;
+  transition: width 0.3s ease;
+}
+.genre-count {
+  width: 140rpx;
+  text-align: right;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ===== 5. 分类构成 ===== */
+.type-pills {
+  display: flex;
+  gap: @sp-4;
+  margin-bottom: @sp-5;
+}
+.type-pill {
+  flex: 1;
+  padding: @sp-4 @sp-5;
+  border-radius: @radius-card-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.type-pill-label {
+  font-size: @fs-sm;
+  margin-bottom: @sp-1;
+}
+.type-pill-num {
+  font-size: @fs-base;
+  font-weight: 600;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.cat-stack {
+  margin-top: @sp-2;
+}
+.cat-stack-bar {
+  width: 100%;
+  height: 32rpx;
+  border-radius: @radius-card-xs;
+  overflow: hidden;
+  display: flex;
+  background: @color-divider;
+}
+.cat-stack-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.cat-share-list {
+  margin-top: @sp-4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3 @sp-6;
+}
+.cat-share-item {
+  display: flex;
+  align-items: center;
+  gap: @sp-2;
+  min-width: 180rpx;
+}
+.cat-share-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: @radius-pill;
+  flex-shrink: 0;
+}
+.cat-share-icon {
+  font-size: @fs-sm;
+  margin-left: @sp-1;
+}
+.cat-share-label {
+  font-size: @fs-sm;
+  color: @color-text-primary;
+}
+.cat-share-count {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  margin-left: auto;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 6. 阅读足迹 ===== */
+.footprint-row {
+  padding: @sp-4 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.footprint-row:last-child {
+  border-bottom: none;
+}
+.footprint-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footprint-place {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.footprint-count {
+  font-size: @fs-sm;
+  color: var(--color-accent, #D97A4A);
+  font-weight: 600;
+  font-family: var(--font-numeric);
+}
+.footprint-sample {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ===== 6.5 P2-5 阅读节律洞察 ===== */
+.insight-section {
+  background: linear-gradient(135deg, color-mix(in srgb, @color-accent 6%, transparent) 0%, color-mix(in srgb, @color-book 6%, transparent) 100%);
+}
+.insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.insight-row {
+  display: flex;
+  align-items: flex-start;
+  gap: @sp-4;
+  padding: @sp-5 @sp-6;
+  background: @color-card;
+  border-radius: @radius-card-xs;
+  box-shadow: @shadow-subtle;
+}
+.insight-emoji {
+  font-size: 36rpx;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.insight-text {
+  flex: 1;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.6;
+  font-family: var(--font-title);
+}
+
+/* ===== 7. 金句墙 ===== */
+.quote-wall {
+  column-count: 2;
+  column-gap: @sp-4;
+}
+.quote-card {
+  break-inside: avoid;
+  background: @color-bg;
+  border-radius: @radius-card-sm;
+  padding: @sp-5;
+  margin-bottom: @sp-4;
+}
+.quote-text {
+  display: block;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  line-height: 1.6;
+  font-family: var(--font-serif);
+}
+.quote-source {
+  display: block;
+  margin-top: @sp-3;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  text-align: right;
+}
+
+/* ===== 8. 高分榜 ===== */
+.rank-list {
+  display: flex;
+  flex-direction: column;
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-4 0;
+  border-bottom: 1rpx solid @color-divider;
+  gap: @sp-3;
+}
+.rank-item:last-child {
+  border-bottom: none;
+}
+.rank-num {
+  width: 40rpx;
+  font-size: @fs-m;
+  font-weight: 700;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  text-align: center;
+  flex-shrink: 0;
+}
+.rank-badge {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-m;
+  flex-shrink: 0;
+}
+.rank-main {
+  flex: 1;
+  min-width: 0;
+}
+.rank-title {
+  display: block;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.rank-date {
+  display: block;
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+}
+.rank-rating {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-star;
+  font-family: var(--font-numeric);
+  flex-shrink: 0;
+}
+
+/* ===== 底部提示 / 空状态 ===== */
+.footer-tip {
+  text-align: center;
+  margin-top: @sp-8;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+
+/* section 底部的「查看更多」文字链接（金句墙等区块用）*/
+.section-more {
+  margin-top: @sp-5;
+  padding-top: @sp-4;
+  border-top: 1rpx solid @color-divider;
+  text-align: center;
+  font-size: @fs-sm;
+  color: var(--color-accent, #D97A4A);
+  font-family: var(--font-title);
+}
+.section-more:active { opacity: 0.7; }
+
+/* ===== P2-8 关系图谱入口 ===== */
+.graph-entry {
+  display: flex;
+  align-items: center;
+  margin: @sp-6 @sp-6 0;
+  padding: @sp-7 @sp-7;
+  background: linear-gradient(135deg, color-mix(in srgb, @color-accent 8%, transparent) 0%, color-mix(in srgb, @color-film 8%, transparent) 100%);
+  border-radius: @radius-card-sm;
+}
+.graph-entry:active { opacity: 0.85; }
+.graph-entry-icon {
+  font-size: 48rpx;
+  margin-right: @sp-5;
+  flex-shrink: 0;
+}
+.graph-entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.graph-entry-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 600;
+  font-family: var(--font-title);
+}
+.graph-entry-sub {
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-title);
+}
+.graph-entry-arrow {
+  font-size: 36rpx;
+  color: @color-text-secondary;
+  flex-shrink: 0;
+}

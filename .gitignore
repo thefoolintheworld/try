@@ -1,0 +1,25 @@
+# 微信开发者工具生成
+**/.DS_Store
+**/miniprogram_npm/
+**/node_modules/
+
+# 构建产物
+app/.tmp-build/
+app/test/**/.tmp-build/
+**/*.js.map
+**/.tsbuildinfo
+
+# 本地配置（含本地 AppID 等，不提交）
+project.private.config.json
+
+# 编辑器 / 工具
+.vscode/
+.idea/
+*.swp
+*~
+.zcode/
+
+# 临时文件
+*.log
+*.tmp
+.cache/

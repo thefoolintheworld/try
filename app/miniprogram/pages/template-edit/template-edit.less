@@ -1,0 +1,273 @@
+/**pages/template-edit/template-edit.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: @sp-4 @sp-7 160rpx;
+}
+
+/* ===== 只读提示 ===== */
+.readonly-tip {
+  background: rgba(232, 163, 61, 0.1);
+  border-radius: @radius-card-xs;
+  padding: @sp-5 @sp-6;
+  font-size: @fs-sm;
+  /* 用 star 令牌（暖琥珀）：亮色下偏黄、暗色下提亮，两套主题都可读 */
+  color: var(--color-star);
+  line-height: 1.6;
+  margin-bottom: @sp-6;
+}
+
+/* ===== 元信息块 ===== */
+.meta-block {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+}
+.meta-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-3;
+}
+.meta-label + .meta-label {
+  margin-top: @sp-6;
+}
+.meta-input {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  padding: @sp-2 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+
+/* ===== 卡片定义块 ===== */
+.cards-block {
+  margin-top: @sp-7;
+}
+.block-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  padding: 0 @sp-2 @sp-4;
+}
+
+.card-def {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  margin-bottom: @sp-5;
+  box-shadow: @shadow-card;
+}
+.card-def-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: @sp-5;
+  padding-bottom: @sp-5;
+  border-bottom: 1rpx solid @color-divider;
+}
+.card-type-tag {
+  font-size: @fs-sm;
+  color: @color-accent;
+  background: rgba(217, 122, 74, 0.1);
+  padding: @sp-2 @sp-4;
+  border-radius: @radius-sm;
+  flex-shrink: 0;
+}
+.card-type-label {
+  flex: 1;
+  margin-left: @sp-4;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  font-family: monospace;
+}
+.card-def-ops {
+  display: flex;
+  gap: @sp-2;
+  flex-shrink: 0;
+}
+.op-arrow,
+.op-del {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: @radius-sm;
+  background: @color-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-base;
+  color: @color-text-primary;
+}
+.op-del {
+  color: @color-danger;
+  background: @color-danger-bg;
+}
+
+/* ===== 字段编辑 ===== */
+.field-row {
+  margin-top: @sp-4;
+}
+.field-row + .field-row {
+  margin-top: @sp-5;
+}
+.field-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+  margin-bottom: @sp-2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.var-tip {
+  font-size: @fs-s;
+  color: @color-accent;
+}
+.field-input {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  padding: @sp-3 @sp-4;
+  background: @color-bg;
+  border-radius: @radius-sm;
+}
+.field-textarea {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  padding: @sp-4;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  min-height: 100rpx;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+/* ===== 添加卡片 ===== */
+.add-card-btn {
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-card-sm;
+  border: 2rpx dashed @color-accent;
+  color: @color-accent;
+  font-size: @fs-m;
+  background: rgba(217, 122, 74, 0.04);
+  margin-bottom: @sp-7;
+}
+
+/* ===== 保存栏 ===== */
+.save-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, @color-bg, rgba(250, 246, 240, 0.95));
+}
+.save-btn {
+  background: @color-accent;
+  color: #FFFFFF;
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-btn;
+  font-size: @fs-lg;
+  font-weight: 500;
+}
+
+/* ===== 底部弹层（复用 report-edit 的样式） ===== */
+.sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(61, 53, 48, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 90;
+}
+.sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: @color-card;
+  border-radius: @radius-card @radius-card 0 0;
+  padding: @sp-7 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 91;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  max-height: 70vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.sheet.show {
+  transform: translateY(0);
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: @sp-6;
+  border-bottom: 1rpx solid @color-divider;
+}
+.sheet-title {
+  flex: 1;
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.sheet-close {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  padding: @sp-1 @sp-2;
+}
+.sheet-list {
+  overflow-y: auto;
+}
+.sheet-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-7 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.sheet-item:last-child {
+  border-bottom: none;
+}
+.sheet-item-label {
+  flex: 1;
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+.sheet-item-arrow {
+  font-size: @fs-lg;
+  color: @color-accent;
+}
+
+/* ===== 变量提示 ===== */
+.vars-tip {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  padding: @sp-4 @sp-2;
+}
+.vars-grid {
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+  padding: @sp-2 0 @sp-4;
+}
+.var-chip {
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-3 @sp-5;
+  font-size: @fs-sm;
+  color: @color-accent;
+  font-family: monospace;
+}

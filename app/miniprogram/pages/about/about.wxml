@@ -1,0 +1,52 @@
+<!--pages/about/about.wxml-->
+<navigation-bar title="关于" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- Logo 区 -->
+  <view class="logo-area">
+    <view class="logo-circle">阅观</view>
+    <view class="app-name">阅观年度</view>
+    <view class="app-slogan">记录每一个值得纪念的成就</view>
+    <view class="version">v{{version}}</view>
+  </view>
+
+  <!-- 功能介绍 -->
+  <view class="section">
+    <view class="section-title">功能特性</view>
+    <view class="feature-list">
+      <view class="feature-item" wx:for="{{features}}" wx:key="title">
+        <view class="feature-icon">{{item.icon}}</view>
+        <view class="feature-main">
+          <view class="feature-title">{{item.title}}</view>
+          <view class="feature-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 产品理念 -->
+  <view class="section">
+    <view class="section-title">产品理念</view>
+    <view class="philosophy">
+      <view class="philo-text">
+        这是一个纯本地工具——所有数据只存在你的手机里，不上传、不联网、不打扰。我们相信"记录"本身就是有意义的，那些读过的书、学会的技能、走过的旅途、勇敢的第一次，构成了独一无二的你。
+      </view>
+    </view>
+  </view>
+
+  <!-- 法律条款 -->
+  <view class="section">
+    <view class="section-title">法律与隐私</view>
+    <view class="link-row" bindtap="onTapPrivacy">
+      <text class="link-text">隐私政策</text>
+      <text class="link-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 版权 -->
+  <view class="copyright">
+    <view>© 2026 阅观年度</view>
+    <view class="copyright-sub">由个人开发者独立维护</view>
+  </view>
+</scroll-view>

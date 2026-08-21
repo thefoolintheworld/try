@@ -1,0 +1,56 @@
+<!--pages/reports/reports.wxml-->
+<navigation-bar title="我的报告" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list" bindscrolltolower="onLoadMore" lower-threshold="100">
+
+  <!-- 首屏加载骨架 -->
+  <loading-skeleton wx:if="{{loading}}" type="list" count="4" />
+
+  <!-- 列表 -->
+  <view class="list animate-fade-up" wx:elif="{{hasReports}}">
+    <view class="report-card" wx:for="{{reports}}" wx:key="id">
+      <view class="report-main" data-id="{{item.id}}" bindtap="onTapEdit">
+        <view class="report-row1">
+          <text class="report-title">{{item.title}}</text>
+          <view class="badge {{item.exported ? 'badge-done' : 'badge-pending'}}">
+            <text class="badge-dot">{{item.exported ? '✓' : '○'}}</text>
+            <text class="badge-text">{{item.exported ? '已导出' : '未导出'}}</text>
+          </view>
+        </view>
+        <view class="report-row2">
+          <text class="meta-item">{{item.cardCount}} 张卡片</text>
+          <text class="meta-sep">·</text>
+          <text class="meta-item">更新于 {{item.updatedLabel}}</text>
+        </view>
+        <view class="report-row3" wx:if="{{item.exported}}">
+          <text class="meta-exported">最近一次导出 {{item.exportedLabel}}</text>
+        </view>
+      </view>
+      <view class="report-ops">
+        <view class="op op-edit" data-id="{{item.id}}" bindtap="onTapEdit">
+          <text class="op-icon">✎</text>
+          <text class="op-label">编辑</text>
+        </view>
+        <view class="op op-export" data-id="{{item.id}}" bindtap="onTapExport">
+          <text class="op-icon">⤓</text>
+          <text class="op-label">导出</text>
+        </view>
+        <view class="op op-delete" data-id="{{item.id}}" bindtap="onTapDelete">
+          <text class="op-icon">✕</text>
+          <text class="op-label">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 上拉加载更多提示 -->
+  <view class="load-more" wx:if="{{!loading && hasMore}}">
+    <text class="load-more-text">{{loadingMore ? '加载中…' : '上拉加载更多'}}</text>
+  </view>
+  <view class="load-end" wx:if="{{!loading && !hasMore && reports.length > 0}}">
+    <text class="load-end-text">— 共 {{reports.length}} 份 —</text>
+  </view>
+
+  <!-- 空状态 -->
+  <empty-state wx:if="{{!loading && !hasReports}}" icon="✦" title="还没有生成过报告" desc="记录几个成就后，把它们做成一份可导出的报告" btnText="生成第一份报告" bind:btntap="onTapGenerate" />
+</scroll-view>

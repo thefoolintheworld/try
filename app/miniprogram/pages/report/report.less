@@ -1,0 +1,334 @@
+/**pages/report/report.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: @sp-6 @sp-7 200rpx;
+}
+
+/* ===== 步骤头 ===== */
+.step-header {
+  display: flex;
+  align-items: center;
+  padding: @sp-4 @sp-2 @sp-6;
+}
+.step-num {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-m;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-info {
+  flex: 1;
+  margin-left: @sp-5;
+}
+.step-title {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.step-sub {
+  margin-top: @sp-1;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.pick-all {
+  font-size: @fs-base;
+  color: @color-accent;
+  padding: @sp-2 @sp-4;
+}
+
+/* ===== 选书搜索框（成就多时定位用）===== */
+.search-area {
+  padding: 0 @sp-2 @sp-3;
+}
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-pill;
+  padding: @sp-3 @sp-5;
+  box-shadow: @shadow-card;
+}
+.search-icon {
+  font-size: @fs-base;
+  margin-right: @sp-3;
+  opacity: 0.7;
+}
+.search-input {
+  flex: 1;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.4;
+  min-width: 0;
+}
+.search-placeholder {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.search-clear {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  padding: 0 @sp-2;
+  opacity: 0.7;
+}
+
+/* ===== 书列表 ===== */
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.book-row {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7;
+  border: 2rpx solid transparent;
+  box-shadow: @shadow-card;
+}
+.book-row.picked {
+  border-color: @color-accent;
+  background: rgba(217, 122, 74, 0.04);
+}
+/* 分类图标徽章（左侧） */
+.book-badge {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: @radius-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-lg;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.book-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border: 2rpx solid @color-divider;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-sm;
+  color: #FFFFFF;
+  flex-shrink: 0;
+  background: @color-card;
+  margin-left: @sp-4;
+}
+.book-row.picked .book-check {
+  background: @color-accent;
+  border-color: @color-accent;
+}
+.book-main {
+  flex: 1;
+  margin-left: @sp-5;
+  min-width: 0;
+}
+.book-title {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.book-meta {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.book-meta2 {
+  margin-top: @sp-2;
+  display: flex;
+  gap: @sp-4;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+}
+.book-rating {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  flex-shrink: 0;
+}
+.book-rating .star {
+  color: @color-star;
+  margin-right: @sp-1;
+}
+
+/* ===== Step 2 表单 ===== */
+.form-block {
+  margin-top: @sp-6;
+}
+.form-label {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  padding: 0 @sp-2 @sp-3;
+}
+.template-hint {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  padding: 0 @sp-2 @sp-4;
+  line-height: 1.5;
+}
+.title-input {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+.template-pick {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7;
+}
+.template-pick-icon {
+  font-size: 48rpx;
+  flex-shrink: 0;
+}
+.template-pick-main {
+  flex: 1;
+  margin: 0 @sp-5;
+}
+.template-pick-name {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.template-pick-name.placeholder {
+  color: @color-text-secondary;
+  font-weight: 400;
+}
+.template-pick-arrow {
+  font-size: 36rpx;
+  color: @color-text-secondary;
+}
+
+/* ===== 底部按钮 ===== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: @sp-5 @sp-7 60rpx;
+  background: linear-gradient(to top, @color-bg, rgba(250, 246, 240, 0.9));
+}
+.next-btn {
+  background: @color-accent;
+  color: #FFFFFF;
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-btn;
+  font-size: @fs-lg;
+  font-weight: 500;
+}
+.next-btn.disabled {
+  background: @color-divider;
+  color: @color-text-secondary;
+}
+
+/* ===== 空状态 ===== */
+/* ===== 生成中 ===== */
+.generating {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.gen-icon {
+  font-size: @fs-display;
+  margin-bottom: @sp-6;
+}
+.gen-text {
+  font-size: @fs-l;
+  color: @color-text-secondary;
+}
+
+/* ===== P5 顶部模式 Tab ===== */
+.mode-tabs {
+  display: flex;
+  gap: @sp-3;
+  padding: @sp-4 @sp-7 0;
+  background: @color-bg;
+}
+.mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: @sp-2;
+  padding: @sp-4 @sp-2;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+}
+.mode-tab.active {
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+  font-weight: 600;
+}
+.mode-tab-icon {
+  font-size: @fs-m;
+  line-height: 1;
+}
+
+/* ===== P5 导入模式 ===== */
+.import-textarea-wrap {
+  position: relative;
+}
+.import-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: @sp-5 @sp-6;
+  background: @color-card-soft;
+  border-radius: @radius-card-sm;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.6;
+  min-height: 320rpx;
+}
+.import-textarea-ph {
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1.6;
+}
+.import-clear {
+  position: absolute;
+  top: @sp-3;
+  right: @sp-4;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  padding: @sp-1 @sp-3;
+  background: @color-card;
+  border-radius: @radius-pill;
+  opacity: 0.8;
+}
+.import-hint {
+  margin-top: @sp-3;
+  font-size: @fs-s;
+  color: var(--color-accent, #D97A4A);
+  line-height: 1.5;
+}
+.import-hint.static {
+  color: @color-text-secondary;
+  opacity: 0.7;
+}

@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./.tmp-build",
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "declaration": false,
+    "sourceMap": false,
+    "rootDir": "../.."
+  },
+  "include": [
+    "./**/*.ts",
+    "../../miniprogram/utils/trash.ts",
+    "../../miniprogram/utils/storage.ts",
+    "../../miniprogram/utils/util.ts",
+    "../../miniprogram/utils/design-tokens.ts",
+    "../../miniprogram/utils/built-in-templates.ts",
+    "../../miniprogram/utils/preferences.ts",
+    "../../miniprogram/utils/category-meta.ts"
+  ],
+  "exclude": []
+}

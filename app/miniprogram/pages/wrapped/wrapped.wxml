@@ -1,0 +1,243 @@
+<!--pages/wrapped/wrapped.wxml-->
+<!-- 年度 Wrapped：五幕叙事页（借鉴 Spotify Wrapped / WeRead 年度报告）。
+     五幕：开场大数字 → Top 5 堆叠 → 读者人格 → 百分比稀有度 → 汇总海报。
+     12 月解锁当年；历史年份永远可看；数据不足时显示"明年再来"。 -->
+<navigation-bar title="{{navTitle}}" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- ============ 锁定态：当年但还没到 12 月 ============ -->
+  <view class="locked" wx:if="{{!unlocked}}">
+    <view class="locked-icon">🎁</view>
+    <view class="locked-title">{{year}} 年度回顾</view>
+    <view class="locked-sub">将在 12 月揭晓</view>
+    <view class="locked-desc">
+      你今年的每一次记录都在为这份报告添砖加瓦。\n再坚持记录，年底来看属于你的年度故事。
+    </view>
+    <view class="locked-current" wx:if="{{currentTotal > 0}}">
+      目前已记录 {{currentTotal}} 条成就
+    </view>
+
+    <!-- 历史年份快捷入口（如果有的话） -->
+    <view class="history-link" wx:if="{{historyYears.length > 0}}">
+      <view class="history-link-label">想先回顾往年？</view>
+      <view class="history-chip-row">
+        <view
+          class="history-chip"
+          wx:for="{{historyYears}}"
+          wx:key="*this"
+          data-year="{{item}}"
+          bindtap="onPickHistoryYear"
+        >{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 数据不足态：当年已解锁但条数 < 阈值 ============ -->
+  <empty-state wx:elif="{{!sufficient}}" icon="🌱" title="{{year}} 年度回顾" desc="今年只记录了 {{total}} 条\n年度回顾需要至少 {{minItems}} 条成就才能生成完整故事。多记录几条，年底再来。" />
+
+  <!-- ============ 完整五幕 ============ -->
+  <block wx:else>
+
+    <!-- 顶部年份选择条（有历史可切换时显示） -->
+    <view class="year-bar" wx:if="{{historyYears.length > 1}}">
+      <view
+        class="year-chip {{item === year ? 'active' : ''}}"
+        wx:for="{{historyYears}}"
+        wx:key="*this"
+        data-year="{{item}}"
+        bindtap="onPickHistoryYear"
+      >{{item}}</view>
+    </view>
+
+    <!-- Act 1：开场大数字（占满首屏，仪式感最强） -->
+    <view class="act act-opening animate-fade-up">
+      <view class="act-tag">Act 1 · 开场</view>
+      <view class="opening-year">{{year}}</view>
+      <view class="opening-headline">你完成了</view>
+      <view class="opening-big">{{opening.total}}</view>
+      <view class="opening-headline">个成就</view>
+      <view class="opening-sub">
+        <text>{{opening.bookCount}} 本书</text>
+        <text class="dot">·</text>
+        <text>{{opening.filmCount}} 部电影</text>
+        <text class="dot" wx:if="{{opening.otherCount > 0}}">·</text>
+        <text wx:if="{{opening.otherCount > 0}}">{{opening.otherCount}} 个其它</text>
+      </view>
+      <view class="opening-meta">
+        <view class="meta-item">
+          <view class="meta-num">{{opening.avgRatingText}}</view>
+          <view class="meta-label">平均评分</view>
+        </view>
+        <view class="meta-divider"></view>
+        <view class="meta-item">
+          <view class="meta-num">{{opening.longestStreak}}</view>
+          <view class="meta-label">最长连续天数</view>
+        </view>
+        <view class="meta-divider"></view>
+        <view class="meta-item">
+          <view class="meta-num">{{opening.uniqueDays}}</view>
+          <view class="meta-label">记录日数</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Act 2：Top 5 堆叠（最爱类型 / 最高分 / 最活跃月份） -->
+    <view class="act act-tops">
+      <view class="act-tag">Act 2 · 偏好</view>
+      <view class="act-title">你的 {{year}}</view>
+
+      <!-- 类型堆叠 -->
+      <view class="tops-section">
+        <view class="tops-section-label">最爱的类型</view>
+        <view
+          class="cat-bar"
+          wx:for="{{topLists.topCategories}}"
+          wx:key="id"
+        >
+          <text class="cat-bar-icon">{{item.icon}}</text>
+          <view class="cat-bar-body">
+            <view class="cat-bar-head">
+              <text class="cat-bar-label">{{item.label}}</text>
+              <text class="cat-bar-count">{{item.count}} 条 · {{item.percent}}%</text>
+            </view>
+            <view class="cat-bar-track">
+              <view class="cat-bar-fill" style="width:{{item.percent}}%; background:{{item.color}};"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 评分榜 Top 5 -->
+      <view class="tops-section" wx:if="{{topLists.topRated.length > 0}}">
+        <view class="tops-section-label">评分最高 Top {{topRatedCount}}</view>
+        <view class="rated-row" wx:for="{{topLists.topRated}}" wx:key="id">
+          <text class="rated-rank">{{index + 1}}</text>
+          <view class="rated-main">
+            <view class="rated-title">{{item.title}}</view>
+            <view class="rated-author" wx:if="{{item.author}}">{{item.author}}</view>
+          </view>
+          <view class="rated-stars">★ {{item.ratingText}}</view>
+        </view>
+      </view>
+
+      <!-- 最活跃月份 -->
+      <view class="tops-section" wx:if="{{topLists.peakMonth}}">
+        <view class="tops-section-label">最拼的月份</view>
+        <view class="peak-box">
+          <view class="peak-num">{{topLists.peakMonth.count}}</view>
+          <view class="peak-text">
+            <view class="peak-month">{{topLists.peakMonth.month}} 月</view>
+            <view class="peak-desc">单月最高产</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Act 3：读者人格（核心仪式感） -->
+    <view class="act act-personality" style="background: linear-gradient(135deg, {{personalityColorSoft}} 0%, {{personalityColor}} 100%);">
+      <view class="act-tag light">Act 3 · 人格</view>
+      <view class="personality-badge" style="background:{{personalityColor}};">
+        <text class="personality-icon">{{personality.meta.icon}}</text>
+      </view>
+      <view class="personality-label">{{personality.meta.label}}</view>
+      <view class="personality-tagline">{{personality.meta.tagline}}</view>
+      <view class="personality-desc">{{personality.meta.desc}}</view>
+
+      <!-- 四维雷达条（简化版：四条横向 bar） -->
+      <view class="dim-list">
+        <view class="dim-row">
+          <text class="dim-label">深度</text>
+          <view class="dim-track"><view class="dim-fill" style="width:{{personality.dims.depth}}%;"></view></view>
+          <text class="dim-num">{{personality.dims.depth}}</text>
+        </view>
+        <view class="dim-row">
+          <text class="dim-label">广度</text>
+          <view class="dim-track"><view class="dim-fill" style="width:{{personality.dims.breadth}}%;"></view></view>
+          <text class="dim-num">{{personality.dims.breadth}}</text>
+        </view>
+        <view class="dim-row">
+          <text class="dim-label">慢读</text>
+          <view class="dim-track"><view class="dim-fill" style="width:{{personality.dims.speed}}%;"></view></view>
+          <text class="dim-num">{{personality.dims.speed}}</text>
+        </view>
+        <view class="dim-row">
+          <text class="dim-label">复读</text>
+          <view class="dim-track"><view class="dim-fill" style="width:{{personality.dims.rewatch}}%;"></view></view>
+          <text class="dim-num">{{personality.dims.rewatch}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Act 4：百分比稀有度 -->
+    <view class="act act-rarity {{rarity.tier}}">
+      <view class="act-tag">Act 4 · 稀有度</view>
+      <view class="rarity-tier-label">{{rarityTierLabel}}</view>
+      <view class="rarity-big">
+        <text class="rarity-prefix">前</text>
+        <text class="rarity-num">{{rarity.topPercent}}%</text>
+      </view>
+      <view class="rarity-sentence">{{rarity.sentence}}</view>
+      <view class="rarity-foot">* 基于本机数据估算</view>
+    </view>
+
+    <!-- Act 5：汇总海报（最具代表性的一条 + 导出入口） -->
+    <view class="act act-summary">
+      <view class="act-tag">Act 5 · 代表作</view>
+      <view class="summary-headline">{{year}} 最具代表性的</view>
+
+      <view class="highlight-card" wx:if="{{summary.highlight}}">
+        <view class="highlight-color-bar" style="background:{{summary.highlight.coverColor}};"></view>
+        <view class="highlight-body">
+          <view class="highlight-title">{{summary.highlight.title}}</view>
+          <view class="highlight-author" wx:if="{{summary.highlight.author}}">{{summary.highlight.author}}</view>
+          <view class="highlight-note" wx:if="{{summary.highlight.note}}">{{summary.highlight.note}}</view>
+          <view class="highlight-meta">
+            <text class="highlight-cat">{{summary.highlight.categoryLabel}}</text>
+            <text class="highlight-stars">★ {{summary.highlight.ratingText}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="keywords-row" wx:if="{{summary.keywords.length > 0}}">
+        <text class="keywords-label">年度关键词</text>
+        <view class="keywords-chips">
+          <text class="kw-chip" wx:for="{{summary.keywords}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+
+      <!-- 年度心境分布（有心境数据才显示） -->
+      <view class="mood-row" wx:if="{{summary.moodStats.length > 0}}">
+        <text class="keywords-label">年度心境</text>
+        <view class="mood-stats-wrap">
+          <view class="mood-stat-item" wx:for="{{summary.moodStats}}" wx:key="mood">
+            <text class="mood-stat-word">{{item.mood}}</text>
+            <text class="mood-stat-count">{{item.count}} 次</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 导出长图按钮（跳 poster 页，带 wrappedYear 参数） -->
+      <view class="export-btn" bindtap="onExportPoster">
+        <text class="export-btn-icon">🖼️</text>
+        <text class="export-btn-text">导出 {{year}} 年度海报</text>
+      </view>
+      <view class="export-hint">生成一张可分享的竖版长图（复用海报引擎）</view>
+    </view>
+
+    <!-- 末尾：再回顾一下 / 切换年份 -->
+    <view class="epilogue" wx:if="{{historyYears.length > 1}}">
+      <view class="epilogue-label">还想回顾其它年份？</view>
+      <view class="history-chip-row">
+        <view
+          class="history-chip"
+          wx:for="{{historyYears}}"
+          wx:key="*this"
+          data-year="{{item}}"
+          bindtap="onPickHistoryYear"
+        >{{item}}</view>
+      </view>
+    </view>
+
+  </block>
+</scroll-view>

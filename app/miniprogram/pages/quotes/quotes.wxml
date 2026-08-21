@@ -1,0 +1,108 @@
+<!--pages/quotes/quotes.wxml-->
+<!-- 金句墙独立页：跨年份全局聚合所有金句，文学化排版。
+     入口：stats 页底部「查看全部金句」+ index 页次要入口。 -->
+<navigation-bar title="金句墙" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list" bindscrolltolower="onLoadMore" lower-threshold="100">
+
+  <!-- 首屏加载骨架 -->
+  <loading-skeleton wx:if="{{loading}}" type="list" count="4" />
+
+  <!-- 空状态：没有任何金句 -->
+  <empty-state wx:elif="{{loaded && total === 0}}" icon="💭" title="还没有摘录任何金句" desc="在录入成就时，把让你心动的句子记下来吧" btnText="＋ 去录入成就" bind:btntap="onTapAdd" />
+
+  <!-- 正常态 -->
+  <block wx:elif="{{loaded}}">
+    <!-- 顶部摘要 -->
+    <view class="hero animate-fade-up">
+      <view class="hero-title">金句墙</view>
+      <view class="hero-stats">
+        <text class="stat-num">{{total}}</text>
+        <text class="stat-unit">句</text>
+        <text class="stat-sep">·</text>
+        <text class="stat-num">{{bookCount}}</text>
+        <text class="stat-unit">本书</text>
+      </view>
+      <view class="hero-sub">那些值得反复回望的句子</view>
+    </view>
+
+    <!-- 排序切换条 -->
+    <view class="sort-bar">
+      <view
+        class="sort-chip {{item.active ? 'active' : ''}}"
+        wx:for="{{sortChips}}"
+        wx:key="mode"
+        data-mode="{{item.mode}}"
+        bindtap="onSortTap"
+      >{{item.label}}</view>
+      <!-- 随机模式下的「换一批」 -->
+      <view class="reshuffle-btn" wx:if="{{sortMode === 'shuffle'}}" bindtap="onReshuffle">↻ 换一批</view>
+    </view>
+
+    <!-- 最近 / 随机 模式：瀑布流平铺 -->
+    <view class="quote-wall" wx:if="{{sortMode !== 'byBook'}}">
+      <view
+        class="quote-card"
+        wx:for="{{flatQuotes}}"
+        wx:key="key"
+        data-book-id="{{item.bookId}}"
+        bindtap="onQuoteTap"
+      >
+        <view class="quote-mark">"</view>
+        <text class="quote-text">{{item.text}}</text>
+        <!-- 上下文（来自 quoteNotes；可选）-->
+        <view class="quote-context" wx:if="{{item.context}}">
+          <text class="quote-context-text">{{item.context}}</text>
+        </view>
+        <view class="quote-source">
+          <view class="quote-cat-icon" style="background:{{item.categoryColor}}22;color:{{item.categoryColor}};">{{item.categoryIcon}}</view>
+          <text class="quote-source-main">《{{item.bookTitle}}》</text>
+          <text class="quote-source-author" wx:if="{{item.bookAuthor}}"> · {{item.bookAuthor}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 按书分组模式 -->
+    <view class="book-groups" wx:if="{{sortMode === 'byBook'}}">
+      <view class="book-group" wx:for="{{bookGroups}}" wx:for-item="grp" wx:key="bookId">
+        <!-- 书的标题行 -->
+        <view class="group-head">
+          <view class="group-cat-icon" style="background:{{grp.categoryColor}}22;color:{{grp.categoryColor}};">{{grp.categoryIcon}}</view>
+          <view class="group-title-area">
+            <text class="group-title">《{{grp.bookTitle}}》</text>
+            <text class="group-author" wx:if="{{grp.bookAuthor}}">{{grp.bookAuthor}}</text>
+          </view>
+          <text class="group-count">{{grp.quotes.length}}</text>
+        </view>
+        <!-- 该书的金句列表 -->
+        <view class="group-quotes">
+          <view
+            class="quote-card in-group"
+            wx:for="{{grp.quotes}}"
+            wx:for-item="q"
+            wx:key="key"
+            data-book-id="{{q.bookId}}"
+            bindtap="onQuoteTap"
+          >
+            <view class="quote-mark">"</view>
+            <text class="quote-text">{{q.text}}</text>
+            <view class="quote-context" wx:if="{{q.context}}">
+              <text class="quote-context-text">{{q.context}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 上拉加载更多（仅 flatQuotes 模式：recent / shuffle）-->
+    <view class="load-more" wx:if="{{sortMode !== 'byBook' && hasMore}}">
+      <text class="load-more-text">{{loadingMore ? '加载中…' : '上拉加载更多'}}</text>
+    </view>
+    <view class="load-end" wx:if="{{sortMode !== 'byBook' && !hasMore && flatQuotes.length > 0}}">
+      <text class="load-end-text">— 共 {{flatQuotes.length}} 句 —</text>
+    </view>
+
+    <view class="footer-tip" wx:if="{{total > 0}}">— 点击金句可跳到原书编辑 —</view>
+  </block>
+
+</scroll-view>

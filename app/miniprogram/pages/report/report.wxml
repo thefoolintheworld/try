@@ -1,0 +1,174 @@
+<!--pages/report/report.wxml-->
+<navigation-bar title="生成报告" back="{{true}}" color="{{navColor}}" background="{{navBg}}" bindback="onBack"></navigation-bar>
+
+<!-- P5 顶部 Tab：从记录生成 / 从文案导入 -->
+<view class="mode-tabs" wx:if="{{step === 1}}">
+  <view class="mode-tab {{mode === 'records' ? 'active' : ''}}" data-mode="records" bindtap="onSwitchMode">
+    <text class="mode-tab-icon">📚</text>
+    <text>从记录生成</text>
+  </view>
+  <view class="mode-tab {{mode === 'import' ? 'active' : ''}}" data-mode="import" bindtap="onSwitchMode">
+    <text class="mode-tab-icon">📝</text>
+    <text>从文案导入</text>
+  </view>
+</view>
+
+<!-- Step 1 records 模式：选成就 -->
+<scroll-view class="page {{themeClass}}" scroll-y type="list" wx:if="{{step === 1 && mode === 'records'}}">
+
+  <view class="step-header">
+    <view class="step-num">1</view>
+    <view class="step-info">
+      <view class="step-title">选择要放进报告的成就</view>
+      <view class="step-sub">已选 {{pickedCount}} 个</view>
+    </view>
+    <view class="pick-all" bindtap="onPickAll">全选</view>
+  </view>
+
+  <empty-state wx:if="{{books.length === 0}}" icon="🏆" title="还没有成就" desc="先去记录几个成就，再回来做成报告" />
+
+  <!-- 搜索框：成就多时按标题/作者/类型/分类快速定位（books 非空才显示） -->
+  <view class="search-area" wx:if="{{books.length > 0}}">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索标题 / 作者 / 类型 / 分类"
+        placeholder-class="search-placeholder"
+        value="{{searchKey}}"
+        bindinput="onSearchInput"
+      />
+      <text class="search-clear" wx:if="{{searchKey}}" bindtap="onClearSearch">✕</text>
+    </view>
+  </view>
+
+  <!-- 搜索无结果（有成就但筛后为空）-->
+  <empty-state wx:if="{{books.length > 0 && filteredBooks.length === 0}}" icon="🔎" title="没找到匹配的成就" desc="换个关键词试试" />
+
+  <view class="book-list" wx:if="{{filteredBooks.length > 0}}">
+    <view
+      class="book-row {{item.picked ? 'picked' : ''}}"
+      wx:for="{{filteredBooks}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTogglePick"
+    >
+      <view class="book-badge" style="background: {{item.categoryColor}}22; color: {{item.categoryColor}};">{{item.categoryIcon}}</view>
+      <view class="book-main">
+        <view class="book-title">{{item.title}}</view>
+        <view class="book-meta">{{item.metaText || item.categoryLabel}}</view>
+        <view class="book-meta2" wx:if="{{item.quotes.length}}">
+          <text>💬 {{item.quotes.length}}</text>
+        </view>
+      </view>
+      <view class="book-rating" wx:if="{{item.ratingText}}"><text class="star">★</text>{{item.ratingText}}</view>
+      <view class="book-check">{{item.picked ? '✓' : ''}}</view>
+    </view>
+  </view>
+
+  <view class="bottom-bar" wx:if="{{books.length > 0}}">
+    <view class="next-btn {{pickedCount > 0 ? '' : 'disabled'}}" bindtap="onNextToStep2">
+      下一步 · 选模板
+    </view>
+  </view>
+</scroll-view>
+
+<!-- Step 1 import 模式：粘贴文案 → 粗排生成 -->
+<scroll-view class="page {{themeClass}}" scroll-y type="list" wx:if="{{step === 1 && mode === 'import'}}">
+
+  <view class="step-header">
+    <view class="step-num">📝</view>
+    <view class="step-info">
+      <view class="step-title">粘贴文案，自动粗排</view>
+      <view class="step-sub">把你写好的文字粘进来，小程序按段落切成卡片</view>
+    </view>
+  </view>
+
+  <view class="form-block">
+    <view class="form-label">报告标题</view>
+    <input
+      class="title-input"
+      placeholder="如 2026 我的读书总结"
+      value="{{importTitle}}"
+      bindinput="onImportTitleInput"
+      maxlength="30"
+    />
+  </view>
+
+  <view class="form-block">
+    <view class="form-label">文案内容</view>
+    <view class="import-textarea-wrap">
+      <textarea
+        class="import-textarea"
+        placeholder="把已经写好的文案粘贴在这里&#10;空行分段会切成不同卡片&#10;每段内的换行保留为段落"
+        placeholder-class="import-textarea-ph"
+        value="{{importText}}"
+        bindinput="onImportTextInput"
+        maxlength="-1"
+        auto-height
+      />
+      <text class="import-clear" wx:if="{{importText}}" bindtap="onClearImport">清空</text>
+    </view>
+    <view class="import-hint" wx:if="{{importChunkCount > 0}}">
+      预计生成 {{importChunkCount + 2}} 张卡片（含封面与落款）
+    </view>
+    <view class="import-hint static" wx:else>
+      提示：段落之间留一个空行，会切成独立的卡片
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <view class="next-btn {{importText ? '' : 'disabled'}}" bindtap="onGenerateFromImport">
+      粗排生成
+    </view>
+  </view>
+</scroll-view>
+
+<!-- Step 2: 填标题 + 选模板 -->
+<scroll-view class="page {{themeClass}}" scroll-y type="list" wx:if="{{step === 2}}">
+
+  <view class="step-header">
+    <view class="step-num">2</view>
+    <view class="step-info">
+      <view class="step-title">为这份报告起个名字</view>
+      <view class="step-sub">包含 {{pickedCount}} 个成就</view>
+    </view>
+  </view>
+
+  <view class="form-block">
+    <view class="form-label">报告标题</view>
+    <input
+      class="title-input"
+      placeholder="如 2026 我的成就回顾"
+      value="{{reportTitle}}"
+      bindinput="onTitleInput"
+      maxlength="30"
+    />
+  </view>
+
+  <view class="form-block">
+    <view class="form-label">选择模板</view>
+    <view class="template-hint">阅读报告模板用书目变量，成就报告模板用成就变量，自由选择</view>
+    <view class="template-pick" bindtap="onTapChooseTemplate">
+      <view class="template-pick-icon">✦</view>
+      <view class="template-pick-main">
+        <view class="template-pick-name" wx:if="{{selectedTemplateName}}">{{selectedTemplateName}}</view>
+        <view class="template-pick-name placeholder" wx:else>点击选择模板</view>
+      </view>
+      <view class="template-pick-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <view class="next-btn {{selectedTemplateId ? '' : 'disabled'}}" bindtap="onGenerate">
+      生成报告
+    </view>
+  </view>
+</scroll-view>
+
+<!-- Step 3: 生成中 -->
+<view class="generating" wx:if="{{step === 3}}">
+  <view class="gen-icon">✦</view>
+  <view class="gen-text">正在生成你的报告...</view>
+</view>

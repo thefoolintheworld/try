@@ -1,0 +1,120 @@
+/**pages/templates/templates.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: @sp-6 @sp-7 @sp-12;
+}
+
+.hint {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  padding: @sp-4 @sp-2 @sp-6;
+}
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-5;
+}
+.template-card {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7;
+  box-shadow: @shadow-card;
+}
+.template-header {
+  display: flex;
+  align-items: flex-start;
+}
+.template-preview-icon {
+  font-size: @fs-xxl;
+  width: 80rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.template-main {
+  flex: 1;
+  margin-left: @sp-4;
+}
+.template-name {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.template-desc {
+  margin-top: @sp-2;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  line-height: 1.5;
+}
+.template-badge {
+  font-size: @fs-s;
+  color: @color-accent;
+  background: rgba(217, 122, 74, 0.1);
+  padding: @sp-2 @sp-4;
+  border-radius: @radius-sm;
+  flex-shrink: 0;
+}
+.template-badge.mine {
+  color: @color-book;
+  background: rgba(107, 142, 90, 0.1);
+}
+.template-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: @sp-6;
+  padding-top: @sp-6;
+  border-top: 1rpx solid @color-divider;
+}
+.meta-text {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+
+/* ===== 操作按钮（管理模式） ===== */
+.template-actions {
+  display: flex;
+  gap: @sp-4;
+  margin-top: @sp-5;
+  padding-top: @sp-5;
+  border-top: 1rpx solid @color-divider;
+}
+.tpl-action {
+  flex: 1;
+  text-align: center;
+  padding: @sp-4 0;
+  border-radius: @radius-sm;
+  background: @color-bg;
+  font-size: @fs-base;
+  color: @color-text-primary;
+}
+.tpl-action.danger {
+  color: @color-danger;
+  background: @color-danger-bg;
+}
+
+/* ===== 新建按钮 ===== */
+.create-block {
+  margin-top: @sp-7;
+}
+.create-btn {
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-btn;
+  border: 2rpx dashed @color-accent;
+  color: @color-accent;
+  font-size: @fs-m;
+  background: rgba(217, 122, 74, 0.04);
+}
+
+/* ===== 空状态 ===== */
+.footer-tip {
+  text-align: center;
+  margin-top: @sp-8;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}

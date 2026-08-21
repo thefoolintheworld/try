@@ -1,0 +1,851 @@
+/**pages/edit/edit.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: @sp-6 @sp-7 @sp-12;
+}
+
+/* ===== 分区标签（升级为视觉分隔：左竖条 + 强调色）===== */
+.section-label {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  font-weight: 600;
+  padding: @sp-8 @sp-4 @sp-5;
+  position: relative;
+  /* 左侧强调色竖条，增强分区感（替代原来的纯灰字标签）*/
+  border-left: 6rpx solid var(--color-accent);
+  padding-left: @sp-5;
+  margin-left: @sp-1;
+  letter-spacing: 1rpx;
+}
+.section-label:first-child {
+  padding-top: @sp-4;
+}
+.section-tip {
+  font-weight: 400;
+  opacity: 0.6;
+  font-size: @fs-s;
+  letter-spacing: 0;
+}
+
+/* ===== 分类选择器（横向 chip 行） ===== */
+.category-bar {
+  white-space: nowrap;
+  padding: @sp-2 0 @sp-4;
+}
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: @sp-4 @sp-7;
+  margin-right: @sp-4;
+  border-radius: @radius-chip;
+  background: @color-card;
+  box-shadow: @shadow-card;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1;
+}
+.category-chip.active {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+.category-icon {
+  font-size: @fs-l;
+  margin-right: @sp-2;
+}
+.category-chip.active .category-icon {
+  filter: brightness(1.2);
+}
+
+/* ===== 表单行 ===== */
+.form-row {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  margin-bottom: @sp-4;
+  min-height: 48rpx;
+}
+.form-row.textarea-row {
+  align-items: flex-start;
+}
+.form-label {
+  width: 160rpx;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  flex-shrink: 0;
+}
+.form-input {
+  flex: 1;
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+/* 标题输入框走标题字族（让用户在录入时就能感受到衬线模式的文学气质）*/
+.form-input.title-input {
+  font-family: var(--font-title);
+  font-weight: 500;
+}
+.form-textarea {
+  flex: 1;
+  font-size: @fs-l;
+  color: @color-text-primary;
+  min-height: 120rpx;
+  line-height: 1.6;
+}
+.form-textarea.long {
+  min-height: 200rpx;
+}
+.form-picker {
+  flex: 1;
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+
+/* ===== P2-3 短评引导 Prompt ===== */
+.note-prompt {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, color-mix(in srgb, @color-accent 10%, transparent) 0%, color-mix(in srgb, @color-accent 4%, transparent) 100%);
+  border-radius: @radius-card-xs;
+  padding: @sp-5 @sp-6;
+  margin: @sp-2 0 @sp-3;
+  gap: @sp-3;
+}
+.note-prompt-icon {
+  font-size: @fs-m;
+  flex-shrink: 0;
+}
+.note-prompt-text {
+  flex: 1;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  font-family: var(--font-title);
+  line-height: 1.5;
+}
+.note-prompt-shuffle {
+  font-size: @fs-s;
+  color: @color-accent;
+  flex-shrink: 0;
+  padding: @sp-2 @sp-3;
+  border-radius: @radius-pill;
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+}
+
+/* ===== 评分星（5 颗 + 半星）=====
+   每颗星三层叠加：底层灰全星 + 上层金色裁剪条（宽度=填充百分比）+ 左右两半点击区。
+   点左半 = 整星 -0.5，点右半 = 整星；数据 rating 保持 0.5-5 步进 0.5。 */
+.rating-stars {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.star-unit {
+  position: relative;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: @sp-2;
+  line-height: 1;
+}
+/* 底层灰色全星 */
+.star-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 48rpx;
+  color: @color-divider;
+  line-height: 1;
+}
+/* 上层金色裁剪条：overflow hidden 把宽度外的部分剪掉，宽度由 wxml inline style 设定 */
+.star-fg-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 48rpx;
+  overflow: hidden;
+  pointer-events: none;   /* 让点击穿透到下面的 .star-half */
+}
+.star-fg {
+  font-size: 48rpx;
+  color: @color-star;
+  line-height: 1;
+  /* 内层星固定 48rpx 宽，不随外层 wrap 收缩——否则裁剪宽度算出来会错 */
+  width: 48rpx;
+}
+/* 左右两半点击区，各占星的 50%，绝对定位覆盖在星上 */
+.star-half {
+  position: absolute;
+  top: 0;
+  height: 48rpx;
+  width: 24rpx;
+  cursor: pointer;
+  /* 关键：点击区必须压在视觉裁剪层（.star-fg-wrap，pointer-events:none）之上，
+     否则部分机型默认堆叠会让点击穿透到下层灰星而不触发 onTapRatingHalf。
+     z-index:2 确保左右两半始终是最上层可点区。*/
+  z-index: 2;
+}
+.star-half.left {
+  left: 0;
+}
+.star-half.right {
+  right: 0;
+}
+.star-half:active {
+  background: color-mix(in srgb, @color-star 18%, transparent);
+}
+
+/* ===== 金句列表 ===== */
+.quotes-block {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  margin-bottom: @sp-4;
+}
+.quotes-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: @sp-4;
+}
+.form-label-inline {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+}
+.quotes-count {
+  margin-left: @sp-4;
+  font-size: @fs-sm;
+  color: @color-accent;
+  background: rgba(217, 122, 74, 0.1);
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-card-xs;
+}
+.quote-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+  margin-bottom: @sp-4;
+}
+.quote-item {
+  display: flex;
+  flex-direction: column;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-6;
+  gap: @sp-3;
+}
+.quote-main-row {
+  display: flex;
+  align-items: flex-start;
+}
+.quote-actions {
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+  margin-left: @sp-4;
+  flex-shrink: 0;
+}
+.quote-text {
+  flex: 1;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.6;
+  font-style: italic;
+}
+.quote-ctx-toggle {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  padding: @sp-1 @sp-2;
+  border-radius: @radius-xs;
+  background: @color-card;
+  line-height: 1.4;
+}
+.quote-ctx-toggle.has-ctx {
+  color: @color-accent;
+  opacity: 1;
+}
+.quote-ctx-toggle.editing {
+  color: @color-accent;
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+  opacity: 1;
+}
+// T3 改正文按钮：与 ✎注 同款小 chip，但用 book 色区分语义（改文本 vs 加注释）
+.quote-text-edit {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  padding: @sp-1 @sp-2;
+  border-radius: @radius-xs;
+  background: @color-card;
+  line-height: 1.4;
+}
+.quote-text-edit.editing {
+  color: @color-book;
+  background: color-mix(in srgb, @color-book 12%, transparent);
+  opacity: 1;
+}
+.quote-context-text {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  padding-left: @sp-2;
+  border-left: 2rpx solid @color-divider;
+  margin-left: @sp-1;
+}
+.quote-ctx-input-row {
+  display: flex;
+  gap: @sp-3;
+  align-items: center;
+  padding-top: @sp-1;
+}
+.quote-ctx-input {
+  flex: 1;
+  background: @color-card;
+  border-radius: @radius-xs;
+  padding: @sp-3 @sp-4;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  border: 1rpx solid @color-divider;
+}
+.quote-ctx-save-btn {
+  font-size: @fs-sm;
+  color: @color-card;
+  background: @color-accent;
+  border-radius: @radius-xs;
+  padding: @sp-2 @sp-5;
+  line-height: 1.4;
+}
+// T3 取消按钮：与「存」并列，ghost 风格
+.quote-ctx-cancel-btn {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  background: transparent;
+  border-radius: @radius-xs;
+  padding: @sp-2 @sp-4;
+  line-height: 1.4;
+}
+.quote-del {
+  margin-left: @sp-1;
+  font-size: 36rpx;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  padding: 0 @sp-2;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.quote-add-row {
+  display: flex;
+  gap: @sp-4;
+  align-items: center;
+}
+.quote-input {
+  flex: 1;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-6;
+  font-size: @fs-m;
+  color: @color-text-primary;
+}
+.quote-add-btn {
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-m;
+  padding: @sp-5 @sp-7;
+  border-radius: @radius-sm;
+  flex-shrink: 0;
+}
+
+/* ===== 批量粘贴摘抄辅助（T2-3）===== */
+.bulk-toggle-row {
+  margin-top: @sp-4;
+}
+.bulk-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  padding: @sp-3 @sp-5;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  border: 1rpx dashed @color-divider;
+}
+.bulk-toggle-btn.open {
+  color: @color-accent;
+  border-color: @color-accent;
+}
+.bulk-toggle-icon {
+  font-size: @fs-base;
+}
+.bulk-panel {
+  margin-top: @sp-4;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-6;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.bulk-hint {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.bulk-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  background: @color-card;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-6;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+.bulk-action-row {
+  display: flex;
+  gap: @sp-4;
+  align-items: center;
+}
+.bulk-action-btn {
+  font-size: @fs-base;
+  padding: @sp-4 @sp-7;
+  border-radius: @radius-sm;
+  line-height: 1.4;
+}
+.bulk-action-btn.secondary {
+  color: @color-text-primary;
+  background: @color-card;
+  border: 1rpx solid @color-divider;
+}
+.bulk-action-btn.primary {
+  color: #FFFFFF;
+  background: @color-book;
+}
+.bulk-preview-list {
+  margin-top: @sp-2;
+  padding-top: @sp-4;
+  border-top: 1rpx dashed @color-divider;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-3;
+}
+.bulk-preview-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.bulk-preview-item {
+  display: flex;
+  align-items: flex-start;
+  background: @color-card;
+  border-radius: @radius-xs;
+  padding: @sp-4 @sp-5;
+  gap: @sp-3;
+}
+.bulk-preview-text {
+  flex: 1;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  line-height: 1.5;
+  font-style: italic;
+}
+.bulk-preview-del {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 0 @sp-1;
+}
+
+/* ===== 成就图片区 ===== */
+.image-section {
+  display: flex;
+  gap: @sp-6;
+  margin-bottom: @sp-2;
+  align-items: stretch;
+}
+.image-preview {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: @radius-card-sm;
+  flex-shrink: 0;
+  background-color: @color-card;
+  background-size: cover;
+  background-position: center;
+  box-shadow: @shadow-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+/* 无图时用虚线边 + 分类的 emoji 占位，避免空旷 */
+.image-preview.empty {
+  border: 2rpx dashed @color-divider;
+  box-shadow: none;
+  background: @color-card;
+}
+.image-preview-placeholder {
+  font-size: 72rpx;
+  opacity: 0.5;
+  line-height: 1;
+}
+.image-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-3;
+  justify-content: space-between;
+}
+.image-action-row {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card-xs;
+  padding: @sp-5 @sp-6;
+  flex: 1;
+  box-shadow: @shadow-card;
+}
+/* 已无图时禁用「不设图片」行，视觉上置灰但仍可点（点击 no-op）*/
+.image-action-row.disabled {
+  opacity: 0.4;
+}
+.image-action-icon {
+  font-size: @fs-lg;
+  margin-right: @sp-4;
+  line-height: 1;
+}
+.image-action-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+}
+
+/* ===== 情绪与五感标签区 ===== */
+.tags-block {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  margin-bottom: @sp-4;
+}
+.tag-group-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin-top: @sp-4;
+  margin-bottom: @sp-3;
+}
+.tag-group-label:first-child {
+  margin-top: 0;
+}
+/* 预设标签 chip 行：横排流式换行，多选 toggle */
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.tag-chip {
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-card;
+  background: @color-bg;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  line-height: 1;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+/* 已选 chip：accent 边框 + accent 文字（半透明背景，区别于未选的灰底）*/
+.tag-chip.active {
+  background: rgba(217, 122, 74, 0.1);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+/* 已选标签展示区（含预设和自定义统一的药丸）*/
+.tag-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+  margin-top: @sp-6;
+  padding-top: @sp-6;
+  border-top: 1rpx solid @color-divider;
+}
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  padding: @sp-2 @sp-3 @sp-2 @sp-5;
+  border-radius: @radius-card-md;
+  background: rgba(217, 122, 74, 0.08);
+  font-size: @fs-sm;
+  color: var(--color-accent, #D97A4A);
+  line-height: 1;
+}
+.tag-item-text {
+  margin-right: @sp-2;
+}
+.tag-item-del {
+  font-size: @fs-lg;
+  opacity: 0.6;
+  line-height: 1;
+  padding: 0 @sp-1;
+}
+/* 自定义标签输入行（克隆 quote-add-row 风格）*/
+.tag-add-row {
+  display: flex;
+  gap: @sp-4;
+  align-items: center;
+  margin-top: @sp-6;
+}
+.tag-input {
+  flex: 1;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-6;
+  font-size: @fs-base;
+  color: @color-text-primary;
+}
+.tag-add-btn {
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-base;
+  padding: @sp-5 @sp-7;
+  border-radius: @radius-sm;
+  flex-shrink: 0;
+}
+
+/* ===== 瞬时心境单选（Item.mood）===== */
+/* 与 tags 多选语义分离：单选 chip 组 + 一个「无」选项（点「无」或重复点已选项 = 清空）*/
+.mood-block {
+  background: @color-card;
+  border-radius: @radius-sm;
+  padding: @sp-6;
+  margin-bottom: @sp-6;
+}
+.mood-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.mood-chip {
+  padding: @sp-4 @sp-7;
+  border-radius: @radius-card;
+  background: @color-bg;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  line-height: 1;
+  border: 2rpx solid transparent;
+  transition: all 0.2s ease;
+}
+/* 心境选中态：用 book 绿（与 tags 的 accent 橙区分，视觉上区分两种语义）*/
+.mood-chip.active {
+  background: rgba(107, 142, 90, 0.12);
+  color: @color-book;
+  border-color: @color-book;
+  font-weight: 500;
+}
+.mood-chip.mood-none {
+  background: @color-bg;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+.mood-chip.mood-none.active {
+  background: @color-bg;
+  color: @color-text-secondary;
+  border-color: @color-divider;
+  opacity: 1;
+}
+
+/* ===== 目标进度行（开关 + 数字输入 + 百分比预览）===== */
+.progress-toggle-row {
+  justify-content: space-between;   /* label 左，开关右 */
+}
+/* iOS 风开关：圆角跑道 + 圆点 knob，靠 transition 滑动 */
+.progress-switch {
+  width: 80rpx;
+  height: 44rpx;
+  border-radius: @radius-pill;
+  background: @color-divider;
+  position: relative;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+.progress-switch.on {
+  background: @color-accent;
+}
+.progress-switch-knob {
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: @shadow-subtle;
+  transition: transform 0.2s ease;
+  display: block;
+}
+.progress-switch.on .progress-switch-knob {
+  transform: translateX(36rpx);
+}
+.progress-input-row {
+  align-items: center;
+}
+.progress-num-input {
+  width: 120rpx;
+  text-align: center;
+  padding: @sp-3 @sp-3;
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.progress-separator {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  margin: 0 @sp-2;
+  line-height: 1;
+}
+.progress-percent {
+  margin-left: auto;
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-accent;
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-pill;
+  background: rgba(217, 122, 74, 0.12);
+}
+
+/* ===== 预设图选择 sheet（底部弹层）===== */
+.preset-sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.preset-sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.preset-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: var(--color-card, #FFFFFF);
+  border-radius: @radius-card @radius-card 0 0;
+  padding: @sp-7 @sp-7 calc(48rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.preset-sheet.show {
+  transform: translateY(0);
+}
+.preset-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @sp-6;
+}
+.preset-sheet-title {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: var(--color-text-primary, #3D3530);
+}
+.preset-sheet-close {
+  font-size: 36rpx;
+  color: var(--color-text-secondary, #8B7D6E);
+  padding: 0 @sp-2;
+  line-height: 1;
+}
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: @sp-5;
+}
+.preset-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: @radius-card-xs;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border: 4rpx solid transparent;
+  transition: border-color 0.2s ease;
+}
+.preset-item.selected {
+  border-color: var(--color-accent, #D97A4A);
+}
+.preset-item-name {
+  display: block;
+  width: 100%;
+  padding: @sp-2 @sp-3;
+  font-size: @fs-s;
+  color: #FFFFFF;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
+  text-align: center;
+}
+
+/* ===== P3-2 共读引导入口 ===== */
+.guide-entry {
+  margin-top: @sp-8;
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-6 @sp-7;
+  background: @color-card;
+  border-radius: @radius-card;
+  box-shadow: @shadow-card;
+  border-left: 6rpx solid @color-book;
+}
+.guide-entry-icon {
+  font-size: @fs-xl;
+}
+.guide-entry-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-1;
+}
+.guide-entry-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.guide-entry-sub {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.guide-entry-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+
+/* ===== 按钮区 ===== */
+.btn-area {
+  margin-top: @sp-9;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-5;
+}
+.btn {
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-btn;
+  font-size: @fs-lg;
+  font-weight: 500;
+}
+.btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+}
+.btn.danger {
+  background: @color-card;
+  color: @color-danger;
+}

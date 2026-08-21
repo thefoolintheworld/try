@@ -1,0 +1,656 @@
+/**pages/index/index.less**/
+@import "../../app.less";
+
+.page {
+  /* 不能用 100vh：自定义导航栏占了顶部 ~44px+safe-area 文档流高度，
+     加 100vh 后总高 > 一屏，原生页与 scroll-view 各滚一次（双滚动条 bug）。
+     减去导航栏高度后正好一屏，只剩 scroll-view 自己滚动。*/
+  height: calc(100vh - 44px - env(safe-area-inset-top));
+  /* 关键：中和 app.less 全局 .page 继承来的 min-height:100vh。
+     CSS 规则 min-height > height 时 min-height 赢，不加这行上面的 height:calc 会被 100vh 盖掉，
+     双滚动条根治不了（上一轮 bug 的真正根因）。min-height:0 让 height:calc 真正生效。*/
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== Hero 年度大标题 ===== */
+.hero {
+  padding: @sp-10 0 44rpx;
+  text-align: center;
+  position: relative;
+}
+/* 搜索入口：右上角放大镜按钮，绝对定位避免破坏 hero 的居中文案布局 */
+.hero-search {
+  position: absolute;
+  top: 24rpx;
+  right: 0;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: @color-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: @shadow-card;
+}
+.hero-search-icon {
+  font-size: @fs-l;
+  opacity: 0.7;
+  line-height: 1;
+}
+.hero-deco {
+  /* 已弃用：原 hero 顶部 ❋ 装饰在 2026-08 版本删除以收紧顶部留白。
+     选择器与样式保留，仅为兜底旧缓存；新版本不再输出该节点。*/
+  display: none;
+}
+.hero-year {
+  /* 字体层：年份这种核心数字用 numeric 字族；标题字体令牌让衬线模式生效 */
+  font-family: var(--font-title), var(--font-numeric);
+  font-size: 120rpx;
+  font-weight: 300;
+  color: @color-accent;
+  line-height: 1;
+  letter-spacing: 6rpx;
+  /* 暗色下用 accent-soft 做柔和光晕，避免亮橙过于刺眼 */
+}
+.hero-divider {
+  width: 48rpx;
+  height: 4rpx;
+  background: @color-accent;
+  opacity: 0.4;
+  border-radius: 2rpx;
+  margin: @sp-6 auto 0;
+}
+.hero-sub {
+  margin-top: @sp-5;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  letter-spacing: 4rpx;
+  /* 副标题用标题字族（衬线模式下文学感更强）*/
+  font-family: var(--font-title);
+}
+
+/* ===== Hero 数据胶囊条（替代原年度目标卡 + 勋章墙卡）=====
+   一行紧凑数字胶囊，把核心指标压在一行；每颗可点跳详情。
+   全为 0 时整条由 wxml wx:if 隐藏（首次使用不轰炸）。 */
+.capsule-bar {
+  margin-top: @sp-8;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: @sp-3 @sp-4;
+}
+.capsule-chip {
+  display: inline-flex;
+  align-items: baseline;
+  padding: @sp-2 @sp-5;
+  background: @color-card;
+  border-radius: @radius-pill;
+  box-shadow: @shadow-card;
+  /* 点按反馈：胶囊可点，给一点 active 态 */
+}
+.capsule-chip:active {
+  opacity: 0.7;
+}
+.capsule-chip-icon {
+  font-size: @fs-s;
+  line-height: 1;
+  margin-right: @sp-2;
+  /* 图标稍小，让数字成为视觉主角 */
+}
+.capsule-chip-num {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.capsule-chip-unit {
+  margin-left: 2rpx;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  line-height: 1;
+}
+
+/* ===== 成就墙展示区（首页核心展示，横向扁条卡片） =====
+   比例参照主流成就系统（Steam/多邻国/得到 等）：横向条，宽高比约 3:1，
+   缩略图占卡宽 ~25%。列数可切换：double 双列（默认紧凑）/ single 单列（宽松好阅读）。*/
+.wall-grid {
+  display: grid;
+  gap: @sp-5;
+}
+/* 双列：两列等宽 */
+.wall-grid.double {
+  grid-template-columns: repeat(2, 1fr);
+}
+/* 单列：一行一张，缩略图和文字区都更宽敞 */
+.wall-grid.single {
+  grid-template-columns: 1fr;
+}
+/* 单列下放大缩略图 + 标题，避免大卡显得空旷 */
+.wall-grid.single .wall-card-img {
+  width: 96rpx;
+  height: 96rpx;
+}
+.wall-grid.single .wall-card-title {
+  font-size: @fs-m;
+}
+.wall-grid.single .wall-card-date {
+  font-size: @fs-sm;
+}
+/* 「查看更多」文字链：居中显示，与下方「全部成就/生成报告」按钮拉开距离，
+   避免视觉上跟按钮区混淆（按钮在更下方，且有自己的卡片底）。*/
+.wall-more {
+  margin-top: @sp-7;
+  margin-bottom: @sp-3;
+  text-align: center;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+.wall-card {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  overflow: hidden;
+  box-shadow: @shadow-card;
+  /* 横向长方形：左图 + 右文，宽远大于高 */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: @sp-4 @sp-5;
+  box-sizing: border-box;
+}
+.wall-card-img {
+  /* 左侧方形缩略图：84rpx（占卡宽 ~25%，落在主流成就条 12–25% 上限）。
+     预设图用 cssPreview 填背景渐变；真实图用 url；无图时透明底 + 居中分类 emoji。*/
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: @radius-sm;
+  flex-shrink: 0;
+  background-color: @color-bg;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wall-card-placeholder {
+  font-size: 36rpx;
+  opacity: 0.55;
+  line-height: 1;
+}
+.wall-card-body {
+  flex: 1;
+  min-width: 0;
+  margin-left: @sp-4;
+  /* 右侧文字区：成就名在上，时间在下，纵向堆叠 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.wall-card-title {
+  font-size: @fs-base;
+  font-weight: 500;
+  color: @color-text-primary;
+  line-height: 1.3;
+  /* 标题用标题字族，衬线模式下文学感更强 */
+  font-family: var(--font-title);
+  /* 1 行省略：横向扁条高度优先，完整标题在详情页/列表页查看 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wall-card-date {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+/* 里程碑进度条：紧凑横条 + 「当前/目标」文字，只在挂了 progress 的卡片渲染 */
+.wall-progress {
+  display: flex;
+  align-items: center;
+  margin-top: @sp-2;
+}
+.wall-progress-track {
+  flex: 1;
+  min-width: 0;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: @color-divider;
+  overflow: hidden;
+}
+.wall-progress-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  background: @color-accent;
+  /* width 由 wxml 内联 style 注入（progressPercent%） */
+  transition: width 0.3s ease;
+}
+.wall-progress-text {
+  margin-left: @sp-3;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ===== 三入口：许愿星 + 灵感抽屉（第一行 2 卡）+ 每日打卡（第二行 1 卡居中）===== */
+.entry-grid {
+  margin-top: @sp-4;
+}
+.entry-row {
+  display: flex;
+  gap: @sp-4;
+}
+.entry-card {
+  flex: 1;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-5;
+  display: flex;
+  align-items: center;
+  box-shadow: @shadow-card;
+  min-width: 0;
+}
+.entry-icon {
+  font-size: @fs-xl;
+  margin-right: @sp-3;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.entry-title {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.entry-sub {
+  margin-top: @sp-1;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.entry-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1;
+  margin-left: @sp-2;
+  flex-shrink: 0;
+}
+/* 打卡入口：第二行单独一张卡，整行宽度，稍微突出（左边一道强调色，强化"习惯入口"地位） */
+.entry-card.checkin-entry {
+  margin-top: @sp-4;
+  border-left: 6rpx solid var(--color-accent, #D97A4A);
+  padding-left: @sp-6;
+}
+
+/* ===== 回顾 · 珍藏区（往年今日 / 年度回顾 / 陈列柜 / 金句墙统一收纳）===== */
+.recap-group {
+  margin-top: @sp-10;   /* 与上方入口区拉开间距，作为独立分区 */
+}
+.recap-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: @sp-4;
+  margin-bottom: @sp-5;
+}
+.recap-group-title {
+  font-family: var(--font-title);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.recap-group-sub {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== 往年今日入口（条件出现，仅当天有往年记录时才显示）===== */
+.memory-entry {
+  margin-top: @sp-4;   /* 组内卡片间距（首张相对标题；后续张叠加） */
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-6;
+  display: flex;
+  align-items: center;
+  box-shadow: @shadow-card;
+  /* 用偏紫的暖色左边强调，区分于打卡的橙色，传递"怀旧"氛围 */
+  border-left: 6rpx solid @color-film;
+  padding-left: @sp-6;
+}
+.memory-entry-icon {
+  font-size: @fs-xl;
+  margin-right: @sp-4;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.memory-entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.memory-entry-title {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.memory-entry-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.85;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+.memory-entry-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1;
+  margin-left: @sp-2;
+  flex-shrink: 0;
+}
+/* 年度回顾入口：品牌橙色强调，呼应 ✨「闪耀回顾」氛围（覆盖 .memory-entry 的紫色怀旧边）*/
+.memory-entry.wrapped-entry {
+  border-left-color: var(--color-accent, #D97A4A);
+}
+/* 陈列柜入口：藏书绿色强调，呼应 🖼️「珍藏」氛围 */
+.memory-entry.showcase-entry {
+  border-left-color: var(--color-book, #6B8E5A);
+}
+/* 金句墙入口：星辉金色强调，呼应 💬「值得反复回望的句子」氛围 */
+.memory-entry.quotes-entry {
+  border-left-color: var(--color-star, #E8A33D);
+}
+
+/* ===== 次要入口 ===== */
+.actions {
+  display: flex;
+  gap: @sp-4;
+  margin-top: @sp-6;
+}
+.action-btn {
+  flex: 1;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: @shadow-card;
+  /* 含角标时让角标能溢出到右上角 */
+  position: relative;
+}
+.action-btn.primary {
+  background: @color-accent;
+}
+.action-btn.primary .action-icon,
+.action-btn.primary .action-text {
+  color: #FFFFFF;
+}
+.action-icon {
+  font-size: 44rpx;
+  color: @color-accent;
+  line-height: 1;
+}
+.action-text {
+  margin-top: @sp-3;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.3;
+}
+/* 「我的报告」按钮的角标：右上角红色小圆数字。
+   原独立报告卡的徽标，随卡片并入按钮后改成角标。 */
+.action-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 12rpx;
+  min-width: 30rpx;
+  height: 30rpx;
+  padding: 0 @sp-2;
+  border-radius: @radius-pill;
+  background: @color-danger;
+  color: #FFFFFF;
+  font-size: @fs-xs;
+  line-height: 30rpx;
+  text-align: center;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 最近记录区 ===== */
+.section {
+  margin-top: @sp-10;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @sp-6;
+}
+.section-title {
+  font-family: var(--font-title);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.section-more {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+/* 成就墙区头部的右侧控件组：列数切换 + 编辑展示入口 */
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: @sp-5;
+}
+/* 列数切换：两个图标并排，当前模式高亮。点击整个容器即切换。*/
+.layout-toggle {
+  display: flex;
+  align-items: center;
+  gap: @sp-2;
+  padding: @sp-1;
+  border-radius: @radius-sm;
+  background: var(--color-card, #FFFFFF);
+  box-shadow: @shadow-card;
+}
+.layout-toggle-item {
+  font-size: @fs-l;
+  line-height: 1;
+  padding: @sp-2 @sp-2;
+  color: var(--color-text-secondary, #8B7D6E);
+  opacity: 0.5;
+}
+.layout-toggle-item.active {
+  color: var(--color-accent, #D97A4A);
+  opacity: 1;
+}
+
+/* ===== 底部 ===== */
+.footer-tip {
+  text-align: center;
+  margin-top: @sp-11;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+}
+.footer-links {
+  text-align: center;
+  margin-top: @sp-11;
+  padding-bottom: @sp-12;
+  /* 上方一道极淡的分隔线，给页脚一个视觉锚点，避免三段文字悬空 */
+  padding-top: @sp-9;
+  position: relative;
+}
+.footer-links::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96rpx;
+  height: 2rpx;
+  background: var(--color-divider);
+  opacity: 0.6;
+}
+.footer-link {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  padding: @sp-4 @sp-7;
+}
+
+/* ===== 空状态（首次使用） ===== */
+/* ===== 成就墙勾选 sheet（底部弹层，固定定位在 scroll-view 之外） ===== */
+.pin-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.pin-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pin-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: var(--color-card, #FFFFFF);
+  border-radius: @radius-card @radius-card 0 0;
+  padding: @sp-7 @sp-7 calc(32rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  /* 高度自适应：列表可滚，最高占 75vh */
+  max-height: 75vh;
+}
+.pin-sheet.show {
+  transform: translateY(0);
+}
+.pin-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.pin-sheet-title {
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: var(--color-text-primary, #3D3530);
+  font-family: var(--font-title);
+}
+.pin-sheet-close {
+  font-size: 36rpx;
+  color: var(--color-text-secondary, #8B7D6E);
+  padding: 0 @sp-2;
+  line-height: 1;
+}
+.pin-sheet-sub {
+  margin-top: @sp-3;
+  font-size: @fs-sm;
+  color: var(--color-text-secondary, #8B7D6E);
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+.pin-list {
+  flex: 1;
+  margin-top: @sp-6;
+  min-height: 0;
+}
+.pin-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-6 @sp-5;
+  border-radius: @radius-card-xs;
+  margin-bottom: @sp-3;
+  background: var(--color-bg, #FAF6F0);
+  transition: background 0.2s ease;
+}
+.pin-item.checked {
+  /* 已勾选：用 accent 极淡背景 + accent 左侧色条做选中态 */
+  background: rgba(217, 122, 74, 0.08);
+}
+.pin-item-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: @radius-poster;
+  background: var(--color-card, #FFFFFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-m;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pin-item-main {
+  flex: 1;
+  margin-left: @sp-5;
+  min-width: 0;
+}
+.pin-item-title {
+  font-size: @fs-m;
+  color: var(--color-text-primary, #3D3530);
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pin-item-date {
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: var(--color-text-secondary, #8B7D6E);
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.pin-item-check {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: @radius-card-md;
+  border: 2rpx solid var(--color-divider, #E5DDD0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-m;
+  color: #FFFFFF;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-left: @sp-4;
+  background: transparent;
+}
+.pin-item.checked .pin-item-check {
+  background: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+.pin-sheet-actions {
+  flex-shrink: 0;
+  margin-top: @sp-6;
+}
+.pin-sheet-btn {
+  text-align: center;
+  padding: @sp-6 0;
+  border-radius: @radius-btn;
+  font-size: @fs-l;
+  font-weight: 500;
+}
+.pin-sheet-btn.confirm {
+  background: var(--color-accent, #D97A4A);
+  color: #FFFFFF;
+}

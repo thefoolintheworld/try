@@ -1,0 +1,892 @@
+/**pages/settings/settings.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== 分区标签 ===== */
+.section-label {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  font-weight: 600;
+  padding: @sp-8 @sp-2 @sp-4;
+}
+.section-label:first-child {
+  padding-top: @sp-4;
+}
+.section-tip {
+  font-weight: 400;
+  opacity: 0.7;
+  font-size: @fs-s;
+  margin-left: @sp-2;
+}
+
+/* ===== 选项卡组 ===== */
+.card-group {
+  background: @color-card;
+  border-radius: @radius-card;
+  overflow: hidden;
+  box-shadow: @shadow-card;
+}
+.option-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-7 @sp-7;
+  border-bottom: 1rpx solid @color-divider;
+  position: relative;
+}
+.option-row:last-child {
+  border-bottom: none;
+}
+.option-row.active {
+  background: var(--color-card-soft);
+}
+
+/* 色块预览（左侧方形氛围色）*/
+.option-swatch {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: @radius-card-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2rpx solid @color-divider;
+  /* 暗色下需要更明显的边框区分 */
+  box-sizing: border-box;
+}
+.option-swatch-icon {
+  font-size: @fs-lg;
+  line-height: 1;
+  color: @color-accent;
+  /* 暗色亮底色块上文字色用强调色 */
+}
+/* 字体预览：让 Aa 字样直观体现字体风格 */
+.font-swatch .option-swatch-icon {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+/* 暗色风格色块：暗色底色块在亮色设置页里需要更明显的边框区分 */
+.dark-swatch {
+  border: 2rpx solid @color-divider;
+}
+
+.option-main {
+  flex: 1;
+  margin-left: @sp-6;
+  min-width: 0;
+}
+.option-title {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+/* 衬线预览：直接用衬线字族渲染 label */
+.preview-serif {
+  font-family: var(--font-serif);
+}
+.option-desc {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.4;
+}
+
+/* 选中标记 */
+.option-check {
+  margin-left: @sp-4;
+  font-size: 36rpx;
+  color: @color-accent;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ===== 年度目标 ===== */
+.goal-group {
+  padding: @sp-2 @sp-7;
+}
+.goal-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-5 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.goal-row:last-child {
+  border-bottom: none;
+}
+.goal-icon {
+  font-size: @fs-lg;
+  margin-right: @sp-4;
+  line-height: 1;
+  width: 40rpx;
+  text-align: center;
+}
+.goal-label {
+  flex: 1;
+  font-size: @fs-m;
+  color: @color-text-primary;
+}
+.goal-input {
+  width: 120rpx;
+  text-align: right;
+  padding: @sp-2 @sp-4;
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.goal-unit {
+  margin-left: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  width: 32rpx;
+}
+
+/* ===== 系统勋章目标 ===== */
+.medal-group {
+  padding: @sp-2 @sp-7;
+}
+.medal-setting-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-5 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.medal-setting-row:last-child {
+  border-bottom: none;
+}
+.medal-setting-row.unlocked .medal-setting-icon {
+  filter: saturate(1.2);
+}
+.medal-setting-icon {
+  font-size: 36rpx;
+  margin-right: @sp-4;
+  line-height: 1;
+  width: 44rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.medal-setting-main {
+  flex: 1;
+  min-width: 0;
+}
+.medal-setting-head {
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+}
+.medal-setting-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+}
+.medal-setting-done {
+  font-size: @fs-s;
+  color: #C9A14A;
+  font-weight: 600;
+}
+.medal-setting-desc {
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+.medal-setting-input {
+  width: 100rpx;
+  text-align: right;
+  padding: @sp-2 @sp-4;
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.medal-setting-unit {
+  margin-left: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  width: 32rpx;
+  flex-shrink: 0;
+}
+
+/* ===== P2-6 节日限量徽章 ===== */
+.medal-setting-row.limited .medal-setting-icon {
+  filter: drop-shadow(0 0 6rpx rgba(217, 122, 74, 0.4));
+}
+.medal-setting-tag {
+  font-size: 18rpx;
+  color: #FFFFFF;
+  background: @color-accent;
+  padding: 2rpx @sp-3;
+  border-radius: @radius-xs;
+  font-weight: 600;
+}
+.medal-setting-window {
+  margin-top: @sp-2;
+  font-size: @fs-xs;
+  color: @color-accent;
+  font-family: var(--font-title);
+}
+.medal-setting-locked {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  flex-shrink: 0;
+  padding: 0 @sp-4;
+  font-family: var(--font-title);
+}
+
+/* ===== A5 进度型成就进度条 ===== */
+.medal-setting-progress {
+  margin-top: @sp-3;
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+}
+.medal-setting-progress-track {
+  flex: 1;
+  height: 8rpx;
+  background: @color-divider;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.medal-setting-progress-fill {
+  height: 100%;
+  background: @color-accent;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+.medal-setting-progress-text {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 80rpx;
+  text-align: right;
+}
+
+/* ===== 年度关键词 ===== */
+.keyword-group {
+  padding: @sp-6 @sp-7;
+}
+.keyword-input {
+  width: 100%;
+  padding: @sp-5 @sp-6;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-family: var(--font-title);
+  box-sizing: border-box;
+}
+.keyword-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @sp-3;
+  margin-top: @sp-5;
+}
+.keyword-candidates-tip {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  margin-right: @sp-1;
+}
+.keyword-cand-chip {
+  padding: @sp-2 @sp-6;
+  border-radius: @radius-card-md;
+  background: rgba(217, 122, 74, 0.1);
+  color: var(--color-accent, #D97A4A);
+  font-size: @fs-sm;
+  border: 2rpx solid var(--color-accent, #D97A4A);
+  line-height: 1.4;
+}
+
+/* ===== 说明 ===== */
+.note {
+  margin-top: @sp-8;
+  padding: 0 @sp-4;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+/* === 备份与恢复 === */
+.backup-group {
+  padding: @sp-6 @sp-7;
+}
+
+/* ===== 回收站入口 ===== */
+.trash-entry {
+  display: flex;
+  align-items: center;
+  padding: @sp-6 @sp-6;
+  margin-bottom: @sp-6;
+}
+
+/* ===== 习惯保护开关卡 ===== */
+.protection-card {
+  /* 单行卡片：与回收站入口同样的横向排版节奏 */
+}
+.protection-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-6 @sp-7;
+}
+.protection-icon {
+  font-size: @fs-xl;
+  line-height: 1;
+  margin-right: @sp-4;
+  flex-shrink: 0;
+}
+.protection-main {
+  flex: 1;
+  min-width: 0;
+  margin-right: @sp-4;
+}
+.protection-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.protection-desc {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+/* 连胜保护详情入口（卡片内第二行，仿打卡管理入口横向排版） */
+.protection-detail-entry {
+  display: flex;
+  align-items: center;
+  padding: @sp-5 @sp-7;
+  border-top: 1rpx solid @color-divider;
+}
+.protection-detail-text {
+  flex: 1;
+  min-width: 0;
+  margin-right: @sp-4;
+}
+.protection-detail-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.protection-detail-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+.protection-detail-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1;
+}
+/* iOS 风格开关：横轨 + 圆形拨头；用 .on / .off 切换配色 + 拨头位移 */
+.toggle {
+  width: 88rpx;
+  height: 50rpx;
+  border-radius: @radius-pill;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.22s ease;
+  box-sizing: border-box;
+}
+.toggle.on {
+  background: @color-accent;
+}
+.toggle.off {
+  background: @color-divider;
+}
+.toggle-knob {
+  position: absolute;
+  top: 4rpx;
+  width: 42rpx;
+  height: 42rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: @shadow-subtle;
+  transition: left 0.22s ease;
+}
+.toggle.on .toggle-knob {
+  left: 42rpx;
+}
+.toggle.off .toggle-knob {
+  left: 4rpx;
+}
+.trash-entry-icon {
+  font-size: @fs-xl;
+  line-height: 1;
+  margin-right: @sp-4;
+  flex-shrink: 0;
+}
+.trash-entry-text {
+  flex: 1;
+  min-width: 0;
+}
+.trash-entry-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.trash-entry-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+.trash-entry-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1;
+  margin-left: @sp-2;
+  flex-shrink: 0;
+}
+
+/* 顶部数据计数行：图标 + 标题 + 明细 */
+.backup-summary {
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: @sp-5;
+  border-bottom: 1rpx solid @color-divider;
+}
+.backup-summary-icon {
+  font-size: @fs-xl;
+  line-height: 1;
+  margin-right: @sp-4;
+}
+.backup-summary-main {
+  flex: 1;
+  min-width: 0;
+}
+.backup-summary-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.backup-summary-detail {
+  margin-top: @sp-1;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 操作区：按钮 + 一行说明 */
+.backup-actions {
+  padding-top: @sp-5;
+}
+.backup-import {
+  margin-top: @sp-2;
+  padding-top: @sp-5;
+  border-top: 1rpx solid @color-divider;
+}
+.backup-import-label {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  margin-bottom: @sp-3;
+}
+
+/* 导入 textarea：自适应高度，等宽便于核对 JSON */
+.backup-import-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 160rpx;
+  padding: @sp-4 @sp-5;
+  background: @color-card-soft;
+  border-radius: @radius-card-sm;
+  font-size: @fs-s;
+  line-height: 1.5;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+}
+.backup-import-placeholder {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.backup-import-preview {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+}
+.backup-import-row {
+  display: flex;
+  align-items: center;
+  margin-top: @sp-3;
+}
+
+/* 通用按钮：与设置页其他区域保持克制风格 */
+.backup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: @sp-4 @sp-7;
+  border-radius: @radius-pill;
+  font-size: @fs-base;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+.backup-btn + .backup-btn {
+  margin-left: @sp-4;
+}
+.backup-btn-icon {
+  margin-right: @sp-2;
+  font-size: @fs-sm;
+}
+.backup-btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+  box-shadow: @shadow-cta;
+}
+.backup-btn.danger {
+  background: @color-danger;
+  color: #FFFFFF;
+}
+.backup-btn.ghost {
+  background: transparent;
+  color: @color-text-secondary;
+  border: 1rpx solid @color-divider;
+  padding: @sp-3 @sp-6;
+}
+.backup-btn.disabled {
+  opacity: 0.5;
+}
+
+/* 单行说明文字：贴近按钮下方 */
+.backup-hint {
+  margin-top: @sp-3;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+/* ===== 第二批功能 2：打卡管理入口卡 + 管理/目标 sheet ===== */
+.checkin-mgmt-card {
+  display: flex;
+  align-items: center;
+  padding: @sp-6 @sp-7;
+  margin-bottom: @sp-6;
+}
+.checkin-mgmt-icon {
+  font-size: @fs-xl;
+  line-height: 1;
+  margin-right: @sp-4;
+  flex-shrink: 0;
+}
+.checkin-mgmt-text {
+  flex: 1;
+  min-width: 0;
+  margin-right: @sp-4;
+}
+.checkin-mgmt-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.checkin-mgmt-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+.checkin-mgmt-arrow {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+/* 通用底部 sheet（mask + 滑入） */
+.sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.mgmt-sheet,
+.mgmt-goal-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.mgmt-sheet.show,
+.mgmt-goal-sheet.show {
+  transform: translateY(0);
+}
+.sheet-handle {
+  width: 64rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: @color-divider;
+  margin: 0 auto @sp-5;
+}
+.sheet-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  margin-bottom: @sp-5;
+}
+.sheet-section-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin: @sp-4 0 @sp-3;
+}
+.sheet-btn-row {
+  display: flex;
+  gap: @sp-4;
+  margin-top: @sp-7;
+}
+.sheet-btn {
+  flex: 1;
+  text-align: center;
+  padding: @sp-6;
+  border-radius: @radius-pill;
+  font-size: @fs-m;
+  line-height: 1;
+}
+.sheet-btn.ghost {
+  background: @color-card-soft;
+  color: @color-text-secondary;
+}
+.sheet-btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+  box-shadow: @shadow-cta;
+}
+
+/* 管理列表行 */
+.mgmt-list {
+  margin: @sp-2 0;
+}
+.mgmt-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-5 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.mgmt-row:last-child {
+  border-bottom: none;
+}
+.mgmt-row-icon {
+  font-size: @fs-l;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.mgmt-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.mgmt-row-label-line {
+  display: flex;
+  align-items: center;
+  gap: @sp-2;
+}
+.mgmt-row-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.mgmt-row-tag {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  padding: 2rpx @sp-2;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  opacity: 0.8;
+}
+.mgmt-row-goal {
+  font-size: @fs-xs;
+  color: var(--color-accent, #D97A4A);
+  letter-spacing: 0.5rpx;
+}
+.mgmt-row-goal.none {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.mgmt-row-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: @sp-3;
+}
+.mgmt-action {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  padding: @sp-1 @sp-3;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  line-height: 1.4;
+}
+.mgmt-action.hide {
+  color: var(--color-danger, #C04A4A);
+}
+.mgmt-action.restore {
+  color: var(--color-book, #6B8E5A);
+}
+
+/* 连胜保护详情 sheet：复用通用 sheet 定位/滑入/标题/按钮行，只新增列表行与用券按钮 */
+.protection-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.protection-sheet.show {
+  transform: translateY(0);
+}
+.protection-subtitle {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  margin-bottom: @sp-4;
+  opacity: 0.85;
+}
+.protection-list {
+  margin: @sp-2 0;
+}
+.protection-status-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-5 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.protection-status-row:last-child {
+  border-bottom: none;
+}
+.protection-status-info {
+  flex: 1;
+  min-width: 0;
+  margin-right: @sp-4;
+}
+.protection-status-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.protection-status-streak {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.4;
+}
+.protection-status-streak.protected {
+  color: var(--color-book, #6B8E5A);
+}
+.protection-status-streak.broken {
+  color: var(--color-danger, #C04A4A);
+}
+.protection-use-btn {
+  flex-shrink: 0;
+  font-size: @fs-s;
+  padding: @sp-2 @sp-4;
+  border-radius: @radius-pill;
+  background: @color-accent;
+  color: #FFFFFF;
+  line-height: 1.4;
+}
+.protection-use-btn.disabled {
+  background: @color-divider;
+  color: @color-text-secondary;
+}
+
+/* 频率 chip 行 + 次数 stepper（与打卡页样式一致） */
+.freq-row {
+  display: flex;
+  gap: @sp-3;
+}
+.freq-chip {
+  flex: 1;
+  text-align: center;
+  padding: @sp-4 @sp-2;
+  border-radius: @radius-pill;
+  background: @color-card-soft;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+}
+.freq-chip.active {
+  background: color-mix(in srgb, @color-accent 12%, transparent);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+}
+.stepper-btn {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: @color-card-soft;
+  font-size: @fs-xl;
+  color: @color-text-primary;
+  line-height: 1;
+  font-weight: 300;
+}
+.stepper-val {
+  min-width: 80rpx;
+  text-align: center;
+  font-size: @fs-xxl;
+  font-weight: 300;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.stepper-hint {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin-left: @sp-2;
+}

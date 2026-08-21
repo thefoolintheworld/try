@@ -1,0 +1,109 @@
+<!--pages/search/search.wxml-->
+<!-- 全局搜索：跨成就/愿望/灵感/打卡的全文搜索。
+     单点入口：首页右上角的放大镜图标。
+     设计要点：
+     - 顶部搜索框 + tab 分组（全部/成就/愿望/灵感/打卡）
+     - 结果卡片统一结构（icon + 标题 + 副标题），点击按类型跳详情
+     - 三态：未输入（引导文案）/ 搜索中（空结果提示）/ 有结果（分组列表）
+     - 历史关键词：保留最近 8 个，点击直接复搜（个人主体无上报顾虑，纯本地） -->
+<navigation-bar title="搜索" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<view class="page {{themeClass}}">
+
+  <!-- 顶部搜索框（固定吸顶） -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索成就 / 愿望 / 灵感 / 打卡"
+        placeholder-class="search-placeholder"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        confirm-type="search"
+        bindconfirm="onConfirmSearch"
+        focus="{{autoFocus}}"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">✕</text>
+    </view>
+  </view>
+
+  <!-- 有输入关键词：执行搜索 -->
+  <block wx:if="{{keyword}}">
+
+    <!-- 分组 tab：全部 + 四类，带命中计数 -->
+    <scroll-view class="filter-bar" scroll-x>
+      <view
+        class="filter-chip {{activeType === item.id ? 'active' : ''}}"
+        wx:for="{{typeFilters}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onSwitchType"
+      >{{item.label}} {{item.count}}</view>
+    </scroll-view>
+
+    <!-- 有结果：分组列表（每组带标题） -->
+    <block wx:if="{{totalCount > 0}}">
+      <scroll-view class="result-scroll" scroll-y type="list">
+        <view class="result-group" wx:for="{{groupedResults}}" wx:for-item="group" wx:key="type">
+          <view class="group-header">
+            <text class="group-icon">{{group.icon}}</text>
+            <text class="group-title">{{group.title}}</text>
+            <text class="group-count">{{group.items.length}} 条</text>
+          </view>
+          <view class="result-list">
+            <view
+              class="result-card"
+              wx:for="{{group.items}}"
+              wx:for-item="item"
+              wx:key="id"
+              data-type="{{item.type}}"
+              data-id="{{item.id}}"
+              bindtap="onTapResult"
+            >
+              <view class="result-card-icon">{{item.icon}}</view>
+              <view class="result-card-body">
+                <view class="result-card-title">{{item.title}}</view>
+                <view class="result-card-sub">{{item.subtitle}}</view>
+              </view>
+              <text class="result-card-arrow">›</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <!-- 搜索中无结果 -->
+    <empty-state wx:else icon="🔍" title="没找到「{{keyword}}」" desc="试试换成书名、作者、类型关键词" />
+  </block>
+
+  <!-- 未输入：历史关键词 + 引导 -->
+  <block wx:else>
+    <view class="hint-block" wx:if="{{history.length > 0}}">
+      <view class="hint-header">
+        <text class="hint-title">最近搜过</text>
+        <text class="hint-clear" bindtap="onClearHistory">清空</text>
+      </view>
+      <view class="history-chips">
+        <view
+          class="history-chip"
+          wx:for="{{history}}"
+          wx:key="*this"
+          data-kw="{{item}}"
+          bindtap="onTapHistory"
+        >{{item}}</view>
+      </view>
+    </view>
+
+    <view class="hint-block">
+      <view class="hint-title">可以搜索</view>
+      <view class="hint-list">
+        <view class="hint-item"><text class="hint-item-icon">📚</text> 书名 / 作者 / 类型 / 笔记 / 金句</view>
+        <view class="hint-item"><text class="hint-item-icon">⭐</text> 愿望标题 / 想做的动机</view>
+        <view class="hint-item"><text class="hint-item-icon">🌱</text> 灵感内容 / 闪念想法</view>
+        <view class="hint-item"><text class="hint-item-icon">🔥</text> 打卡备注 / 分类标签</view>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,169 @@
+/* components/heatmap/heatmap.less
+   GitHub 式热力图样式。
+   关键：颜色全部用 CSS 变量，跟随主题切换；不用 LESS @color-* 别名（组件 styleIsolation: apply-shared，
+   但为稳妥起见，组件内直接用 var(--color-*)）。 */
+
+.heatmap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 标题行 ===== */
+.hm-header {
+  margin-bottom: 16rpx;
+}
+.hm-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.hm-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.hm-sub {
+  font-size: 22rpx;
+  color: var(--color-text-secondary);
+  opacity: 0.85;
+}
+
+/* ===== 横向滚动容器 ===== */
+.hm-grid-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+.hm-grid-inner {
+  display: inline-block;
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 4rpx 0;
+}
+
+/* ===== 月份标签行 ===== */
+.hm-month-row {
+  position: relative;
+  height: 28rpx;
+  margin-left: 40rpx;   /* 给左侧星期标签列留位 */
+  margin-bottom: 8rpx;
+}
+.hm-month-label {
+  position: absolute;
+  top: 0;
+  font-size: 20rpx;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+  line-height: 1;
+}
+
+/* ===== 主体：星期列 + 格子网格 ===== */
+.hm-body {
+  display: flex;
+  align-items: flex-start;
+}
+.hm-week-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40rpx;
+  flex-shrink: 0;
+  padding-top: 0;
+}
+.hm-week-spacer {
+  height: 13px;   /* 与单元格步长对齐（11px + 2px gap）*/
+}
+.hm-week-label {
+  font-size: 18rpx;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  height: 13px;
+  line-height: 13px;
+}
+
+/* ===== 格子网格 ===== */
+.hm-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+.hm-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hm-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+/* 5 档颜色（亮色主题默认值；下面 .theme-dark 会覆盖）*/
+.hm-level-0 {
+  background-color: var(--color-divider);
+  opacity: 0.5;
+}
+.hm-level-1 {
+  background-color: var(--color-accent-soft);
+  opacity: 0.55;
+}
+.hm-level-2 {
+  background-color: var(--color-accent-soft);
+  opacity: 0.8;
+}
+.hm-level-3 {
+  background-color: var(--color-accent);
+  opacity: 0.8;
+}
+.hm-level-4 {
+  background-color: var(--color-accent-dark);
+}
+
+/* 今天：加一圈强调描边 */
+.hm-cell.today {
+  box-shadow: 0 0 0 1.5px var(--color-accent);
+}
+/* 未来日期：淡化（不应有记录但保留格子完整）*/
+.hm-cell.future {
+  opacity: 0.25;
+}
+
+/* ===== 图例 ===== */
+.hm-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6rpx;
+  margin-top: 16rpx;
+  padding-right: 8rpx;
+}
+.hm-legend-label {
+  font-size: 20rpx;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  margin: 0 4rpx;
+}
+.hm-legend-cell {
+  width: 11px;
+  height: 11px;
+}
+
+/* ===== 暗色主题微调 =====
+   通过页面根节点的 .theme-dark 类作用到组件（apply-shared）。
+   暗色下用更深的底色 + 更亮的强调，保证对比度。 */
+.theme-dark .hm-level-0 {
+  background-color: var(--color-divider);
+  opacity: 0.35;
+}
+.theme-dark .hm-level-1 {
+  background-color: var(--color-accent-soft);
+  opacity: 0.4;
+}
+.theme-dark .hm-level-2 {
+  background-color: var(--color-accent-soft);
+  opacity: 0.7;
+}
+.theme-dark .hm-level-3 {
+  background-color: var(--color-accent);
+  opacity: 0.85;
+}

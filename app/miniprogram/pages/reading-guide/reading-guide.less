@@ -1,0 +1,157 @@
+/* pages/reading-guide/reading-guide.less */
+/* 共读引导页：书籍信息 + 问题卡片 + 回答录入 + 理解预览。配色走 design-tokens。*/
+
+.page {
+  height: calc(100vh - 44px - env(safe-area-inset-top));
+  background: @color-bg;
+}
+.page-inner {
+  padding: @sp-6 @sp-7 @sp-11;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 书籍信息头 ===== */
+.book-head {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+  margin-bottom: @sp-6;
+}
+.book-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  letter-spacing: 1rpx;
+  font-family: var(--font-title);
+}
+.book-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: @sp-3;
+  margin-top: @sp-3;
+}
+.book-cat {
+  font-size: @fs-s;
+  color: @color-accent;
+  background: color-mix(in srgb, @color-accent 10%, transparent);
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-xs;
+}
+.book-author {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.book-mood {
+  font-size: @fs-s;
+  color: @color-book;
+}
+.book-intro {
+  margin-top: @sp-4;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.6;
+}
+
+/* ===== 问题卡片 ===== */
+.question-card {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-7 @sp-5;
+  box-shadow: @shadow-card;
+  margin-bottom: @sp-5;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-3;
+}
+.question-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.question-group-tag {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  background: @color-bg;
+  padding: @sp-1 @sp-3;
+  border-radius: @radius-xs;
+}
+.question-num {
+  font-size: @fs-s;
+  color: @color-accent;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+.question-text {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.question-hint {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+.question-answer {
+  width: 100%;
+  box-sizing: border-box;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-5 @sp-5;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.6;
+  min-height: 100rpx;
+}
+.question-action-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.question-append-btn {
+  font-size: @fs-sm;
+  color: #FFFFFF;
+  background: @color-accent;
+  padding: @sp-3 @sp-7;
+  border-radius: @radius-xs;
+  line-height: 1.4;
+}
+
+/* ===== 一键拼接按钮 ===== */
+.append-all-btn {
+  margin: @sp-2 0 @sp-7;
+  text-align: center;
+  font-size: @fs-base;
+  color: @color-book;
+  background: color-mix(in srgb, @color-book 10%, transparent);
+  padding: @sp-5;
+  border-radius: @radius-card;
+  border: 1rpx dashed @color-book;
+  letter-spacing: 1rpx;
+}
+
+/* ===== understanding 预览 ===== */
+.understanding-preview {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.preview-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+  margin-bottom: @sp-3;
+}
+.preview-text {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+

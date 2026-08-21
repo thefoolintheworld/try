@@ -1,0 +1,709 @@
+/**pages/wrapped/wrapped.less**/
+/* 年度 Wrapped 五幕叙事页样式。
+   设计：每幕占满或近满屏，仪式感强；配色走设计令牌（不硬编码 hex）。 */
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* ===== 年份切换条（顶部） ===== */
+.year-bar {
+  display: flex;
+  gap: @sp-3;
+  padding: @sp-6 @sp-7 @sp-2;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.year-chip {
+  flex: 0 0 auto;
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-pill;
+  background: @color-card;
+  color: @color-text-secondary;
+  font-size: @fs-sm;
+  letter-spacing: 1rpx;
+  box-shadow: @shadow-card;
+  transition: all 0.2s;
+}
+.year-chip.active {
+  background: @color-accent;
+  color: #FFFFFF;
+  box-shadow: @shadow-cta;
+}
+
+/* ===== 通用幕样式 ===== */
+.act {
+  padding: @sp-11 @sp-7 @sp-10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.act + .act {
+  border-top: 1rpx solid @color-divider;
+}
+.act-tag {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 4rpx;
+  opacity: 0.7;
+  margin-bottom: @sp-7;
+  text-transform: uppercase;
+}
+.act-tag.light {
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0.9;
+}
+.act-title {
+  font-size: @fs-xl;
+  font-weight: 300;
+  color: @color-text-primary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-7;
+  font-family: var(--font-title);
+}
+
+/* ===== Act 1：开场大数字 ===== */
+.act-opening {
+  padding-top: @sp-12;
+  background: linear-gradient(180deg, @color-bg 0%, @color-card 100%);
+  text-align: center;
+}
+.opening-year {
+  font-size: @fs-display;
+  font-weight: 200;
+  color: @color-accent;
+  letter-spacing: 8rpx;
+  font-family: var(--font-numeric);
+  line-height: 1;
+  margin-bottom: @sp-9;
+  opacity: 0.85;
+}
+.opening-headline {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  letter-spacing: 3rpx;
+  font-weight: 300;
+}
+.opening-big {
+  font-size: 160rpx;
+  font-weight: 700;
+  color: @color-accent;
+  letter-spacing: 4rpx;
+  font-family: var(--font-numeric);
+  line-height: 1;
+  margin: @sp-4 0;
+  text-shadow: 0 8rpx 32rpx rgba(217, 122, 74, 0.2);
+}
+.opening-sub {
+  margin-top: @sp-6;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+}
+.opening-sub .dot {
+  color: @color-divider;
+}
+.opening-meta {
+  margin-top: @sp-11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: @sp-2;
+  background: @color-card;
+  padding: @sp-7 @sp-4;
+  border-radius: @radius-card;
+  box-shadow: @shadow-card;
+  width: 100%;
+  box-sizing: border-box;
+}
+.meta-item {
+  flex: 1;
+  text-align: center;
+}
+.meta-num {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  line-height: 1.2;
+}
+.meta-label {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+}
+.meta-divider {
+  width: 1rpx;
+  height: 56rpx;
+  background: @color-divider;
+}
+
+/* ===== Act 2：Top 5 堆叠 ===== */
+.act-tops {
+  background: @color-card;
+  align-items: stretch;
+}
+.act-tops .act-title {
+  align-self: center;
+}
+.tops-section {
+  margin-top: @sp-8;
+  width: 100%;
+}
+.tops-section-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-5;
+  padding-left: @sp-2;
+}
+
+/* 类型堆叠条 */
+.cat-bar {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-4 0;
+}
+.cat-bar-icon {
+  font-size: 36rpx;
+  width: 48rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.cat-bar-body {
+  flex: 1;
+  min-width: 0;
+}
+.cat-bar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: @sp-2;
+}
+.cat-bar-label {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.cat-bar-count {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+}
+.cat-bar-track {
+  height: 12rpx;
+  background: @color-card-soft;
+  border-radius: @radius-pill;
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: @radius-pill;
+  transition: width 0.6s ease;
+}
+
+/* 评分榜 */
+.rated-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-5;
+  padding: @sp-5 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.rated-row:last-child {
+  border-bottom: none;
+}
+.rated-rank {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: @color-card-soft;
+  color: @color-text-secondary;
+  font-size: @fs-sm;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-numeric);
+}
+.rated-main {
+  flex: 1;
+  min-width: 0;
+}
+.rated-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rated-author {
+  margin-top: @sp-1;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rated-stars {
+  font-size: @fs-base;
+  color: @color-star;
+  font-family: var(--font-numeric);
+  flex-shrink: 0;
+}
+
+/* 最活跃月份 */
+.peak-box {
+  display: flex;
+  align-items: center;
+  gap: @sp-6;
+  padding: @sp-7;
+  background: linear-gradient(135deg, rgba(217, 122, 74, 0.08) 0%, rgba(232, 163, 61, 0.08) 100%);
+  border-radius: @radius-card;
+}
+.peak-num {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: @color-accent;
+  font-family: var(--font-numeric);
+  line-height: 1;
+}
+.peak-text {
+  flex: 1;
+}
+.peak-month {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.peak-desc {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+
+/* ===== Act 3：读者人格 ===== */
+.act-personality {
+  color: #FFFFFF;
+  text-align: center;
+  padding: @sp-12 @sp-7;
+}
+.personality-badge {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: @shadow-elevated;
+  margin-bottom: @sp-7;
+}
+.personality-icon {
+  font-size: 72rpx;
+}
+.personality-label {
+  font-size: @fs-xxl;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  line-height: 1.2;
+  text-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
+}
+.personality-tagline {
+  margin-top: @sp-3;
+  font-size: @fs-m;
+  font-weight: 300;
+  letter-spacing: 6rpx;
+  opacity: 0.9;
+}
+.personality-desc {
+  margin-top: @sp-6;
+  font-size: @fs-base;
+  line-height: 1.7;
+  letter-spacing: 1rpx;
+  opacity: 0.92;
+  max-width: 560rpx;
+}
+
+/* 四维雷达条 */
+.dim-list {
+  margin-top: @sp-9;
+  width: 100%;
+  max-width: 560rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7;
+  box-sizing: border-box;
+}
+.dim-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-3 0;
+}
+.dim-label {
+  width: 80rpx;
+  font-size: @fs-base;
+  letter-spacing: 2rpx;
+  opacity: 0.92;
+  flex-shrink: 0;
+}
+.dim-track {
+  flex: 1;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: @radius-pill;
+  overflow: hidden;
+}
+.dim-fill {
+  height: 100%;
+  background: #FFFFFF;
+  border-radius: @radius-pill;
+  opacity: 0.9;
+  transition: width 0.6s ease;
+}
+.dim-num {
+  width: 56rpx;
+  text-align: right;
+  font-size: @fs-sm;
+  font-family: var(--font-numeric);
+  opacity: 0.92;
+  flex-shrink: 0;
+}
+
+/* ===== Act 4：稀有度 ===== */
+.act-rarity {
+  background: @color-card;
+  text-align: center;
+}
+.act-rarity.rare {
+  /* 用 card-soft→card 派生暖白渐变；card-soft 比 card 略深一档，自然呈现「稀有的暖意」，
+     且自动跟随主题（暗色下 card-soft 是深色，避免白底白字）*/
+  background: linear-gradient(180deg, @color-card-soft 0%, @color-card 100%);
+}
+.act-rarity.epic {
+  background: linear-gradient(180deg, color-mix(in srgb, @color-film 6%, @color-card) 0%, @color-card 100%);
+}
+.act-rarity.legendary {
+  background: linear-gradient(180deg, color-mix(in srgb, @color-star 10%, transparent) 0%, color-mix(in srgb, @color-accent 4%, transparent) 100%);
+}
+/* 暗色覆盖：epic/legendary 用更饱和的暗色渐变，保持「稀有感」；
+   rare 的 card-soft→card 派生已自动跟随主题，无需额外覆盖。*/
+.theme-dark .act-rarity.epic {
+  background: linear-gradient(180deg, color-mix(in srgb, @color-film 18%, @color-card) 0%, @color-card 100%);
+}
+.theme-dark .act-rarity.legendary {
+  background: linear-gradient(180deg, color-mix(in srgb, @color-star 16%, @color-card) 0%, color-mix(in srgb, @color-accent 10%, @color-card) 100%);
+}
+.rarity-tier-label {
+  font-size: @fs-m;
+  color: @color-accent;
+  letter-spacing: 8rpx;
+  font-weight: 300;
+  margin-bottom: @sp-4;
+}
+.rarity-big {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: @sp-2;
+  margin: @sp-4 0;
+}
+.rarity-prefix {
+  font-size: 36rpx;
+  color: @color-text-secondary;
+  font-weight: 300;
+  letter-spacing: 2rpx;
+}
+.rarity-num {
+  font-size: 128rpx;
+  font-weight: 700;
+  color: @color-accent;
+  font-family: var(--font-numeric);
+  line-height: 1;
+  letter-spacing: 2rpx;
+}
+.act-rarity.legendary .rarity-num {
+  color: @color-star;
+  text-shadow: 0 8rpx 32rpx rgba(232, 163, 61, 0.4);
+}
+.rarity-sentence {
+  margin-top: @sp-6;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.7;
+  letter-spacing: 1rpx;
+  max-width: 560rpx;
+}
+.rarity-foot {
+  margin-top: @sp-6;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+
+/* ===== Act 5：代表作汇总 ===== */
+.act-summary {
+  background: @color-card;
+  text-align: center;
+  padding-bottom: @sp-12;
+}
+.summary-headline {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  letter-spacing: 3rpx;
+  font-weight: 300;
+  margin-bottom: @sp-7;
+}
+.highlight-card {
+  display: flex;
+  align-items: stretch;
+  background: @color-bg;
+  border-radius: @radius-card;
+  overflow: hidden;
+  box-shadow: @shadow-card;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+.highlight-color-bar {
+  width: 12rpx;
+  flex-shrink: 0;
+}
+.highlight-body {
+  flex: 1;
+  padding: @sp-7;
+  min-width: 0;
+}
+.highlight-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.highlight-author {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.highlight-note {
+  margin-top: @sp-4;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.7;
+  letter-spacing: 0.5rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+.highlight-meta {
+  margin-top: @sp-5;
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+}
+.highlight-cat {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  background: @color-card-soft;
+  padding: @sp-2 @sp-4;
+  border-radius: @radius-pill;
+}
+.highlight-stars {
+  font-size: @fs-sm;
+  color: @color-star;
+  font-family: var(--font-numeric);
+}
+
+/* 关键词 */
+.keywords-row {
+  margin-top: @sp-8;
+  width: 100%;
+  text-align: left;
+}
+.keywords-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-4;
+  padding-left: @sp-2;
+}
+.keywords-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.kw-chip {
+  font-size: @fs-m;
+  color: @color-accent;
+  background: rgba(217, 122, 74, 0.08);
+  padding: @sp-3 @sp-7;
+  border-radius: @radius-pill;
+  letter-spacing: 1rpx;
+}
+
+/* 年度心境分布（与关键词区同构，但用 book 绿区分语义）*/
+.mood-row {
+  margin-top: @sp-7;
+  width: 100%;
+  text-align: left;
+}
+.mood-stats-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.mood-stat-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: @sp-2;
+  background: rgba(107, 142, 90, 0.1);
+  border-radius: @radius-pill;
+  padding: @sp-3 @sp-6;
+}
+.mood-stat-word {
+  font-size: @fs-m;
+  color: @color-book;
+  letter-spacing: 1rpx;
+}
+.mood-stat-count {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+}
+
+/* 导出按钮 */
+.export-btn {
+  margin-top: @sp-10;
+  display: inline-flex;
+  align-items: center;
+  gap: @sp-3;
+  padding: @sp-6 @sp-9;
+  background: @color-accent;
+  color: #FFFFFF;
+  border-radius: @radius-pill;
+  font-size: @fs-m;
+  letter-spacing: 2rpx;
+  box-shadow: @shadow-cta;
+  transition: transform 0.2s;
+}
+.export-btn:active {
+  transform: scale(0.97);
+}
+.export-btn-icon {
+  font-size: @fs-lg;
+}
+.export-hint {
+  margin-top: @sp-4;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+  opacity: 0.7;
+}
+
+/* ===== 末尾切换年份 ===== */
+.epilogue {
+  padding: @sp-9 @sp-7 @sp-11;
+  background: @color-bg;
+  text-align: center;
+}
+.epilogue-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-5;
+}
+
+/* ===== 历史年份 chip 行（锁定态 / 末尾共用） ===== */
+.history-link {
+  margin-top: @sp-10;
+  padding-top: @sp-8;
+  border-top: 1rpx solid @color-divider;
+  text-align: center;
+}
+.history-link-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-5;
+}
+.history-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+  justify-content: center;
+}
+.history-chip {
+  padding: @sp-3 @sp-7;
+  border-radius: @radius-pill;
+  background: @color-card;
+  color: @color-text-primary;
+  font-size: @fs-base;
+  letter-spacing: 1rpx;
+  box-shadow: @shadow-card;
+  font-family: var(--font-numeric);
+  transition: all 0.2s;
+}
+.history-chip:active {
+  transform: scale(0.97);
+  background: @color-card-soft;
+}
+
+/* ===== 锁定态（当年未到 12 月） ===== */
+.locked {
+  min-height: 80vh;
+  padding: 96rpx /* 有意大于 @sp-12 的仪式感留白 */ @sp-9 @sp-11;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, @color-bg 0%, @color-card 100%);
+}
+.locked-icon {
+  font-size: 120rpx;
+  margin-bottom: @sp-7;
+  filter: drop-shadow(0 8rpx 24rpx rgba(217, 122, 74, 0.2));
+}
+.locked-title {
+  font-size: 44rpx;
+  font-weight: 300;
+  color: @color-accent;
+  letter-spacing: 4rpx;
+  font-family: var(--font-title);
+}
+.locked-sub {
+  margin-top: @sp-3;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+}
+.locked-desc {
+  margin-top: @sp-7;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  line-height: 1.8;
+  letter-spacing: 1rpx;
+  max-width: 520rpx;
+  white-space: pre-wrap;
+  opacity: 0.85;
+}
+.locked-current {
+  margin-top: @sp-7;
+  padding: @sp-4 @sp-7;
+  background: @color-card-soft;
+  border-radius: @radius-pill;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 1rpx;
+}
+
+/* ===== 数据不足态 ===== */

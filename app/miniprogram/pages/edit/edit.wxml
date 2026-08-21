@@ -1,0 +1,417 @@
+<!--pages/edit/edit.wxml-->
+<navigation-bar title="{{isEdit ? '编辑成就' : '记录成就'}}" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 分类选择器（成就系统主轴第一项） -->
+  <view class="section-label">选择分类</view>
+  <scroll-view class="category-bar" scroll-x>
+    <view
+      class="category-chip {{item.active ? 'active' : ''}}"
+      wx:for="{{categoryViews}}"
+      wx:key="id"
+      style="{{item.active ? 'background:' + item.color + ';' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="onPickCategory"
+    >
+      <text class="category-icon">{{item.icon}}</text>
+      <text class="category-label">{{item.label}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 自定义分类名输入（仅当选择"自定义"时出现） -->
+  <view class="form-row" wx:if="{{category === '__custom__'}}">
+    <text class="form-label">分类名</text>
+    <input
+      class="form-input"
+      placeholder="如 演讲 / 攀岩 / 考研"
+      value="{{customCategory}}"
+      bindinput="onCustomCategoryInput"
+      maxlength="12"
+    />
+  </view>
+
+  <!-- 成就图片区：预览 + 三个操作 -->
+  <view class="section-label">成就图片 <text class="section-tip">（选填）</text></view>
+  <view class="image-section">
+    <view class="image-preview {{imageType === 'none' ? 'empty' : ''}}"
+      style="{{imageType === 'preset' ? presetCss : ''}}{{imageType === 'custom' || imageType === 'builtin' ? 'background-image:url(' + image + ');background-size:cover;background-position:center;' : ''}}">
+      <text wx:if="{{imageType === 'none'}}" class="image-preview-placeholder">{{categoryIcon}}</text>
+    </view>
+    <view class="image-actions">
+      <view class="image-action-row" bindtap="onPickFromAlbum">
+        <text class="image-action-icon">📷</text>
+        <text class="image-action-label">上传图片</text>
+      </view>
+      <view class="image-action-row" bindtap="onOpenPresetSheet">
+        <text class="image-action-icon">🎨</text>
+        <text class="image-action-label">选预设图</text>
+      </view>
+      <view class="image-action-row {{imageType === 'none' ? 'disabled' : ''}}" bindtap="onClearImage">
+        <text class="image-action-icon">✕</text>
+        <text class="image-action-label">不设图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分区：基础信息 -->
+  <view class="section-label">基础信息</view>
+
+  <view class="form-row">
+    <text class="form-label">标题</text>
+    <input
+      class="form-input title-input"
+      placeholder="{{titlePlaceholder}}"
+      data-field="title"
+      value="{{title}}"
+      bindinput="onInput"
+    />
+  </view>
+
+  <!-- 仅 reading/film 显示作者与细分类型 -->
+  <block wx:if="{{isRichCategory}}">
+    <view class="form-row">
+      <text class="form-label">{{category === 'film' ? '导演/主创' : '作者'}}</text>
+      <input
+        class="form-input"
+        placeholder="{{category === 'film' ? '导演 / 主演 / 工作室' : '作者名'}}"
+        data-field="author"
+        value="{{author}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">{{category === 'film' ? '类型' : '分类'}}</text>
+      <input
+        class="form-input"
+        placeholder="{{category === 'film' ? '如 剧情 / 纪录片 / 动画' : '如 小说 / 科幻 / 历史'}}"
+        data-field="genre"
+        value="{{genre}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">评分</text>
+      <view class="rating-stars">
+        <!-- 5 颗星，每颗分左右两半：点左半 = 整星 -0.5，点右半 = 整星。
+             数据层 rating 保持 0.5-5 步进 0.5；呈现按 (rating - (i-1)) 钳到 [0,1] 算每颗的填充宽度。 -->
+        <view class="star-unit" wx:for="{{ratingLevels}}" wx:for-item="level" wx:key="*this" data-level="{{level}}">
+          <!-- 底层：灰色全星 -->
+          <view class="star-bg">★</view>
+          <!-- 上层：金色裁剪条，宽度 = 该颗星的填充百分比 -->
+          <view class="star-fg-wrap" style="width:{{rating >= level ? 100 : (rating > level - 0.5 ? 50 : 0)}}%">
+            <view class="star-fg">★</view>
+          </view>
+          <!-- 左右两半的点击区，覆盖在星上 -->
+          <view class="star-half left" data-rating="{{level - 0.5}}" bindtap="onTapRatingHalf"></view>
+          <view class="star-half right" data-rating="{{level}}" bindtap="onTapRatingHalf"></view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 三态状态机（P1-5）：决定 finishedDate 的语义 + 是否强制评分。
+       选「在读/搁置」时下方日期 label 会联动变「开读于/搁置于」，评分也不再强制。 -->
+  <view class="form-row">
+    <text class="form-label">状态</text>
+    <picker bindchange="onStatusChange" value="{{statusIndex}}" range="{{statusOptions}}" range-key="label">
+      <view class="form-picker">{{statusOptions[statusIndex].label}}</view>
+    </picker>
+  </view>
+
+  <view class="form-row">
+    <text class="form-label">{{dateLabel}}</text>
+    <picker mode="date" value="{{finishedDate}}" end="{{today}}" bindchange="onDateChange">
+      <view class="form-picker">{{finishedDate}}</view>
+    </picker>
+  </view>
+
+  <!-- 目标进度（可选）：开关 + 当前进度/目标，用于「读完某系列书的 3/5」这类里程碑 -->
+  <view class="form-row progress-toggle-row">
+    <text class="form-label">目标进度</text>
+    <view class="progress-switch {{hasProgress ? 'on' : ''}}" bindtap="onToggleProgress">
+      <text class="progress-switch-knob"></text>
+    </view>
+  </view>
+  <view class="form-row progress-input-row" wx:if="{{hasProgress}}">
+    <text class="form-label">已完成</text>
+    <input
+      class="form-input progress-num-input"
+      type="digit"
+      placeholder="0"
+      data-field="progressCurrent"
+      value="{{progressCurrent}}"
+      bindinput="onProgressInput"
+    />
+    <text class="progress-separator">/</text>
+    <input
+      class="form-input progress-num-input"
+      type="digit"
+      placeholder="目标"
+      data-field="progressTarget"
+      value="{{progressTarget}}"
+      bindinput="onProgressInput"
+    />
+    <text class="progress-percent" wx:if="{{progressPercent}}">{{progressPercent}}%</text>
+  </view>
+
+  <!-- P2-3：随机 Prompt 钩子，点 ✨ 换一条；用户可无视直接写自己的 -->
+  <view class="note-prompt" wx:if="{{notePrompt}}" bindtap="onRefreshNotePrompt">
+    <text class="note-prompt-icon">✨</text>
+    <text class="note-prompt-text">{{notePrompt}}</text>
+    <text class="note-prompt-shuffle">换一句</text>
+  </view>
+  <view class="form-row textarea-row">
+    <text class="form-label">短评</text>
+    <textarea
+      class="form-textarea"
+      placeholder="一句话记录这个成就（≤200字）"
+      data-field="note"
+      value="{{note}}"
+      bindinput="onInput"
+      maxlength="200"
+      auto-height
+    />
+  </view>
+
+  <!-- 阅读情境区：仅 reading 显示（film 简化掉，避免字段过载） -->
+  <block wx:if="{{category === 'reading'}}">
+    <view class="section-label">阅读情境 <text class="section-tip">（选填，用于生成读书报告）</text></view>
+
+    <view class="form-row">
+      <text class="form-label">阅读地点</text>
+      <input
+        class="form-input"
+        placeholder="如 祁连山下 / 飞往深圳的航班 / 杭州"
+        data-field="readingPlace"
+        value="{{readingPlace}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">情境心境</text>
+      <input
+        class="form-input"
+        placeholder="如 旅行时 / 深夜独坐 / 与谁相伴"
+        data-field="readingContext"
+        value="{{readingContext}}"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="form-row textarea-row">
+      <text class="form-label">我的理解</text>
+      <textarea
+        class="form-textarea long"
+        placeholder="对这本书的理解、感悟、它给你的影响（用于报告年度之书等卡片）"
+        data-field="understanding"
+        value="{{understanding}}"
+        bindinput="onInput"
+        maxlength="1000"
+        auto-height
+      />
+    </view>
+
+    <!-- 金句列表 -->
+    <view class="quotes-block">
+      <view class="quotes-header">
+        <text class="form-label-inline">金句摘录</text>
+        <text class="quotes-count" wx:if="{{quotes.length > 0}}">{{quotes.length}}</text>
+      </view>
+
+      <view class="quote-list" wx:if="{{quotes.length > 0}}">
+        <view class="quote-item" wx:for="{{quotes}}" wx:key="*this">
+          <view class="quote-main-row">
+            <text class="quote-text">「{{item}}」</text>
+            <view class="quote-actions">
+              <text
+                class="quote-ctx-toggle {{quoteNotes[item] ? 'has-ctx' : ''}} {{editingQuoteIndex === index ? 'editing' : ''}}"
+                data-index="{{index}}"
+                bindtap="onToggleQuoteContext"
+              >{{quoteNotes[item] ? '✎注' : '＋注'}}</text>
+              <!-- T3 改正文入口：✎字 打开正文编辑器；提交走 editQuoteText 迁移 quoteNotes key -->
+              <text
+                class="quote-text-edit {{editingQuoteTextIndex === index ? 'editing' : ''}}"
+                data-index="{{index}}"
+                bindtap="onEditQuoteText"
+              >✎字</text>
+              <view class="quote-del" data-index="{{index}}" bindtap="onDeleteQuote">×</view>
+            </view>
+          </view>
+          <text class="quote-context-text" wx:if="{{quoteNotes[item] && editingQuoteIndex !== index && editingQuoteTextIndex !== index}}">— {{quoteNotes[item]}}</text>
+          <view class="quote-ctx-input-row" wx:if="{{editingQuoteIndex === index}}">
+            <input
+              class="quote-ctx-input"
+              placeholder="上下文：页码 / 章节 / 一句话感想"
+              value="{{quoteContextInput}}"
+              bindinput="onQuoteContextInput"
+              confirm-type="done"
+              bindconfirm="onSaveQuoteContext"
+              focus="{{true}}"
+            />
+            <view class="quote-ctx-save-btn" bindtap="onSaveQuoteContext">存</view>
+          </view>
+          <!-- T3 正文编辑器：与上下文编辑互斥；提交走 editQuoteText 迁移 quoteNotes key -->
+          <view class="quote-ctx-input-row" wx:if="{{editingQuoteTextIndex === index}}">
+            <input
+              class="quote-ctx-input"
+              placeholder="修改金句正文"
+              value="{{quoteTextInput}}"
+              bindinput="onQuoteTextInput"
+              confirm-type="done"
+              bindconfirm="onSaveQuoteText"
+              focus="{{true}}"
+            />
+            <view class="quote-ctx-save-btn" bindtap="onSaveQuoteText">存</view>
+            <view class="quote-ctx-cancel-btn" bindtap="onCancelEditQuoteText">取消</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="quote-add-row">
+        <input
+          class="quote-input"
+          placeholder="添加一句书中的金句"
+          value="{{quoteInput}}"
+          bindinput="onQuoteInput"
+          confirm-type="done"
+          bindconfirm="onAddQuote"
+        />
+        <view class="quote-add-btn" bindtap="onAddQuote">添加</view>
+      </view>
+
+      <!-- 批量粘贴摘抄辅助（T2-3）：展开/收起按钮 -->
+      <view class="bulk-toggle-row">
+        <view class="bulk-toggle-btn {{showBulkQuote ? 'open' : ''}}" bindtap="onToggleBulkQuote">
+          <text class="bulk-toggle-icon">📋</text>
+          <text>{{showBulkQuote ? '收起批量录入' : '批量粘贴摘抄'}}</text>
+        </view>
+      </view>
+
+      <!-- 批量录入面板 -->
+      <view class="bulk-panel" wx:if="{{showBulkQuote}}">
+        <view class="bulk-hint">粘贴一大段文本，按换行或引号自动切段。纯本地处理，零隐私风险。</view>
+        <textarea
+          class="bulk-textarea"
+          placeholder="把书里的划线、段落粘贴到这里…&#10;每行一条，或用「」引号包裹句子"
+          value="{{bulkQuoteText}}"
+          bindinput="onBulkQuoteInput"
+          maxlength="-1"
+          auto-height
+        />
+        <view class="bulk-action-row">
+          <view class="bulk-action-btn secondary" bindtap="onPreviewBulkQuote">切分预览</view>
+          <view class="bulk-action-btn primary" wx:if="{{bulkQuoteHasPreview}}" bindtap="onConfirmBulkQuote">确认导入 {{bulkQuotePreview.length}} 条</view>
+        </view>
+
+        <!-- 切分预览列表（导入前可逐条剔除） -->
+        <view class="bulk-preview-list" wx:if="{{bulkQuoteHasPreview && bulkQuotePreview.length > 0}}">
+          <view class="bulk-preview-label">预览（点 × 剔除）</view>
+          <view class="bulk-preview-item" wx:for="{{bulkQuotePreview}}" wx:key="*this">
+            <text class="bulk-preview-text">「{{item}}」</text>
+            <view class="bulk-preview-del" data-index="{{index}}" bindtap="onRemoveBulkPreviewItem">×</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 情绪与五感标签区（所有分类都显示） -->
+  <view class="section-label">情绪与五感 <text class="section-tip">（选填）</text></view>
+  <view class="tags-block">
+    <!-- 预设标签分组：情绪 + 五感，点选切换 -->
+    <block wx:for="{{presetTagGroups}}" wx:for-item="group" wx:key="id">
+      <view class="tag-group-label">{{group.label}}</view>
+      <view class="tag-chips">
+        <view
+          class="tag-chip {{selectedTagMap[item] ? 'active' : ''}}"
+          wx:for="{{group.tags}}"
+          wx:for-item="item"
+          wx:key="*this"
+          data-tag="{{item}}"
+          bindtap="onTogglePresetTag"
+        >{{item}}</view>
+      </view>
+    </block>
+
+    <!-- 已选标签列表（含自定义输入的） -->
+    <view class="tag-selected" wx:if="{{tags.length > 0}}">
+      <view class="tag-item" wx:for="{{tags}}" wx:key="*this">
+        <text class="tag-item-text">{{item}}</text>
+        <view class="tag-item-del" data-index="{{index}}" bindtap="onDeleteTag">×</view>
+      </view>
+    </view>
+
+    <!-- 自定义标签输入 -->
+    <view class="tag-add-row">
+      <input
+        class="tag-input"
+        placeholder="添加自定义标签"
+        value="{{tagInput}}"
+        bindinput="onTagInput"
+        confirm-type="done"
+        bindconfirm="onAddTag"
+      />
+      <view class="tag-add-btn" bindtap="onAddTag">添加</view>
+    </view>
+  </view>
+
+  <!-- 瞬时心境单选（Item.mood；与 tags 多选语义分离） -->
+  <view class="section-label">此刻心境 <text class="section-tip">（单选 · 选填）</text></view>
+  <view class="mood-block">
+    <view class="mood-chips">
+      <view
+        class="mood-chip {{mood === item ? 'active' : ''}}"
+        wx:for="{{moodOptions}}"
+        wx:key="*this"
+        data-value="{{item}}"
+        bindtap="onMoodTap"
+      >{{item}}</view>
+      <view
+        class="mood-chip mood-none {{(!mood || mood === moodNone) ? 'active' : ''}}"
+        data-value="{{moodNone}}"
+        bindtap="onMoodTap"
+      >{{moodNone}}</view>
+    </view>
+  </view>
+
+  <!-- 共读引导入口（仅编辑模式：新成就还没存，没有 id 可关联） -->
+  <view class="guide-entry" wx:if="{{isEdit}}" bindtap="onOpenReadingGuide">
+    <text class="guide-entry-icon">💬</text>
+    <view class="guide-entry-text">
+      <view class="guide-entry-title">共读引导</view>
+      <view class="guide-entry-sub">几个问题，帮你想清楚想说的话</view>
+    </view>
+    <text class="guide-entry-arrow">›</text>
+  </view>
+
+  <!-- 按钮区 -->
+  <view class="btn-area">
+    <view class="btn primary" bindtap="onSave">{{isEdit ? '保存修改' : '记录这个成就'}}</view>
+    <view class="btn danger" wx:if="{{isEdit}}" bindtap="onDelete">删除</view>
+  </view>
+</scroll-view>
+
+<!-- 预设图选择 sheet（底部弹层，用 cssPreview 近似缩略）-->
+<view class="preset-sheet-mask {{showPresetSheet ? 'show' : ''}}" bindtap="onClosePresetSheet"></view>
+<view class="preset-sheet {{showPresetSheet ? 'show' : ''}}">
+  <view class="preset-sheet-header">
+    <text class="preset-sheet-title">选择预设图</text>
+    <text class="preset-sheet-close" bindtap="onClosePresetSheet">✕</text>
+  </view>
+  <view class="preset-grid">
+    <view
+      class="preset-item {{image === item.id ? 'selected' : ''}}"
+      wx:for="{{presetList}}"
+      wx:key="id"
+      style="{{item.css}}"
+      data-id="{{item.id}}"
+      bindtap="onPickPreset"
+    >
+      <text class="preset-item-name">{{item.name}}</text>
+    </view>
+  </view>
+</view>

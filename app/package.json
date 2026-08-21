@@ -1,0 +1,19 @@
+{
+  "name": "miniprogram-ts-less-quickstart",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "lint:less": "node test/lint-less.js",
+    "lint:agg": "node test/lint-aggregator-inputs.js",
+    "lint:wxml": "node test/lint-wxml-handlers.js",
+    "lint": "npm run lint:less && npm run lint:agg && npm run lint:wxml"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^2.8.3-1"
+  }
+}

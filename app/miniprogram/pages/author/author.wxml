@@ -1,0 +1,64 @@
+<!--pages/author/author.wxml-->
+<!-- P2-4 作者聚合页：展示某作者的全部作品 / 平均分 / 时间线。
+     入口：list/edit 页点作者名（带 author=URL编码参数）。 -->
+<navigation-bar title="作者档案" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 空状态：作者名错或没有任何作品 -->
+  <empty-state wx:if="{{!found}}" icon="👤" title="没有这位作者的记录" desc="{{author || '未指定作者'}}" />
+
+  <!-- 正常态：顶部摘要 + 作品时间线 -->
+  <block wx:else>
+    <!-- 顶部作者摘要卡 -->
+    <view class="hero">
+      <view class="hero-author">{{author}}</view>
+      <view class="hero-stats">
+        <view class="stat-cell">
+          <text class="stat-num">{{count}}</text>
+          <text class="stat-label">部作品</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-cell">
+          <text class="stat-num">{{avgRatingText}}</text>
+          <text class="stat-label">平均分</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-cell">
+          <text class="stat-num">{{yearSpan}}</text>
+          <text class="stat-label">阅读跨度</text>
+        </view>
+      </view>
+      <view class="hero-genre" wx:if="{{topGenre}}">主要领域 · {{topGenre}}</view>
+    </view>
+
+    <!-- 作品时间线（按完成日降序；最新在前） -->
+    <view class="section-label">作品时间线 <text class="section-count">{{count}} 部</text></view>
+    <view class="timeline">
+      <view
+        class="timeline-item"
+        wx:for="{{books}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onTapBook"
+      >
+        <view class="timeline-badge" style="background:{{item.categoryColor}}22;color:{{item.categoryColor}};">{{item.categoryIcon}}</view>
+        <view class="timeline-main">
+          <view class="timeline-head">
+            <text class="timeline-title">{{item.title}}</text>
+            <text class="timeline-rating">{{item.ratingText}}</text>
+          </view>
+          <view class="timeline-meta">
+            <text class="timeline-genre">{{item.genre}}</text>
+            <text class="timeline-dot">·</text>
+            <text class="timeline-date">{{item.finishedDate}}</text>
+          </view>
+          <text class="timeline-note" wx:if="{{item.note}}">「{{item.note}}」</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-tip">— 点击任意作品可跳到编辑 —</view>
+  </block>
+
+</scroll-view>

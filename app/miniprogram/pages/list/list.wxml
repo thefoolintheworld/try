@@ -1,0 +1,214 @@
+<!--pages/list/list.wxml-->
+<navigation-bar title="成就墙" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list" bindscrolltolower="onLoadMore" lower-threshold="100">
+
+  <!-- B2 关键词搜索框（顶部，年份/分类/状态筛选之上） -->
+  <view class="search-area" wx:if="{{years.length > 0}}">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索标题 / 作者 / 短评 / 地点……"
+        placeholder-class="search-placeholder"
+        value="{{activeKeyword}}"
+        bindinput="onKeywordInput"
+      />
+      <text class="search-clear" wx:if="{{activeKeyword}}" bindtap="onClearKeyword">✕</text>
+    </view>
+  </view>
+
+  <!-- 年份切换 -->
+  <scroll-view class="year-bar" scroll-x wx:if="{{years.length > 0}}">
+    <view
+      class="year-chip {{currentYear === item ? 'active' : ''}}"
+      wx:for="{{years}}"
+      wx:key="*this"
+      data-year="{{item}}"
+      bindtap="onSwitchYear"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- 分类筛选 -->
+  <scroll-view class="category-bar" scroll-x wx:if="{{categories.length > 0}}">
+    <view
+      class="filter-chip {{activeCategory === item.id ? 'active' : ''}}"
+      wx:for="{{categories}}"
+      wx:key="id"
+      style="{{activeCategory === item.id ? 'background:' + item.color + ';border-color:' + item.color + ';' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="onSwitchCategory"
+    >
+      <text class="filter-icon">{{item.icon}}</text>
+      <text class="filter-label">{{item.label}}</text>
+      <text class="filter-count">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 状态筛选（三态状态机 P1-5）：与分类筛选正交，AND 组合 -->
+  <scroll-view class="status-bar" scroll-x wx:if="{{statuses.length > 0}}">
+    <view
+      class="filter-chip {{activeStatus === item.id ? 'active' : ''}}"
+      wx:for="{{statuses}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onSwitchStatus"
+    >
+      <text class="filter-icon">{{item.icon}}</text>
+      <text class="filter-label">{{item.label}}</text>
+      <text class="filter-count">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 错误态：refresh 抛错时显示 -->
+  <empty-state wx:if="{{loadError}}" icon="⚠️" title="加载失败" desc="数据可能出了点问题，点下方按钮重试" btnText="重试" bind:btntap="onRetry" />
+
+  <!-- 首屏加载骨架（在筛选条之后、视图切换器之前） -->
+  <loading-skeleton wx:if="{{!loadError && loading}}" type="list" count="5" />
+
+  <!-- P2-7 视图切换：列表 / 网格 / 画廊（segmented control） -->
+  <view class="view-switcher" wx:if="{{!loadError && !loading && items.length > 0}}">
+    <view
+      class="view-option {{viewMode === item.id ? 'active' : ''}}"
+      wx:for="{{viewOptions}}"
+      wx:key="id"
+      data-mode="{{item.id}}"
+      bindtap="onSwitchView"
+    >{{item.icon}} {{item.label}}</view>
+  </view>
+
+  <!-- 列表视图（默认横向卡） -->
+  <view class="list animate-fade-up" wx:if="{{!loadError && !loading && items.length > 0 && viewMode === 'list'}}">
+    <view class="item-card {{item.status === 'abandoned' ? 'is-abandoned' : item.status === 'reading' ? 'is-reading' : ''}}" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapItem" bindlongpress="onCycleStatus">
+      <view class="item-badge" style="background: {{item.categoryColor}}22; color: {{item.categoryColor}};">
+        <text class="item-badge-icon">{{item.categoryIcon}}</text>
+      </view>
+      <view class="item-main">
+        <view class="item-row1">
+          <text class="item-title">{{item.title}}</text>
+          <text class="status-pin" wx:if="{{item.statusIcon}}">{{item.statusIcon}} {{item.statusLabel}}</text>
+          <view class="item-rating" wx:if="{{item.ratingText}}"><text class="star">★</text>{{item.ratingText}}</view>
+        </view>
+        <view class="item-row2" wx:if="{{item.metaText}}">{{item.metaText}}</view>
+        <view class="item-row3">
+          <text class="item-cat-tag">{{item.categoryLabel}}</text>
+          <text> · {{item.finishedDate}}</text>
+        </view>
+        <!-- P2-4 作者入口：单独可点击 chip，catchtap 阻止冒泡到卡片点击 -->
+        <view class="item-author-chip" wx:if="{{item.authorDisplay}}"
+          data-author="{{item.authorDisplay}}"
+          catchtap="onTapAuthor">
+          ✍ {{item.authorDisplay}}
+        </view>
+        <view class="item-meta" wx:if="{{item.quotes.length > 0 || item.understanding}}">
+          <text wx:if="{{item.quotes.length > 0}}">💬 {{item.quotes.length}} 条金句</text>
+          <text wx:if="{{item.understanding}}"> ✎ 有笔记</text>
+        </view>
+        <view class="item-note" wx:if="{{item.note}}">"{{item.note}}"</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- P2-7 网格视图：紧凑 2 列，封面 + 标题 + 评分，扫视友好 -->
+  <view class="grid-view animate-fade-up" wx:if="{{!loadError && !loading && items.length > 0 && viewMode === 'grid'}}">
+    <view class="grid-card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapItem" bindlongpress="onCycleStatus">
+      <view class="grid-cover" style="background: {{item.coverColor}};">
+        <view class="grid-cover-preset" wx:if="{{item.imageKind === 'preset'}}" style="{{item.presetCss}}"></view>
+        <image class="grid-cover-image" wx:elif="{{item.imageKind === 'image'}}" src="{{item.image}}" mode="aspectFill" lazy-load binderror="onImageError" data-id="{{item.id}}"></image>
+        <text class="grid-cover-emoji" wx:else>{{item.categoryIcon}}</text>
+        <view class="grid-rating" wx:if="{{item.ratingText}}">★{{item.ratingText}}</view>
+        <view class="grid-status" wx:if="{{item.statusIcon}}">{{item.statusIcon}}</view>
+      </view>
+      <view class="grid-body">
+        <text class="grid-title">{{item.title}}</text>
+        <text class="grid-meta">{{item.categoryLabel}} · {{item.finishedDate}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- P2-7 画廊视图：大封面 2 列，视觉优先（适合有图的成就） -->
+  <view class="gallery-view animate-fade-up" wx:if="{{!loadError && !loading && items.length > 0 && viewMode === 'gallery'}}">
+    <view class="gallery-card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapItem" bindlongpress="onCycleStatus">
+      <view class="gallery-cover">
+        <view class="gallery-cover-preset" wx:if="{{item.imageKind === 'preset'}}" style="{{item.presetCss}}"></view>
+        <image class="gallery-cover-image" wx:elif="{{item.imageKind === 'image'}}" src="{{item.image}}" mode="aspectFill" lazy-load binderror="onImageError" data-id="{{item.id}}"></image>
+        <view class="gallery-cover-placeholder" wx:else style="background:{{item.coverColor}};">
+          <text class="gallery-cover-emoji">{{item.categoryIcon}}</text>
+          <text class="gallery-cover-title">{{item.title}}</text>
+        </view>
+        <view class="gallery-rating" wx:if="{{item.ratingText}}">★ {{item.ratingText}}</view>
+      </view>
+      <view class="gallery-body">
+        <text class="gallery-title">{{item.title}}</text>
+        <text class="gallery-author" wx:if="{{item.authorDisplay}}">{{item.authorDisplay}}</text>
+        <view class="gallery-meta">
+          <text class="gallery-cat">{{item.categoryLabel}}</text>
+          <text class="gallery-date"> · {{item.finishedDate}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 上拉加载更多（三种视图共用）-->
+  <view class="load-more" wx:if="{{!loadError && !loading && items.length > 0 && hasMore}}">
+    <text class="load-more-text">{{loadingMore ? '加载中…' : '上拉加载更多'}}</text>
+  </view>
+  <view class="load-end" wx:if="{{!loadError && !loading && items.length > 0 && !hasMore && items.length >= 20}}">
+    <text class="load-end-text">— 共 {{items.length}} 条 —</text>
+  </view>
+
+  <!-- 许愿星：未完成的愿望（灰显，点跳愿望页）。
+       与年份/分类筛选无关——愿望没有完成日期，独立成区放在成就列表下方。 -->
+  <view class="wish-section" wx:if="{{pendingWishes.length > 0}}">
+    <view class="wish-section-head">
+      <text class="wish-section-title">⭐ 许愿星 · 待实现</text>
+      <text class="wish-section-more" bindtap="onTapWishlist">查看全部 ›</text>
+    </view>
+    <view class="list">
+      <view
+        class="item-card wish-card-grey"
+        wx:for="{{pendingWishes}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onTapWishItem"
+      >
+        <view class="item-badge" style="background: {{item.categoryColor}}22; color: {{item.categoryColor}};">
+          <text class="item-badge-icon">{{item.categoryIcon}}</text>
+        </view>
+        <view class="item-main">
+          <view class="item-row1">
+            <text class="item-title">{{item.title}}</text>
+          </view>
+          <view class="item-row3">
+            <text class="item-cat-tag">愿望</text>
+            <text> · {{item.categoryLabel}}</text>
+          </view>
+          <view class="item-note" wx:if="{{item.note}}">"{{item.note}}"</view>
+        </view>
+        <view class="wish-tap-hint">点此标记完成 ›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据可视化彩蛋：列表底部趣味统计，数据≥3 条才显示 -->
+  <view class="viz-egg" wx:if="{{items.length >= 3 && vizEggs.length > 0}}">
+    <view class="viz-egg-head">
+      <text class="viz-egg-title">✦ 数据小彩蛋</text>
+      <text class="viz-egg-sub">藏在成就里的有趣模式</text>
+    </view>
+    <view class="viz-egg-item" wx:for="{{vizEggs}}" wx:key="key">
+      <text class="viz-egg-icon">{{item.icon}}</text>
+      <view class="viz-egg-body">
+        <text class="viz-egg-label">{{item.label}}</text>
+        <text class="viz-egg-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态：显式 wx:if 而非 wx:else，避免错误绑定到 viz-egg（二者中间隔着其它兄弟节点） -->
+  <empty-state wx:if="{{!loadError && !loading && items.length === 0 && pendingWishes.length === 0}}" icon="🏆" title="这一年还没有成就" desc="记录一个值得纪念的瞬间" btnText="记录第一个成就" bind:btntap="onTapAdd" />
+
+  <!-- 浮动添加按钮 -->
+  <view class="fab" bindtap="onTapAdd">＋</view>
+</scroll-view>

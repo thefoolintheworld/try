@@ -1,0 +1,205 @@
+/**pages/poster/poster.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== 顶部 ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: @sp-4 0 @sp-2;
+}
+.report-title {
+  flex: 1;
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: @sp-5;
+}
+.card-count {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  flex-shrink: 0;
+}
+
+/* ===== 卡片 swiper ===== */
+.card-swiper {
+  height: 880rpx;
+  margin-top: @sp-2;
+}
+/* 海报预览卡：海报本身是浅色艺术品，与暗色页面背景之间容易产生硬边缘。
+   这里用一个不随主题变的柔光边框 + 双层阴影做"画框舞台"过渡，
+   让海报在亮/暗主题下都能柔和地浮在页面上，而非硬切。 */
+.canvas-card {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: @color-card;
+  border-radius: @radius-poster;
+  /* 内层细描边给海报一个明确边界；外层大半径柔光把硬边晕开 */
+  box-shadow:
+    0 0 0 1rpx rgba(0, 0, 0, 0.06),
+    @shadow-elevated;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.card-placeholder {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+
+/* ===== 指示器 + 说明 ===== */
+.indicator {
+  text-align: center;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin: @sp-5 0 @sp-1;
+  letter-spacing: 4rpx;
+}
+.cur-tip {
+  text-align: center;
+  font-size: @fs-s;
+  color: @color-accent;
+  letter-spacing: 2rpx;
+  min-height: 30rpx;
+}
+
+/* ===== 模式切换 ===== */
+.mode-switch {
+  display: flex;
+  gap: @sp-4;
+  margin: @sp-6 0 @sp-2;
+}
+.mode-chip {
+  flex: 1;
+  text-align: center;
+  padding: @sp-4 0;
+  border-radius: @radius-card-xs;
+  background: @color-card;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  box-shadow: 0 2rpx 8rpx rgba(217, 122, 74, 0.04);
+}
+.mode-chip.active {
+  background: @color-accent;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(217, 122, 74, 0.2);
+}
+
+/* ===== 操作区 ===== */
+.actions {
+  margin-top: @sp-5;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-5;
+}
+.btn {
+  text-align: center;
+  padding: @sp-7 0;
+  border-radius: @radius-btn;
+  font-size: @fs-lg;
+  font-weight: 500;
+  line-height: normal;
+}
+.btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+}
+.btn.ghost {
+  background: @color-card;
+  color: @color-text-primary;
+  border: 1rpx solid @color-divider;
+  margin: 0;
+  box-sizing: border-box;
+}
+button.btn {
+  padding: @sp-7 0;
+}
+button.btn::after {
+  border: none;
+}
+
+.hint {
+  text-align: center;
+  margin-top: @sp-5;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+
+/* ===== 离屏 canvas（彻底隐藏但保证渲染）
+ *  组合策略：
+ *  1. canvas 本体用 fixed 推到屏外一点点（left:-2000px），既在屏外不可见，又不至于太远导致节点延迟初始化
+ *  2. wrap 是 0×0 占位，不影响布局
+ *  关键教训：微信对 type="2d" canvas 的位图合成会绕过 opacity 和父级 overflow:hidden，
+ *  直接落到屏幕坐标；纯靠透明度/裁剪隐藏不可靠。把 canvas 本体推到屏外是唯一稳妥的办法。
+ *  -2000px 而非 -9999px：太远会让部分基础库版本延迟初始化 canvas 节点或尺寸坍缩。 */
+.off-canvas-wrap {
+  position: relative;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.off-canvas {
+  position: fixed;
+  left: -2000px;
+  top: -2000px;
+  width: 600rpx;
+  height: 800rpx;
+}
+
+/* ===== 保存中遮罩 ===== */
+.saving-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(61, 53, 48, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.saving-box {
+  background: @color-card;
+  border-radius: @radius-card-md;
+  padding: @sp-9 @sp-10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.saving-spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border: 4rpx solid @color-divider;
+  border-top-color: @color-accent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.saving-text {
+  margin-top: @sp-5;
+  font-size: @fs-base;
+  color: @color-text-primary;
+}
+
+/* ===== 空状态 ===== */

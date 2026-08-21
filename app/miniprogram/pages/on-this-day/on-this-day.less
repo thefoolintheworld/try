@@ -1,0 +1,168 @@
+/**pages/on-this-day/on-this-day.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== 顶部"今天"卡片 ===== */
+.hero {
+  padding: @sp-9 0 @sp-7;
+  text-align: center;
+}
+.hero-date {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  letter-spacing: 4rpx;
+  opacity: 0.85;
+}
+.hero-divider {
+  width: 48rpx;
+  height: 4rpx;
+  background: @color-accent;
+  opacity: 0.4;
+  border-radius: 2rpx;
+  margin: @sp-5 auto;
+}
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 300;
+  color: @color-accent;
+  letter-spacing: 4rpx;
+  font-family: var(--font-title);
+  line-height: 1.3;
+}
+.hero-sub {
+  margin-top: @sp-4;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  opacity: 0.8;
+}
+
+/* ===== 年份分组 ===== */
+.year-group {
+  margin-top: @sp-7;
+}
+.year-header {
+  display: flex;
+  align-items: center;
+  padding: 0 @sp-1 @sp-4;
+  gap: @sp-4;
+}
+.year-badge {
+  display: inline-block;
+  padding: @sp-2 @sp-5;
+  border-radius: @radius-pill;
+  background: rgba(217, 122, 74, 0.12);
+  color: var(--color-accent, #D97A4A);
+  font-size: @fs-s;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.year-num {
+  font-size: @fs-l;
+  font-weight: 200;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  font-family: var(--font-numeric);
+  opacity: 0.7;
+}
+
+/* ===== 记忆卡片列表 ===== */
+.memory-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.memory-card {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-6 @sp-6;
+  box-shadow: @shadow-card;
+}
+.memory-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: @color-card-soft;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  flex-shrink: 0;
+  margin-right: @sp-6;
+}
+.memory-body {
+  flex: 1;
+  min-width: 0;
+}
+.memory-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+.memory-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+  line-height: 1.4;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* P3-1 金句预览：serif + 引号色，文学感回忆钩子（只成就类有）*/
+.memory-quote {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-primary;
+  opacity: 0.75;
+  line-height: 1.5;
+  font-family: var(--font-serif);
+  /* 金句可能稍长，允许两行 */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+/* P3-1 心境/标签预览：小号胶囊感（星辉金色，呼应"心境"的温暖）*/
+.memory-mood {
+  margin-top: @sp-2;
+  font-size: @fs-xs;
+  color: var(--color-star, #E8A33D);
+  opacity: 0.85;
+  line-height: 1.4;
+}
+.memory-type-tag {
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-sm;
+  background: @color-bg;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  margin-left: @sp-3;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+/* ===== 底部小字 ===== */
+.footer-tip {
+  margin-top: @sp-11;
+  text-align: center;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  letter-spacing: 2rpx;
+}
+
+/* ===== 空状态 ===== */

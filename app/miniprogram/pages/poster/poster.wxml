@@ -1,0 +1,73 @@
+<!--pages/poster/poster.wxml-->
+<navigation-bar title="导出报告" back="{{true}}" color="{{navColor}}" background="{{navBg}}" bindback="onBack"></navigation-bar>
+
+<view class="page {{themeClass}}" wx:if="{{report}}">
+
+  <!-- 顶部标题 + 卡片计数 -->
+  <view class="topbar">
+    <view class="report-title">{{report.title}}</view>
+    <view class="card-count">共 {{report.cards.length}} 张</view>
+  </view>
+
+  <!-- 卡片滑动预览：每张卡一张图片 -->
+  <!-- 用 image 而非 canvas：微信 swiper 对内部多个 type="2d" canvas 做了虚拟化，
+       会导致所有页显示成同一张。卡片在离屏 canvas 画好后转成图片，swiper 里放 image 最稳。 -->
+  <swiper
+    class="card-swiper"
+    current="{{current}}"
+    previous-margin="40rpx"
+    next-margin="40rpx"
+    bindchange="onSwiperChange"
+  >
+    <swiper-item wx:for="{{cardImages}}" wx:key="*this">
+      <view class="canvas-card">
+        <image class="card-image" src="{{item}}" mode="aspectFit" wx:if="{{item}}"></image>
+        <view class="card-placeholder" wx:else>生成中…</view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 指示器 -->
+  <view class="indicator">{{current + 1}} / {{report.cards.length}}</view>
+
+  <!-- 当前卡片说明 -->
+  <view class="cur-tip">{{tipText}}</view>
+
+  <!-- 导出模式切换 -->
+  <view class="mode-switch">
+    <view class="mode-chip {{exportMode === 'long' ? 'active' : ''}}" data-mode="long" bindtap="onSwitchMode">拼长图</view>
+    <view class="mode-chip {{exportMode === 'single' ? 'active' : ''}}" data-mode="single" bindtap="onSwitchMode">导出当前张</view>
+  </view>
+
+  <!-- 操作区 -->
+  <view class="actions">
+    <view class="btn primary" bindtap="onSave">
+      {{exportMode === 'long' ? '保存长图到相册' : '保存本张到相册'}}
+    </view>
+    <button class="btn ghost" open-type="share">分享给朋友</button>
+  </view>
+
+  <view class="hint">保存到相册后，可在朋友圈或社交媒体分享</view>
+</view>
+
+<!-- 隐藏的离屏 canvas，用于渲染卡片 + 长图拼接 + 单张导出 -->
+<!-- 用 0×0 overflow:hidden 容器物理裁剪 canvas 位图：
+     微信部分版本对 type="2d" canvas 的 opacity 合成不可靠，单靠 opacity:0+z-index:-1
+     会让最后画的位图浮到左上角盖住界面。容器裁剪能彻底杜绝这个泄露。 -->
+<view class="off-canvas-wrap">
+  <canvas type="2d" id="offCanvas" class="off-canvas"></canvas>
+</view>
+
+<!-- 加载遮罩 -->
+<view class="saving-mask" wx:if="{{generating}}">
+  <view class="saving-box">
+    <view class="saving-spinner"></view>
+    <view class="saving-text">正在生成图片...</view>
+  </view>
+</view>
+
+<!-- 空状态：年度海报模式专属占位（管线开发中） -->
+<empty-state wx:if="{{!report && loaded && wrappedYear}}" icon="✨" title="{{wrappedYear}} 年度海报" desc="竖版长图导出正在路上，敬请期待。你可以先回到「年度回顾」页面浏览五幕故事。" />
+
+<!-- 空状态：报告不存在或已删除 -->
+<empty-state wx:if="{{!report && loaded && !wrappedYear}}" icon="📭" title="报告不存在或已删除" />

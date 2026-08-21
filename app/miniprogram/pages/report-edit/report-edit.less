@@ -1,0 +1,949 @@
+/**pages/report-edit/report-edit.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  padding-bottom: @sp-8;
+  box-sizing: border-box;
+}
+
+/* ===== 顶部 ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: @sp-4 @sp-7 @sp-2;
+}
+.report-title {
+  flex: 1;
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: @sp-5;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.theme-btn {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  padding: @sp-2 @sp-4 @sp-2 @sp-1;
+}
+.export-btn {
+  font-size: @fs-m;
+  color: @color-accent;
+  padding: @sp-2 @sp-1 @sp-2 @sp-4;
+}
+
+/* ===== 卡片滑动区 ===== */
+.card-swiper {
+  height: 720rpx;
+  margin-top: @sp-2;
+}
+.card {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: @color-card;
+  border-radius: @radius-poster;
+  box-shadow: @shadow-elevated;
+  padding: @sp-10 @sp-9;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 卡片右上角小装饰 */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: @color-accent;
+  opacity: 0.5;
+}
+
+/* 通用卡片 */
+.card-tag {
+  font-size: @fs-sm;
+  letter-spacing: 4rpx;
+  color: @color-accent;
+  padding-bottom: @sp-6;
+  border-bottom: 1rpx solid @color-divider;
+  margin-bottom: @sp-8;
+}
+.card-body {
+  flex: 1;
+  font-size: @fs-lg;
+  line-height: 1.9;
+  color: @color-text-primary;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;  /* P10 自由布局：做绝对定位段的锚点 */
+}
+
+/* ===== 封面卡 ===== */
+.card-cover-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;  /* P10 自由布局：做绝对定位段的锚点 */
+}
+.cover-decor {
+  font-size: 48rpx;
+  color: @color-accent;
+  opacity: 0.6;
+  margin-bottom: @sp-8;
+}
+.cover-title {
+  font-size: 52rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  letter-spacing: 4rpx;
+  line-height: 1.4;
+}
+.cover-divider {
+  width: 60rpx;
+  height: 4rpx;
+  background: @color-accent;
+  margin: @sp-8 0;
+  opacity: 0.7;
+}
+.cover-content {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* ===== 落款卡 ===== */
+.card-ending-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  text-align: right;
+  position: relative;  /* P10 自由布局：做绝对定位段的锚点 */
+}
+
+/* ===== P10 自由布局：绝对定位段落盒 + 右下角缩放手柄 ===== */
+/* seg-box.free 由 boxCss 内联 style 给出 position:absolute + left/top/width%；
+   这里只补视觉：拖拽态提亮 + transform 锚点中心（与 P9 rotate/skew 同源）。
+   注意：boxCss 的 position/left/top/width 优先级高于类的默认值，不冲突。*/
+.seg-box.free {
+  transform-origin: center;
+  z-index: 2;  /* 自由定位段盖在流式段之上 */
+}
+.seg-resize-handle {
+  position: absolute;
+  right: -14rpx;
+  bottom: -14rpx;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: rgba(217, 122, 74, 0.85);
+  border: 2rpx solid @color-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16rpx;
+  color: @color-card;
+  z-index: 3;
+}
+.ending-content {
+  font-size: @fs-lg;
+  line-height: 1.9;
+  color: @color-text-primary;
+  white-space: pre-wrap;
+  margin-bottom: @sp-7;
+}
+.ending-sign {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 8rpx;
+}
+
+/* ===== 指示器 ===== */
+.indicator {
+  text-align: center;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin: @sp-6 0 @sp-2;
+  letter-spacing: 4rpx;
+}
+
+/* ===== 编辑区 ===== */
+.editor {
+  margin: @sp-4 @sp-7 0;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+}
+.editor-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-3;
+}
+.editor-label + .editor-label {
+  margin-top: @sp-6;
+}
+.editor-input {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  padding: @sp-2 0;
+  border-bottom: 1rpx solid @color-divider;
+}
+.editor-textarea {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.7;
+  padding: @sp-2 0;
+  min-height: 80rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.editor-hint {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  letter-spacing: 0;
+}
+
+/* T2-4 段落结构预设按钮组 */
+.para-preset-row {
+  margin-top: @sp-4;
+  padding-top: @sp-4;
+  border-top: 1rpx dashed @color-divider;
+}
+.para-preset-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  margin-bottom: @sp-3;
+}
+.para-preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.para-preset-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: @sp-3 @sp-5;
+  border-radius: @radius-sm;
+  background: @color-card;
+  border: 1rpx solid @color-divider;
+}
+.para-preset-chip-label {
+  font-size: @fs-sm;
+  color: @color-accent;
+  line-height: 1.3;
+}
+.para-preset-chip-desc {
+  font-size: 18rpx;
+  color: @color-text-secondary;
+  opacity: 0.8;
+  line-height: 1.3;
+  margin-top: 2rpx;
+}
+
+/* ===== 段落样式预览（富文本） ===== */
+.seg-editor {
+  margin: @sp-4 @sp-7 0;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-6 @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.seg-editor-label {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-2;
+}
+.seg-editor-hint {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  letter-spacing: 0;
+}
+.seg-editor-tip {
+  margin: @sp-2 0 @sp-4;
+  padding: @sp-3 @sp-4;
+  background: rgba(217, 122, 74, 0.08);
+  border-radius: @radius-xs;
+  font-size: @fs-s;
+  color: @color-accent;
+  line-height: 1.5;
+}
+.seg-preview {
+  display: flex;
+  align-items: flex-start;
+  margin-top: @sp-3;
+  padding: @sp-4 @sp-4 @sp-4 @sp-5;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  border-left: 4rpx solid @color-divider;
+}
+.seg-preview.has-style {
+  border-left-color: @color-accent;
+}
+.seg-preview-text {
+  flex: 1;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+  min-width: 0;
+}
+/* P6 段拖拽手柄（仅多段时显示）*/
+.seg-handle {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: @sp-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: @color-text-secondary;
+  letter-spacing: -4rpx;
+  opacity: 0.5;
+}
+/* P6 段拖拽态高亮 */
+.seg-preview.dragging {
+  opacity: 0.5;
+}
+.seg-preview.drop-target {
+  border-top: 4rpx solid @color-accent;
+}
+/* 点段直接编辑的光标暗示 */
+.seg-preview-text {
+  cursor: pointer;
+}
+.seg-preview-btn {
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: @sp-3;
+  border-radius: 50%;
+  background: @color-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-base;
+  color: @color-accent;
+  box-shadow: @shadow-subtle;
+}
+.seg-preview.has-style .seg-preview-btn {
+  background: @color-accent;
+  color: #FFFFFF;
+}
+/* 图片段预览：缩略图 + 删除按钮 */
+.seg-preview.is-image {
+  border-left-color: @color-book;
+  padding: @sp-3 @sp-3 @sp-3 @sp-4;
+}
+.seg-preview-image {
+  flex: 1;
+  height: 96rpx;
+  border-radius: @radius-xs;
+  min-width: 0;
+  background: @color-divider;
+}
+.seg-preview.is-image .seg-preview-btn {
+  background: @color-danger;
+  color: #FFFFFF;
+  box-shadow: 0 2rpx 8rpx rgba(192, 86, 80, 0.25);
+}
+
+/* 卡片正文里的图片段：宽度撑满，圆角，上下留白 */
+.card-body-image {
+  width: 100%;
+  border-radius: @radius-sm;
+  margin: @sp-3 0;
+  display: block;
+}
+
+/* ===== 操作栏 ===== */
+.action-bar {
+  display: flex;
+  margin: @sp-6 @sp-7 0;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-5 0;
+  box-shadow: @shadow-card;
+}
+.action-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: @sp-2 0;
+}
+.action-icon {
+  font-size: @fs-xl;
+  color: @color-text-primary;
+  line-height: 1;
+}
+.action-text {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.action-item.danger .action-icon,
+.action-item.danger .action-text {
+  color: @color-danger;
+}
+.action-item.style-entry .action-icon,
+.action-item.style-entry .action-text {
+  color: @color-accent;
+}
+
+/* ===== 底部弹层 ===== */
+.sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(61, 53, 48, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 90;
+}
+.sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: @color-card;
+  border-radius: @radius-card @radius-card 0 0;
+  padding: @sp-7 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 91;
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  max-height: 70vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.sheet::before {
+  content: '';
+  position: absolute;
+  top: 12rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: @color-divider;
+}
+.sheet.show {
+  transform: translateY(0);
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  padding-top: @sp-4;
+  padding-bottom: @sp-6;
+  border-bottom: 1rpx solid @color-divider;
+}
+.sheet-title {
+  flex: 1;
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.sheet-close {
+  font-size: @fs-lg;
+  color: @color-text-secondary;
+  padding: @sp-1 @sp-2;
+}
+.sheet-list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 添加卡片列表 */
+.sheet-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-7 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.sheet-item:last-child {
+  border-bottom: none;
+}
+.sheet-item-label {
+  flex: 1;
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+.sheet-item-arrow {
+  font-size: @fs-lg;
+  color: @color-accent;
+}
+
+/* 顺序调整列表 */
+.order-row {
+  display: flex;
+  align-items: center;
+  padding: @sp-6 @sp-2;
+  border-bottom: 1rpx solid @color-divider;
+}
+.order-row:last-child {
+  border-bottom: none;
+}
+.order-row.current {
+  background: rgba(217, 122, 74, 0.05);
+  border-radius: @radius-sm;
+}
+.order-no {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: @color-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  flex-shrink: 0;
+}
+.order-row.current .order-no {
+  background: @color-accent;
+  color: #FFFFFF;
+}
+.order-title {
+  flex: 1;
+  margin: 0 @sp-4;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.order-actions {
+  display: flex;
+  gap: @sp-2;
+  flex-shrink: 0;
+}
+.order-arrow {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: @radius-sm;
+  background: @color-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: @fs-m;
+  color: @color-text-primary;
+}
+
+/* P6 拖拽手柄 + 拖拽态高亮 */
+.order-tip-row {
+  padding: @sp-3 @sp-6;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+.order-handle {
+  width: 56rpx;
+  height: 56rpx;
+  flex-shrink: 0;
+  margin-right: @sp-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: @color-text-secondary;
+  letter-spacing: -4rpx;
+}
+.order-row.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+.order-row.drop-target {
+  border-top: 4rpx solid @color-accent;
+}
+
+/* P6 缩略图导航条 */
+.thumb-nav {
+  margin: @sp-2 0 0;
+  white-space: nowrap;
+}
+.thumb-nav-inner {
+  display: inline-flex;
+  padding: @sp-3 @sp-6;
+  gap: @sp-3;
+}
+.thumb-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 88rpx;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.thumb-item.active {
+  opacity: 1;
+}
+.thumb-icon {
+  width: 72rpx;
+  height: 96rpx;
+  border-radius: @radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  box-shadow: @shadow-subtle;
+}
+.thumb-label {
+  margin-top: @sp-2;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  max-width: 88rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ===== 样式编辑弹层（S2） ===== */
+/* 样式弹层内容多，撑高一点；并让内部 scroll-view 能正确滚动 */
+.sheet-style {
+  max-height: 85vh;
+}
+.sheet-style .style-body {
+  /* scroll-view 必须给明确高度才能滚（flex:1 在小程序部分基础库不稳）
+     用固定高度兜底：85vh 弹层 - header ~120rpx - 安全区域，保守给 60vh */
+  height: 60vh;
+  padding: @sp-6 @sp-2 @sp-4;
+  box-sizing: border-box;
+}
+
+/* 段样式小弹层（富文本）：比卡片样式弹层更轻量 */
+.sheet-seg {
+  max-height: 75vh;
+}
+.sheet-seg .seg-body {
+  height: 50vh;
+  padding: @sp-4 @sp-2;
+  box-sizing: border-box;
+}
+.style-section {
+  padding: @sp-4 @sp-4 @sp-5;
+  border-bottom: 1rpx solid @color-divider;
+}
+.style-section:last-child {
+  border-bottom: none;
+}
+.style-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  letter-spacing: 2rpx;
+  margin-bottom: @sp-4;
+  display: flex;
+  align-items: center;
+}
+.style-value {
+  margin-left: @sp-2;
+  color: @color-accent;
+  font-size: @fs-sm;
+}
+/* 标签内的灰色提示文字（如「楷体依赖系统字体」），区别于强调数值 */
+.style-hint {
+  margin-left: auto;
+  color: @color-text-secondary;
+  font-size: @fs-xs;
+}
+/* 旋转/倾斜滑块旁的重置按钮（PPT 化段落样式扩展） */
+.reset-mini {
+  margin-left: auto;
+  color: @color-text-secondary;
+  font-size: @fs-xs;
+  padding: @sp-1 @sp-3;
+  border: 1rpx solid @color-divider;
+  border-radius: @radius-sm;
+}
+
+/* 分段控件（背景类型 / 对齐） */
+.seg-control {
+  display: flex;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  padding: @sp-1;
+}
+.seg-btn {
+  flex: 1;
+  text-align: center;
+  padding: @sp-4 0;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  border-radius: @radius-sm;
+}
+.seg-btn.active {
+  background: @color-card;
+  color: @color-text-primary;
+  font-weight: 600;
+  box-shadow: @shadow-subtle;
+}
+
+/* 艺术字网格 */
+.art-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+}
+.art-chip {
+  padding: @sp-4 @sp-7;
+  border-radius: @radius-sm;
+  background: @color-bg;
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+}
+.art-chip.active {
+  background: @color-card;
+  color: @color-text-primary;
+  border-color: @color-accent;
+  font-weight: 600;
+}
+/* 各风格 chip 自身展示对应效果（让用户预览） */
+.art-chip.art-outline {
+  text-shadow: 1rpx 0 #3D3530, -1rpx 0 #3D3530, 0 1rpx #3D3530, 0 -1rpx #3D3530;
+}
+.art-chip.art-shadow {
+  text-shadow: 0 2rpx 4rpx rgba(61, 53, 48, 0.45);
+}
+.art-chip.art-gradient {
+  background-image: linear-gradient(180deg, #3D3530, #D97A4A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.art-chip.art-gradient.active {
+  background: @color-card;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: @color-text-primary;
+  background-image: none;
+}
+.art-chip.art-handwritten {
+  font-style: italic;
+}
+/* 霓虹发光：多层同色光晕 */
+.art-chip.art-neon {
+  color: #FF6EC7;
+  text-shadow: 0 0 6rpx #FF6EC7, 0 0 4rpx #FF6EC7, 0 0 2rpx #FF6EC7;
+}
+/* 高光描边：白色细描边 + 柔光 */
+.art-chip.art-glow {
+  text-shadow: 1rpx 0 #FFFFFF, -1rpx 0 #FFFFFF, 0 1rpx #FFFFFF, 0 -1rpx #FFFFFF, 0 0 4rpx #FFFFFF;
+}
+/* 彩虹渐变：横向 7 色 */
+.art-chip.art-rainbow {
+  background-image: linear-gradient(90deg, #FF6B6B, #FFA94D, #FFD43B, #8CE99A, #74C0FC, #9775FA, #E599F7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.art-chip.art-rainbow.active {
+  background: @color-card;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: @color-text-primary;
+  background-image: none;
+}
+/* 金属质感：垂直三段金属渐变 */
+.art-chip.art-metallic {
+  background-image: linear-gradient(180deg, #6A6A6A 0%, #F5F5F5 42%, #FFFFFF 50%, #F5F5F5 58%, #6A6A6A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.art-chip.art-metallic.active {
+  background: @color-card;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: @color-text-primary;
+  background-image: none;
+}
+/* 立体投影：右下长投影 */
+.art-chip.art-relief {
+  text-shadow: 1rpx 1rpx rgba(61, 53, 48, 0.35), 2rpx 2rpx rgba(61, 53, 48, 0.35), 3rpx 3rpx rgba(61, 53, 48, 0.35), 4rpx 4rpx rgba(61, 53, 48, 0.35), 5rpx 5rpx rgba(61, 53, 48, 0.35), 6rpx 6rpx rgba(61, 53, 48, 0.35);
+}
+/* 凹陷字：上亮下暗内嵌阴影 */
+.art-chip.art-letterpress {
+  text-shadow: 0 -1rpx 0 rgba(255, 255, 255, 0.6), 0 1rpx 1rpx rgba(0, 0, 0, 0.4);
+}
+/* 复古做旧：暖褐描边 + 半透明 */
+.art-chip.art-vintage {
+  text-shadow: 1rpx 0 #6B4A2B, -1rpx 0 #6B4A2B, 0 1rpx #6B4A2B, 0 -1rpx #6B4A2B;
+  opacity: 0.88;
+}
+/* 印章风：粗印泥色描边 + 偏移投影 */
+.art-chip.art-stamp {
+  color: #C0392B;
+  text-shadow: 2rpx 0 #C0392B, -2rpx 0 #C0392B, 0 2rpx #C0392B, 0 -2rpx #C0392B, 2rpx 3rpx 4rpx rgba(192, 57, 43, 0.3);
+}
+
+/* 色板行 */
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-5;
+}
+.swatch {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  border: 4rpx solid @color-card;
+  box-shadow: 0 0 0 1rpx @color-divider;
+  position: relative;
+}
+.swatch.active {
+  box-shadow: 0 0 0 4rpx @color-accent;
+  border-color: @color-card;
+}
+
+/* 滑块 */
+.style-slider {
+  margin: @sp-2 0 0;
+}
+
+/* 重置按钮 */
+.reset-btn {
+  text-align: center;
+  padding: @sp-5;
+  font-size: @fs-m;
+  color: @color-danger;
+  border-radius: @radius-sm;
+  background: @color-danger-bg;
+}
+
+/* ===== S3：内置背景网格 + 上传 + 主题套用 ===== */
+.bg-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: @sp-5;
+}
+.bg-thumb {
+  position: relative;
+  height: 120rpx;
+  border-radius: @radius-card-xs;
+  border: 4rpx solid @color-card;
+  box-shadow: 0 0 0 1rpx @color-divider;
+  overflow: hidden;
+}
+.bg-thumb.active {
+  box-shadow: 0 0 0 4rpx @color-accent;
+  border-color: @color-card;
+}
+.bg-thumb-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: @sp-2 0;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: @fs-xs;
+  color: @color-text-primary;
+  text-align: center;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-6;
+}
+.upload-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: @sp-6;
+  border: 2rpx dashed @color-accent;
+  border-radius: @radius-sm;
+  color: @color-accent;
+}
+.upload-icon {
+  font-size: @fs-lg;
+  margin-right: @sp-3;
+}
+.upload-text {
+  font-size: @fs-base;
+}
+.clear-bg-btn {
+  font-size: @fs-sm;
+  color: @color-danger;
+  padding: @sp-4;
+}
+.bg-current {
+  margin-top: @sp-4;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+
+/* 主题套用弹层 */
+.sheet-theme {
+  /* 复用 .sheet 基础样式 */
+}
+.theme-tip {
+  padding: @sp-4 @sp-4 @sp-6;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: @sp-6;
+  padding: 0 @sp-4 @sp-6;
+}
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: @sp-6;
+  background: @color-bg;
+  border-radius: @radius-card-xs;
+}
+.theme-swatch {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: @shadow-card;
+}
+.theme-swatch-dot {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+}
+.theme-name {
+  margin-top: @sp-4;
+  font-size: @fs-base;
+  color: @color-text-primary;
+}

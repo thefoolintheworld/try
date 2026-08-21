@@ -1,0 +1,74 @@
+<!--components/heatmap/heatmap.wxml-->
+<!-- GitHub 式热力图：53 周 × 7 天的格子墙。
+     每格 color 由 level 决定（0=无记录/1-4=记录多少），与 GitHub 贡献图同构。
+     数据由父页面通过 property days 传入（[{date, count, label?}]）。 -->
+<view class="heatmap">
+  <!-- 主标题 + 副信息（命中条数 / 最长连续 / 总天数） -->
+  <view class="hm-header" wx:if="{{showHeader}}">
+    <view class="hm-title-row">
+      <text class="hm-title">{{title}}</text>
+      <text class="hm-sub" wx:if="{{summaryText}}">{{summaryText}}</text>
+    </view>
+  </view>
+
+  <!-- 格子墙容器：横向滚动（小屏可能放不下 53 列） -->
+  <scroll-view class="hm-grid-scroll" scroll-x="{{scrollable}}" enhanced show-scrollbar="{{false}}">
+    <view class="hm-grid-inner" style="width:{{gridWidthPx}}px;">
+      <!-- 月份标签行（每列起始周对应的月份） -->
+      <view class="hm-month-row" wx:if="{{showMonthLabels}}">
+        <view
+          class="hm-month-label"
+          wx:for="{{monthLabels}}"
+          wx:key="index"
+          style="left:{{item.leftPx}}px;"
+        >{{item.label}}</view>
+      </view>
+
+      <!-- 主体格子区：左星期标签 + 右格子网格 -->
+      <view class="hm-body">
+        <!-- 星期标签列（Mon/Wed/Fri）-->
+        <view class="hm-week-col" wx:if="{{showWeekLabels}}">
+          <view class="hm-week-spacer"></view>
+          <text class="hm-week-label">一</text>
+          <view class="hm-week-spacer"></view>
+          <text class="hm-week-label">三</text>
+          <view class="hm-week-spacer"></view>
+          <text class="hm-week-label">五</text>
+          <view class="hm-week-spacer"></view>
+        </view>
+
+        <!-- 格子网格：按列（周）渲染；每周 7 格（天） -->
+        <view class="hm-grid">
+          <view
+            class="hm-col"
+            wx:for="{{weeks}}"
+            wx:for-item="week"
+            wx:key="colIndex"
+          >
+            <view
+              class="hm-cell hm-level-{{day.level}} {{day.today ? 'today' : ''}} {{day.future ? 'future' : ''}}"
+              wx:for="{{week.days}}"
+              wx:for-item="day"
+              wx:key="date"
+              data-date="{{day.date}}"
+              data-count="{{day.count}}"
+              bindtap="onTapCell"
+              bindlongpress="onLongPressCell"
+            ></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 图例：少 → 多 -->
+  <view class="hm-legend" wx:if="{{showLegend}}">
+    <text class="hm-legend-label">少</text>
+    <view class="hm-cell hm-level-0 hm-legend-cell"></view>
+    <view class="hm-cell hm-level-1 hm-legend-cell"></view>
+    <view class="hm-cell hm-level-2 hm-legend-cell"></view>
+    <view class="hm-cell hm-level-3 hm-legend-cell"></view>
+    <view class="hm-cell hm-level-4 hm-legend-cell"></view>
+    <text class="hm-legend-label">多</text>
+  </view>
+</view>

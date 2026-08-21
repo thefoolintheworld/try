@@ -1,0 +1,134 @@
+/* components/loading-skeleton/loading-skeleton.less */
+/* 通用骨架屏样式。配色走 --color-card-soft（灰条底）+ shimmer 扫光。
+   通过各页面 @import app.less 间接拿到 CSS 变量；主题切换自动跟随。*/
+
+.skeleton {
+  padding: @sp-6;
+}
+
+/* 灰条基础：所有占位元素共用 */
+.sk-box {
+  background: #F0EAE0;
+  background: var(--color-card-soft, #F0EAE0);
+  border-radius: @radius-xs;
+}
+.sk-line {
+  background: #F0EAE0;
+  background: var(--color-card-soft, #F0EAE0);
+  border-radius: 4rpx;
+  height: 24rpx;
+}
+
+/* shimmer 扫光动画：从左到右一遍（不循环，避免持续视觉噪音）*/
+@keyframes sk-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.sk-box, .sk-line {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+}
+
+/* ===== list 模式 ===== */
+.skeleton-list .sk-row {
+  display: flex;
+  align-items: center;
+  gap: @sp-4;
+  padding: @sp-5;
+  margin-bottom: @sp-4;
+  background: #FFFFFF;
+  background: var(--color-card, #FFFFFF);
+  border-radius: @radius-card-sm;
+}
+.skeleton-list .sk-cover {
+  width: 96rpx;
+  height: 128rpx;
+  flex-shrink: 0;
+  border-radius: @radius-xs;
+}
+.skeleton-list .sk-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-4;
+}
+.skeleton-list .sk-title { width: 70%; height: 32rpx; }
+.skeleton-list .sk-sub   { width: 45%; height: 24rpx; }
+
+/* ===== card 模式 ===== */
+.skeleton-card .sk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @sp-4;
+}
+.skeleton-card .sk-card {
+  padding: @sp-4;
+  background: #FFFFFF;
+  background: var(--color-card, #FFFFFF);
+  border-radius: @radius-card-sm;
+}
+.skeleton-card .sk-card-cover {
+  width: 100%;
+  height: 240rpx;
+  margin-bottom: @sp-4;
+}
+.skeleton-card .sk-card-line { width: 80%; margin-bottom: @sp-3; }
+.skeleton-card .sk-card-line.short { width: 50%; }
+
+/* ===== stats 模式 ===== */
+.skeleton-stats .sk-stats-hero {
+  text-align: center;
+  padding: @sp-8 0 @sp-7;
+}
+.skeleton-stats .sk-big-num {
+  width: 200rpx;
+  height: 96rpx;
+  margin: 0 auto @sp-4;
+}
+.skeleton-stats .sk-stats-label {
+  width: 120rpx;
+  height: 24rpx;
+  margin: 0 auto;
+}
+.skeleton-stats .sk-stats-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: @sp-4;
+  margin-bottom: @sp-7;
+}
+.skeleton-stats .sk-stats-cell {
+  text-align: center;
+}
+.skeleton-stats .sk-stats-num {
+  width: 80rpx;
+  height: 56rpx;
+  margin: 0 auto @sp-3;
+}
+.skeleton-stats .sk-stats-cell-label {
+  width: 60rpx;
+  height: 20rpx;
+  margin: 0 auto;
+}
+.skeleton-stats .sk-chart {
+  width: 100%;
+  height: 320rpx;
+}
+
+/* 暗色主题：灰条更深，扫光更柔 */
+.theme-dark .sk-box,
+.theme-dark .sk-line {
+  background: #2A2520;
+  background: var(--color-card-soft, #2A2520);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%
+  );
+}

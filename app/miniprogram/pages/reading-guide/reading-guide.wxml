@@ -1,0 +1,57 @@
+<!-- pages/reading-guide/reading-guide.wxml -->
+<!-- P3-2 共读引导页：展示推荐问题，用户回答写进 Item.understanding。
+     纯本地「预设问题 + 思考角度」，无用户间交互（合规）。 -->
+<navigation-bar title="共读引导" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+  <view class="page-inner">
+
+    <!-- 书籍信息头 -->
+    <view class="book-head" wx:if="{{found}}">
+      <view class="book-title">《{{bookTitle}}》</view>
+      <view class="book-meta">
+        <text class="book-cat">{{bookCategoryLabel}}</text>
+        <text class="book-author" wx:if="{{bookAuthor}}">{{bookAuthor}}</text>
+        <text class="book-mood" wx:if="{{bookMood}}">· 心境：{{bookMood}}</text>
+      </view>
+      <view class="book-intro">下面是几个帮你把感受落成文字的问题。挑你最有话说的回答，写完会存进这本书的「理解」字段。</view>
+    </view>
+
+    <!-- 空态：没传 bookId 或书不存在 -->
+    <empty-state wx:if="{{!found}}" icon="📖" title="没有指定书目" desc="请从录入页或成就列表的「共读引导」入口进入。" />
+
+    <!-- 问题列表 -->
+    <block wx:if="{{found}}">
+      <view class="question-card" wx:for="{{questions}}" wx:key="text" wx:for-index="idx">
+        <view class="question-head">
+          <text class="question-group-tag">{{item.groupLabel}}</text>
+          <text class="question-num">Q{{idx + 1}}</text>
+        </view>
+        <text class="question-text">{{item.text}}</text>
+        <text class="question-hint" wx:if="{{item.hint}}">💡 {{item.hint}}</text>
+        <textarea
+          class="question-answer"
+          placeholder="在这里写下你的回答…"
+          value="{{item.answer}}"
+          data-index="{{idx}}"
+          bindinput="onAnswerInput"
+          maxlength="500"
+          auto-height
+        />
+        <view class="question-action-row">
+          <view class="question-append-btn" data-index="{{idx}}" bindtap="onAppendAnswer">写入理解</view>
+        </view>
+      </view>
+
+      <!-- 一键拼接全部 -->
+      <view class="append-all-btn" bindtap="onAppendAll">把所有回答拼成读书笔记</view>
+
+      <!-- 当前 understanding 预览 -->
+      <view class="understanding-preview" wx:if="{{understanding}}">
+        <view class="preview-label">当前「理解」字段</view>
+        <text class="preview-text">{{understanding}}</text>
+      </view>
+    </block>
+
+  </view>
+</scroll-view>

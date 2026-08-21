@@ -1,0 +1,80 @@
+<!--pages/profile/profile.wxml-->
+<!-- P2-2 个人陈列柜：把首页置顶的 6 条成就以「个人主页」风格展示。
+     与首页成就墙共享 pinnedAchievements 数据源；这里是只读展示，编辑跳回首页 pin 流程。 -->
+<navigation-bar title="陈列柜" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 顶部「我的画像」摘要卡 -->
+  <view class="hero animate-fade-up" wx:if="{{summary}}">
+    <view class="hero-deco">❋</view>
+    <view class="hero-title">我的阅读陈列柜</view>
+    <view class="hero-pin-badge" wx:if="{{pinnedCount > 0}}">{{pinnedCount}} / 6 精选</view>
+    <view class="hero-stats" wx:if="{{summary.totalAchievements > 0}}">
+      <view class="stat-cell">
+        <text class="stat-num">{{summary.totalAchievements}}</text>
+        <text class="stat-label">总成就</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{summary.totalBooks}}</text>
+        <text class="stat-label">本书</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{summary.totalFilms}}</text>
+        <text class="stat-label">部片</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-cell">
+        <text class="stat-num">{{summary.yearSpan}}</text>
+        <text class="stat-label">跨度</text>
+      </view>
+    </view>
+    <view class="hero-genre" wx:if="{{summary.topGenre}}">主要领域 · {{summary.topGenre}}</view>
+  </view>
+
+  <!-- 陈列柜槽位（网格 2 列） -->
+  <block wx:if="{{hasPin}}">
+    <view class="section-label">精选陈列 <text class="section-count">{{pinnedCount}} 条</text></view>
+    <view class="showcase-grid">
+      <view
+        class="slot {{item.imageKind === 'preset' ? 'has-preset' : item.imageKind === 'image' ? 'has-image' : ''}}"
+        wx:for="{{slots}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onTapSlot"
+      >
+        <!-- 封面区：预设渐变 / 真图 / 纯色占位三态 -->
+        <view class="slot-cover">
+          <view class="slot-cover-preset" wx:if="{{item.imageKind === 'preset'}}" style="{{item.presetCss}}"></view>
+          <image class="slot-cover-image" wx:elif="{{item.imageKind === 'image'}}" src="{{item.image}}" mode="aspectFill" lazy-load binderror="onImageError" data-id="{{item.id}}"></image>
+          <view class="slot-cover-placeholder" wx:else style="background:{{item.categoryColor}};">
+            <text class="slot-cover-emoji">{{item.categoryIcon}}</text>
+          </view>
+          <view class="slot-rating" wx:if="{{item.ratingText}}">★ {{item.ratingText}}</view>
+        </view>
+        <!-- 文案区 -->
+        <view class="slot-body">
+          <text class="slot-title">{{item.title}}</text>
+          <text class="slot-author" wx:if="{{item.author}}">{{item.author}}</text>
+          <text class="slot-note" wx:if="{{item.note}}">「{{item.note}}」</text>
+          <view class="slot-meta">
+            <text class="slot-cat">{{item.categoryLabel}}</text>
+            <text class="slot-date"> · {{item.finishedDate}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空态：还没置顶过 -->
+  <empty-state wx:else icon="🖼️" title="陈列柜还是空的" desc="从首页成就墙长按或点击「编辑」置顶 6 条最得意的作品，它们会以陈列柜风格展示在这里 —— 像私人画廊一样。" btnText="去首页置顶" bind:btntap="onTapGoPin" />
+
+  <!-- 引导脚注：已 pin 但想调整 -->
+  <view class="footer-tip" wx:if="{{hasPin}}">
+    想调整陈列？在首页成就墙点「编辑」即可置顶 / 取消 →
+    <text class="footer-link" bindtap="onTapGoPin">前往</text>
+  </view>
+
+</scroll-view>

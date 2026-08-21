@@ -1,0 +1,333 @@
+/**app.less**/
+// === 主题系统（CSS 变量层）===
+// 设计思路：
+//   1) 所有颜色/阴影/圆角令牌都通过 CSS 变量暴露，运行时可切换（亮/暗双主题）。
+//   2) LESS 变量 @color-xxx 只是 CSS 变量的别名（编译期替换为 var(--xxx)），
+//      这样所有现有 .less 文件零修改就能自动跟随主题切换。
+//   3) 暗色主题沿用"暖色文学化"基因：暖墨色底 + 米黄文字 + 暖橙强调，
+//      不是冷调灰黑 —— 保持产品调性连贯。
+//   4) 报告导出（poster canvas）走另一套色（维持亮色分享），与本套独立。
+//
+// === 关键级联原理 ===
+//   变量定义放在 page {} 里（默认亮色），.theme-dark 覆盖之。
+//   每个页面的根节点是 <scroll-view class="page {{themeClass}}">，
+//   class 字符串里同时含 "page" 和 "theme-light"/"theme-dark"，
+//   所以 .theme-dark 选择器会作用于这个元素，重定义其后代（整个页面）的变量。
+//   背景色由 .page 类承载（而非 page 标签），这样它能正确读到被 .theme-dark
+//   覆盖后的变量值。page 标签只承载全局默认（无背景色，避免覆盖）。
+
+/* ===== 亮色（默认）===== */
+page {
+  --color-bg: #FAF6F0;
+  --color-card: #FFFFFF;
+  --color-card-soft: #F4EEE5;           /* 卡片次级底（嵌套/输入框）*/
+  --color-text-primary: #3D3530;
+  --color-text-secondary: #6F6354;   /* WCAG AA: 对 #FAF6F0 对比度 5.2+（原 #8B7D6E 仅 3.71 不达标）*/
+  --color-accent: #D97A4A;
+  --color-accent-soft: #F2C8A6;         /* 大面积使用的去饱和橙（背景块/装饰）*/
+  --color-accent-dark: #C5622F;
+  --color-book: #6B8E5A;
+  --color-film: #8B6F9C;
+  --color-star: #E8A33D;
+  --color-divider: #E8E0D5;
+  --color-danger: #C05650;
+  --color-danger-bg: rgba(192, 86, 80, 0.10);
+
+  /* 圆角节奏（9 档，覆盖全项目实际用法）*/
+  --radius-xs: 8rpx;          /* 小标签/角标/输入框微圆角 */
+  --radius-sm: 12rpx;         /* 次级小卡/嵌套块/进度条槽 */
+  --radius-card-xs: 16rpx;    /* 列表项内部小块（紧凑感）*/
+  --radius-btn: 40rpx;        /* 大按钮/主卡/底部弹层顶部 */
+  --radius-card: 32rpx;       /* 主卡片（从 24 调到 32，更柔和）*/
+  --radius-card-md: 24rpx;    /* 内部卡/次级卡（列表项内的卡）*/
+  --radius-card-sm: 20rpx;    /* 表单行/小卡/嵌套块 */
+  --radius-chip: 36rpx;       /* 分类 chip 这种胶囊形 */
+  --radius-poster: 28rpx;     /* 海报/报告卡 */
+  --radius-pill: 999rpx;      /* 胶囊条/圆形 */
+
+  /* 阴影：微信读书式宽弥散软阴影（"漂浮感"）*/
+  --shadow-subtle: 0 2rpx 8rpx rgba(61, 53, 48, 0.06);   /* 内联元素/选中态/小卡 */
+  --shadow-card: 0 8rpx 48rpx rgba(61, 53, 48, 0.06);
+  --shadow-elevated: 0 16rpx 64rpx rgba(61, 53, 48, 0.10);
+  --shadow-cta: 0 12rpx 32rpx rgba(217, 122, 74, 0.32);
+  /* 彩色发光（三环/勋章等仪式时刻用；亮色主题值）*/
+  --glow-red: rgba(245, 77, 77, 0.30);
+  --glow-green: rgba(107, 227, 107, 0.30);
+  --glow-blue: rgba(74, 157, 255, 0.30);
+  /* 三环/图例等仪式语义色（亮色：饱和原色；暗色由 .theme-dark 提亮）*/
+  --color-ring-red: #F54D4D;
+  --color-ring-green: #6BE36B;
+  --color-ring-blue: #4A9DFF;
+
+  /* 字号阶梯（9 档，覆盖全项目实际用法；单位 rpx）*/
+  --font-size-xs: 20rpx;     /* 角标/极小辅助 */
+  --font-size-s: 22rpx;      /* 辅助说明（最高频）*/
+  --font-size-sm: 24rpx;     /* 次文字 */
+  --font-size-base: 26rpx;   /* 正文小 */
+  --font-size-m: 28rpx;      /* 正文 */
+  --font-size-l: 30rpx;      /* 小标题/强调正文 */
+  --font-size-lg: 32rpx;     /* 标题基准 */
+  --font-size-xl: 40rpx;     /* 大标题 */
+  --font-size-xxl: 56rpx;    /* 展示标题 */
+  --font-size-display: 96rpx;/* 数字展示（年份/计数）*/
+  --font-size-2xl: 120rpx;   /* 更大数字展示（打卡计数/连胜天数）*/
+  --font-size-3xl: 160rpx;   /* 最大数字展示（年份仪式位）*/
+
+  /* 间距阶梯（12 档，4 基准网格；填补此前 24 种散落值的系统空白）
+     用法：padding/margin/gap 一律走 @sp-* 别名，不再写裸 rpx。*/
+  --space-1: 4rpx;
+  --space-2: 8rpx;
+  --space-3: 12rpx;
+  --space-4: 16rpx;
+  --space-5: 20rpx;
+  --space-6: 24rpx;
+  --space-7: 32rpx;
+  --space-8: 40rpx;
+  --space-9: 48rpx;
+  --space-10: 56rpx;
+  --space-11: 64rpx;
+  --space-12: 80rpx;
+
+  /* 字体层（默认无衬线；切到 .theme-serif-title 时标题用衬线）*/
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif: "PingFang SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-title: var(--font-sans);
+  --font-numeric: -apple-system, "DIN Alternate", "PingFang SC", sans-serif;
+
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* ===== 暗色主题（三套子方案）=====
+   每页根节点 class 含 .theme-dark + 一个变体 class：
+     .theme-dark.theme-dark-neutral  中性深灰（Apple Books 式，推荐）
+     .theme-dark.theme-dark-warm     暖墨色调浅版（保留文学氛围）
+     .theme-dark.theme-dark-oled     纯黑高对比（OLED 省电）
+   .theme-dark 提供共享的强调色/阴影；变体 class 只覆盖底色相关字段。
+   都保留米黄文字 + 暖橙强调的文学基因。 */
+
+.theme-dark {
+  /* 三套共享的文字/强调/分类色 —— 暗色下统一提亮的版本 */
+  --color-text-primary: #F2E9DC;
+  --color-text-secondary: #B0A290;
+  --color-accent: #F0A875;
+  --color-accent-soft: #4A3322;
+  --color-accent-dark: #D08850;
+  --color-book: #9CC080;
+  --color-film: #C5A8D8;
+  --color-star: #F5C26B;
+  --color-danger: #E08884;
+  --color-danger-bg: rgba(224, 136, 132, 0.16);
+
+  --shadow-subtle: 0 2rpx 8rpx rgba(0, 0, 0, 0.30);
+  --shadow-card: 0 8rpx 48rpx rgba(0, 0, 0, 0.40);
+  --shadow-elevated: 0 16rpx 64rpx rgba(0, 0, 0, 0.52);
+  --shadow-cta: 0 12rpx 32rpx rgba(240, 168, 117, 0.32);
+  /* 暗色下发光略强，让仪式时刻在深底上更显眼 */
+  --glow-red: rgba(255, 107, 107, 0.45);
+  --glow-green: rgba(142, 230, 142, 0.40);
+  --glow-blue: rgba(120, 175, 255, 0.45);
+  /* 三环/图例语义色：暗色下提亮一档，在深底上更鲜活 */
+  --color-ring-red: #FF6B6B;
+  --color-ring-green: #8EE68E;
+  --color-ring-blue: #78AFFF;
+}
+
+/* 变体一：中性深灰（Apple Books/Kindle 式）—— 干净不发泥，最稳妥 */
+.theme-dark-neutral {
+  --color-bg: #1C1C1E;
+  --color-card: #2C2C2E;
+  --color-card-soft: #353537;
+  --color-divider: #3D3D40;
+}
+
+/* 变体二：暖墨色调浅版 —— 保留暖色文学氛围，比初版更明亮 */
+.theme-dark-warm {
+  --color-bg: #221E1A;
+  --color-card: #2E2823;
+  --color-card-soft: #382F27;
+  --color-divider: #3D362E;
+}
+
+/* 变体三：纯黑高对比（OLED 省电）—— 近乎纯黑，极简冷调 */
+.theme-dark-oled {
+  --color-bg: #0F0F0F;
+  --color-card: #1C1C1C;
+  --color-card-soft: #262626;
+  --color-divider: #2E2E2E;
+  --color-text-primary: #F5F0E8;
+  --color-text-secondary: #A8A098;
+}
+
+/* ===== 字体主题：衬线标题 =====
+   .theme-serif-title 与 .theme-dark 一起加在根节点上，可叠加。 */
+.theme-serif-title {
+  --font-title: var(--font-serif);
+}
+
+/* ===== 页面根节点：承载背景色（关键！）=====
+   .page 类是每页根节点的通用 class（scroll-view/view 都用）。
+   背景色放这里，而不是 page 标签上 —— 这样它能读到 .theme-dark 覆盖后的变量。
+   撑满高度 + 自身可滚动（scroll-view 自带滚动；view 不滚动但有内层 scroll-view）。*/
+.page {
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  box-sizing: border-box;
+  /* 主题切换过渡 */
+  transition: background-color 0.3s ease;
+}
+
+/* ===== 全局动效工具类（各页面按需加 class 即可复用）===== */
+
+/* 通用 tap 反馈：点按轻微缩小 + 降透明度，释放回弹。给可点元素加 .tap-feedback 即可。*/
+.tap-feedback {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.tap-feedback:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+
+/* ===== 全局可点元素统一 :active 反馈 =====
+   背景：全项目 245 个 bindtap 里只有 2 处 hover-class、5 处 .tap-feedback，
+   绝大多数可点元素点了没视觉响应（"按了像没按"）。这里给高频可点类统一加
+   :active 状态（与 .tap-feedback 同款 scale+opacity），单点改动覆盖全部页面，
+   不用逐个给 245 个元素加 class。
+   类名清单是基于全项目 grep 出的真实可点类（卡片/按钮/chip/小图标按钮）。*/
+.wall-card, .entry-card, .action-btn, .memory-entry,
+.report-card, .report-main, .op,
+.grid-card, .gallery-card, .quote-card, .item-card,
+.fab, .graph-entry, .guide-entry, .template-card,
+.capsule-chip, .art-chip, .mode-chip,
+.category-chip, .tag-chip, .mood-chip, .form-picker,
+.action-item, .note-action, .wish-action, .history-action,
+.theme-btn, .export-btn, .section-more, .wall-more, .wish-section-more,
+.sheet-close, .preset-sheet-close, .pin-sheet-close, .tag-item-del,
+.pin-sheet-btn,
+.add-btn, .add-card-btn, .upload-btn, .save-btn, .reset-btn, .next-btn,
+.create-btn, .reshuffle-btn, .append-all-btn, .question-append-btn,
+.quote-add-btn, .tag-add-btn, .bulk-toggle-btn, .bulk-action-btn,
+.backup-btn, .sheet-btn, .btn, .today-input-btn,
+.search-clear, .date-clear, .clear-bg-btn {
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.2s ease;
+}
+.wall-card:active, .entry-card:active, .action-btn:active, .memory-entry:active,
+.report-card:active, .report-main:active, .op:active,
+.grid-card:active, .gallery-card:active, .quote-card:active, .item-card:active,
+.fab:active, .graph-entry:active, .guide-entry:active, .template-card:active,
+.capsule-chip:active, .art-chip:active, .mode-chip:active,
+.category-chip:active, .tag-chip:active, .mood-chip:active, .form-picker:active,
+.action-item:active, .note-action:active, .wish-action:active, .history-action:active,
+.theme-btn:active, .export-btn:active, .section-more:active, .wall-more:active, .wish-section-more:active,
+.sheet-close:active, .preset-sheet-close:active, .pin-sheet-close:active, .tag-item-del:active,
+.pin-sheet-btn:active,
+.add-btn:active, .add-card-btn:active, .upload-btn:active, .save-btn:active, .reset-btn:active, .next-btn:active,
+.create-btn:active, .reshuffle-btn:active, .append-all-btn:active, .question-append-btn:active,
+.quote-add-btn:active, .tag-add-btn:active, .bulk-toggle-btn:active, .bulk-action-btn:active,
+.backup-btn:active, .sheet-btn:active, .btn:active, .today-input-btn:active,
+.search-clear:active, .date-clear:active, .clear-bg-btn:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+
+/* 仪式时刻：打卡完成 / 勋章解锁 / 三环全亮等用。元素加 .animate-pop 触发一次弹出。*/
+@keyframes ui-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop {
+  animation: ui-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 淡入上滑：列表项/卡片入场用。加 .animate-fade-up 即可（首次渲染时触发）。*/
+@keyframes ui-fade-up {
+  from { opacity: 0; transform: translateY(16rpx); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: ui-fade-up 0.3s ease both;
+}
+
+/* 庆祝发光：三环全亮 / 年度解锁等高光时刻。加 .animate-glow 触发一次光晕脉冲。*/
+@keyframes ui-glow {
+  0%   { box-shadow: 0 0 0 0 var(--glow-green); }
+  50%  { box-shadow: 0 0 32rpx 8rpx var(--glow-green); }
+  100% { box-shadow: 0 0 0 0 var(--glow-green); }
+}
+.animate-glow {
+  animation: ui-glow 1.2s ease-out;
+}
+
+// === LESS 变量别名（让所有现有 .less 文件零修改自动跟随主题）===
+@color-bg: var(--color-bg);
+@color-card: var(--color-card);
+@color-card-soft: var(--color-card-soft);
+@color-text-primary: var(--color-text-primary);
+@color-text-secondary: var(--color-text-secondary);
+@color-accent: var(--color-accent);
+@color-accent-soft: var(--color-accent-soft);
+@color-accent-dark: var(--color-accent-dark);
+@color-book: var(--color-book);
+@color-film: var(--color-film);
+@color-star: var(--color-star);
+@color-divider: var(--color-divider);
+@color-danger: var(--color-danger);
+@color-danger-bg: var(--color-danger-bg);
+@color-ring-red: var(--color-ring-red);
+@color-ring-green: var(--color-ring-green);
+@color-ring-blue: var(--color-ring-blue);
+
+@radius-xs: var(--radius-xs);
+@radius-sm: var(--radius-sm);
+@radius-card-xs: var(--radius-card-xs);
+@radius-btn: var(--radius-btn);
+@radius-card: var(--radius-card);
+@radius-card-md: var(--radius-card-md);
+@radius-card-sm: var(--radius-card-sm);
+@radius-chip: var(--radius-chip);
+@radius-poster: var(--radius-poster);
+@radius-pill: var(--radius-pill);
+
+@shadow-subtle: var(--shadow-subtle);
+@shadow-card: var(--shadow-card);
+@shadow-elevated: var(--shadow-elevated);
+@shadow-cta: var(--shadow-cta);
+@glow-red: var(--glow-red);
+@glow-green: var(--glow-green);
+@glow-blue: var(--glow-blue);
+
+@font-sans: var(--font-sans);
+@font-serif: var(--font-serif);
+@font-title: var(--font-title);
+@font-numeric: var(--font-numeric);
+
+/* 字号阶梯别名（@fs-* 前缀，避免与 @font-* 字族混淆）*/
+@fs-xs: var(--font-size-xs);
+@fs-s: var(--font-size-s);
+@fs-sm: var(--font-size-sm);
+@fs-base: var(--font-size-base);
+@fs-m: var(--font-size-m);
+@fs-l: var(--font-size-l);
+@fs-lg: var(--font-size-lg);
+@fs-xl: var(--font-size-xl);
+@fs-xxl: var(--font-size-xxl);
+@fs-display: var(--font-size-display);
+@fs-2xl: var(--font-size-2xl);
+@fs-3xl: var(--font-size-3xl);
+
+/* 间距阶梯别名（@sp-* 前缀）*/
+@sp-1: var(--space-1);
+@sp-2: var(--space-2);
+@sp-3: var(--space-3);
+@sp-4: var(--space-4);
+@sp-5: var(--space-5);
+@sp-6: var(--space-6);
+@sp-7: var(--space-7);
+@sp-8: var(--space-8);
+@sp-9: var(--space-9);
+@sp-10: var(--space-10);
+@sp-11: var(--space-11);
+@sp-12: var(--space-12);
+

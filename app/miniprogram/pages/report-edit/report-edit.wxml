@@ -1,0 +1,778 @@
+<!--pages/report-edit/report-edit.wxml-->
+<navigation-bar title="编辑报告" back="{{true}}" color="{{navColor}}" background="{{navBg}}" bindback="onBack"></navigation-bar>
+
+<view class="page {{themeClass}}" wx:if="{{report}}">
+
+  <!-- 顶部：标题 + 主题 + 导出 -->
+  <view class="topbar">
+    <view class="report-title">{{report.title}}</view>
+    <view class="topbar-actions">
+      <view class="theme-btn" bindtap="onOpenThemeSheet">主题</view>
+      <view class="export-btn" bindtap="onExport">导出 ›</view>
+    </view>
+  </view>
+
+  <!-- 卡片滑动预览 -->
+  <swiper
+    class="card-swiper"
+    current="{{current}}"
+    previous-margin="40rpx"
+    next-margin="40rpx"
+    bindchange="onSwiperChange"
+  >
+    <swiper-item wx:for="{{cardViews}}" wx:for-item="item" wx:for-index="cardIdx" wx:key="cardIdx">
+
+      <!-- 卡片视觉样式：根据 type 区分；样式（背景/字色/字号/对齐）走内联绑定 -->
+      <view class="card card-{{item.type}}" style="{{item.cardStyleCss}}">
+
+        <!-- 封面卡：大留白 + 居中标题 -->
+        <block wx:if="{{item.type === 'cover'}}">
+          <view class="card-cover-inner">
+            <view class="cover-decor">❋</view>
+            <view class="cover-title" style="color: {{item.textColor}};">{{item.title}}</view>
+            <view class="cover-divider"></view>
+            <block
+              wx:for="{{item.segmentViews}}"
+              wx:for-item="seg"
+              wx:for-index="segIdx"
+              wx:key="segIdx"
+            >
+              <image
+                wx:if="{{seg.image}}"
+                class="card-body-image"
+                src="{{seg.image}}"
+                mode="widthFix"
+              ></image>
+              <view
+                wx:elif="{{seg.isFreePositioned && cardIdx === current}}"
+                class="cover-content seg-box free"
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+                data-segindex="{{segIdx}}"
+                catchtouchstart="onSegBoxDragStart"
+                catchtouchmove="onSegBoxDragMove"
+                catchtouchend="onSegBoxDragEnd"
+              >{{seg.text || ' '}}<view class="seg-resize-handle" data-segindex="{{segIdx}}" catchtouchstart="onSegBoxResizeStart" catchtouchmove="onSegBoxResizeMove" catchtouchend="onSegBoxDragEnd">↘</view></view>
+              <view
+                wx:else
+                class="cover-content"
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+              >{{seg.text || ' '}}</view>
+            </block>
+          </view>
+        </block>
+
+        <!-- 落款卡：右下落款式 -->
+        <block wx:elif="{{item.type === 'ending'}}">
+          <view class="card-ending-inner">
+            <block
+              wx:for="{{item.segmentViews}}"
+              wx:for-item="seg"
+              wx:for-index="segIdx"
+              wx:key="segIdx"
+            >
+              <image
+                wx:if="{{seg.image}}"
+                class="card-body-image"
+                src="{{seg.image}}"
+                mode="widthFix"
+              ></image>
+              <view
+                wx:elif="{{seg.isFreePositioned && cardIdx === current}}"
+                class="ending-content seg-box free"
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+                data-segindex="{{segIdx}}"
+                catchtouchstart="onSegBoxDragStart"
+                catchtouchmove="onSegBoxDragMove"
+                catchtouchend="onSegBoxDragEnd"
+              >{{seg.text || ' '}}<view class="seg-resize-handle" data-segindex="{{segIdx}}" catchtouchstart="onSegBoxResizeStart" catchtouchmove="onSegBoxResizeMove" catchtouchend="onSegBoxDragEnd">↘</view></view>
+              <view
+                wx:else
+                class="ending-content"
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+              >{{seg.text || ' '}}</view>
+            </block>
+            <view class="ending-sign" style="color: {{item.textColor}};">— 完 —</view>
+          </view>
+        </block>
+
+        <!-- 通用卡片：标题 + 正文 -->
+        <block wx:else>
+          <view class="card-tag" style="color: {{item.titleColor}}; font-size: {{item.titleFontSizeRpx}}rpx;">{{item.title}}</view>
+          <view class="card-body">
+            <block
+              wx:for="{{item.segmentViews}}"
+              wx:for-item="seg"
+              wx:for-index="segIdx"
+              wx:key="segIdx"
+            >
+              <image
+                wx:if="{{seg.image}}"
+                class="card-body-image"
+                src="{{seg.image}}"
+                mode="widthFix"
+              ></image>
+              <view
+                wx:elif="{{seg.isFreePositioned && cardIdx === current}}"
+                class="seg-box free"
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+                data-segindex="{{segIdx}}"
+                catchtouchstart="onSegBoxDragStart"
+                catchtouchmove="onSegBoxDragMove"
+                catchtouchend="onSegBoxDragEnd"
+              >{{seg.text || ' '}}<view class="seg-resize-handle" data-segindex="{{segIdx}}" catchtouchstart="onSegBoxResizeStart" catchtouchmove="onSegBoxResizeMove" catchtouchend="onSegBoxDragEnd">↘</view></view>
+              <view
+                wx:else
+                style="color: {{seg.color}}; font-size: {{seg.fontSizeRpx}}rpx; text-align: {{seg.align}}; font-family: {{seg.fontFamilyCss}}; letter-spacing: {{seg.letterSpacingCss}}; {{seg.boxCss}}; transform: {{seg.transformCss}}; {{seg.artCss}}"
+              >{{seg.text || ' '}}</view>
+            </block>
+          </view>
+        </block>
+
+      </view>
+
+    </swiper-item>
+  </swiper>
+
+  <!-- 卡片指示器 -->
+  <view class="indicator">
+    {{current + 1}} / {{report.cards.length}}
+  </view>
+
+  <!-- P6 缩略图导航：横向滚动，点缩略图跳转到该卡 -->
+  <scroll-view class="thumb-nav" scroll-x scroll-with-animation scroll-into-view="thumb-{{current}}" wx:if="{{report.cards.length > 1}}">
+    <view class="thumb-nav-inner">
+      <view
+        class="thumb-item {{index === current ? 'active' : ''}}"
+        wx:for="{{cardViews}}"
+        wx:for-item="cv"
+        wx:for-index="index"
+        wx:key="index"
+        id="thumb-{{index}}"
+        data-index="{{index}}"
+        bindtap="onJumpToCard"
+      >
+        <view class="thumb-icon" style="background: {{cv.cardStyleCssBgOnly}};">{{cv.thumbIcon}}</view>
+        <view class="thumb-label">{{cv.thumbLabel}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 编辑区 -->
+  <view class="editor">
+    <view class="editor-label">标题</view>
+    <input
+      class="editor-input"
+      placeholder="卡片标题（可留空）"
+      value="{{titleInput}}"
+      bindinput="onTitleInput"
+      maxlength="30"
+    />
+    <view class="editor-label">正文 <text class="editor-hint">（换行分段，每段可单独设样式）</text></view>
+    <textarea
+      class="editor-textarea"
+      placeholder="在这里写你想说的话…支持换行"
+      value="{{contentInput}}"
+      bindinput="onContentInput"
+      bindblur="onContentBlur"
+      maxlength="500"
+      auto-height
+    />
+    <!-- T2-4 段落结构预设：一键套用多段骨架，配合每段独立样式形成结构化排版 -->
+    <view class="para-preset-row">
+      <view class="para-preset-label">套用结构</view>
+      <view class="para-preset-chips">
+        <view
+          class="para-preset-chip"
+          wx:for="{{paragraphPresets}}"
+          wx:key="id"
+          data-preset="{{item.id}}"
+          bindtap="onApplyParagraphPreset"
+        >
+          <text class="para-preset-chip-label">{{item.label}}</text>
+          <text class="para-preset-chip-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 段落样式预览（P6：点段直接弹样式器；长按 ≡ 拖动段顺序；图片段保留 ✕ 删图）-->
+  <view class="seg-editor" wx:if="{{cardViews[current] && cardViews[current].segmentViews.length > 0}}">
+    <view class="seg-editor-label">段落样式 <text class="seg-editor-hint">点段改样式 · 长按 ≡ 拖动排序</text></view>
+    <view class="seg-editor-tip" wx:if="{{cardViews[current].segmentViews.length === 1}}">提示：在正文里多按几次回车分成多段，才能逐段设置样式</view>
+    <view
+      class="seg-preview {{seg.hasOwnStyle ? 'has-style' : ''}} {{seg.image ? 'is-image' : ''}} {{index === segDragIndex ? 'dragging' : ''}} {{index === segDropIndex && index !== segDragIndex ? 'drop-target' : ''}}"
+      wx:for="{{cardViews[current].segmentViews}}"
+      wx:for-item="seg"
+      wx:key="index"
+    >
+      <view
+        class="seg-handle"
+        wx:if="{{!seg.image && cardViews[current].segmentViews.length > 1}}"
+        data-segindex="{{index}}"
+        catchtouchstart="onSegDragStart"
+        catchtouchmove="onSegDragMove"
+        catchtouchend="onSegDragEnd"
+        catchtouchcancel="onSegDragEnd"
+      >≡</view>
+      <image
+        wx:if="{{seg.image}}"
+        class="seg-preview-image"
+        src="{{seg.image}}"
+        mode="aspectFill"
+      ></image>
+      <view
+        wx:else
+        class="seg-preview-text"
+        data-segindex="{{index}}"
+        bindtap="onOpenSegSheet"
+      >{{seg.text || '（空段）'}}</view>
+      <!-- 图片段保留删除按钮；文本段删除 ✎（点段直接编辑）-->
+      <view class="seg-preview-btn" wx:if="{{seg.image}}" data-segindex="{{index}}" catchtap="onDeleteSegImage">✕</view>
+    </view>
+  </view>
+
+  <!-- 操作栏 -->
+  <view class="action-bar">
+    <view class="action-item" bindtap="onOpenAddSheet">
+      <view class="action-icon">＋</view>
+      <view class="action-text">加一张</view>
+    </view>
+    <view class="action-item" bindtap="onOpenOrderSheet">
+      <view class="action-icon">↕</view>
+      <view class="action-text">顺序</view>
+    </view>
+    <view class="action-item style-entry" bindtap="onOpenStyleSheet">
+      <view class="action-icon">◢</view>
+      <view class="action-text">样式</view>
+    </view>
+    <view class="action-item" bindtap="onInsertImage">
+      <view class="action-icon">▣</view>
+      <view class="action-text">插图</view>
+    </view>
+    <view class="action-item danger" bindtap="onDeleteCard">
+      <view class="action-icon">✕</view>
+      <view class="action-text">删除</view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 报告不存在兜底：之前 wx:if 缺 wx:else，删除/异常 id 时整页空白 -->
+<view class="page {{themeClass}}" wx:elif="{{notFound}}">
+  <empty-state icon="📭" title="报告不存在" desc="可能已被删除或链接失效" btnText="返回列表" bind:btntap="onBack" />
+</view>
+
+<!-- 添加卡片弹层 -->
+<view class="sheet-mask {{showAddSheet ? 'show' : ''}}" bindtap="onCloseAddSheet"></view>
+<view class="sheet {{showAddSheet ? 'show' : ''}}" wx:if="{{report}}">
+  <view class="sheet-header">
+    <view class="sheet-title">添加一张卡片</view>
+    <view class="sheet-close" bindtap="onCloseAddSheet">✕</view>
+  </view>
+  <view class="sheet-list">
+    <view
+      class="sheet-item"
+      wx:for="{{cardTypeLabels}}"
+      wx:key="type"
+      data-type="{{item.type}}"
+      bindtap="onAddCardByType"
+    >
+      <view class="sheet-item-label">{{item.label}}</view>
+      <view class="sheet-item-arrow">＋</view>
+    </view>
+  </view>
+</view>
+
+<!-- 调整顺序弹层（P6：长按 ≡ 拖拽排序；↑↓ 微调保留）-->
+<view class="sheet-mask {{showOrderSheet ? 'show' : ''}}" bindtap="onCloseOrderSheet"></view>
+<view class="sheet sheet-order {{showOrderSheet ? 'show' : ''}}" wx:if="{{report}}">
+  <view class="sheet-header">
+    <view class="sheet-title">调整卡片顺序</view>
+    <view class="sheet-close" bindtap="onCloseOrderSheet">✕</view>
+  </view>
+  <view class="order-tip-row">长按左侧 ≡ 拖动排序，或用 ↑↓ 微调</view>
+  <view class="sheet-list">
+    <view
+      class="order-row {{index === current ? 'current' : ''}} {{index === orderDragIndex ? 'dragging' : ''}} {{index === orderDropIndex && index !== orderDragIndex ? 'drop-target' : ''}}"
+      wx:for="{{report.cards}}"
+      wx:for-item="card"
+      wx:for-index="index"
+      wx:key="index"
+      data-index="{{index}}"
+      bindtap="onJumpToCard"
+    >
+      <view
+        class="order-handle"
+        data-index="{{index}}"
+        catchtouchstart="onOrderDragStart"
+        catchtouchmove="onOrderDragMove"
+        catchtouchend="onOrderDragEnd"
+        catchtouchcancel="onOrderDragEnd"
+      >≡</view>
+      <view class="order-no">{{index + 1}}</view>
+      <view class="order-title">{{card.title || card.content}}</view>
+      <view class="order-actions" catchtap="">
+        <view class="order-arrow" data-index="{{index}}" catchtap="onMoveCardUp">↑</view>
+        <view class="order-arrow" data-index="{{index}}" catchtap="onMoveCardDown">↓</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 样式编辑弹层（S2 新增） -->
+<view class="sheet-mask {{showStyleSheet ? 'show' : ''}}" bindtap="onCloseStyleSheet"></view>
+<view class="sheet sheet-style {{showStyleSheet ? 'show' : ''}}" wx:if="{{report}}" catchtap="">
+  <view class="sheet-header">
+    <view class="sheet-title">卡片样式</view>
+    <view class="sheet-close" bindtap="onCloseStyleSheet">✕</view>
+  </view>
+
+  <scroll-view class="style-body" scroll-y>
+
+    <!-- 背景类型切换 -->
+    <view class="style-section">
+      <view class="style-label">背景</view>
+      <view class="seg-control">
+        <view
+          class="seg-btn {{editBgType === 'color' ? 'active' : ''}}"
+          data-type="color"
+          bindtap="onSwitchBgType"
+        >纯色</view>
+        <view
+          class="seg-btn {{editBgType === 'gradient' ? 'active' : ''}}"
+          data-type="gradient"
+          bindtap="onSwitchBgType"
+        >渐变</view>
+        <view
+          class="seg-btn {{editBgType === 'image' ? 'active' : ''}}"
+          bindtap="onSwitchToImageBg"
+        >图片</view>
+      </view>
+    </view>
+
+    <!-- 图片背景：内置预设 + 上传 -->
+    <block wx:if="{{editBgType === 'image'}}">
+      <view class="style-section">
+        <view class="style-label">内置背景</view>
+        <view class="bg-grid">
+          <view
+            class="bg-thumb {{editBgImage === item.id ? 'active' : ''}}"
+            wx:for="{{bgPresets}}"
+            wx:key="id"
+            style="background: {{item.swatch}};"
+            data-id="{{item.id}}"
+            bindtap="onPickBuiltInBg"
+          >
+            <view class="bg-thumb-name">{{item.name}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="style-section">
+        <view class="style-label">自定义</view>
+        <view class="upload-row">
+          <view class="upload-btn" bindtap="onUploadBgImage">
+            <view class="upload-icon">⇧</view>
+            <view class="upload-text">从相册选择</view>
+          </view>
+          <view class="clear-bg-btn" wx:if="{{editBgImage}}" bindtap="onClearBgImage">清除背景图</view>
+        </view>
+        <view class="bg-current" wx:if="{{editBgImage && editBgImage.indexOf('/') < 0}}">当前：内置「{{editBgImage}}」</view>
+      </view>
+    </block>
+
+    <!-- 纯色背景选色 -->
+    <view class="style-section" wx:if="{{editBgType === 'color'}}">
+      <view class="style-label">背景颜色</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editBgColor === c ? 'active' : ''}}"
+          wx:for="{{bgColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickBgColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 渐变背景选色 -->
+    <block wx:if="{{editBgType === 'gradient'}}">
+      <view class="style-section">
+        <view class="style-label">起点色</view>
+        <view class="swatch-row">
+          <view
+            class="swatch {{editGradFrom === c ? 'active' : ''}}"
+            wx:for="{{accentColorPalette}}"
+            wx:for-item="c"
+            wx:key="*this"
+            style="background: {{c}};"
+            data-color="{{c}}"
+            bindtap="onPickGradFrom"
+          ></view>
+        </view>
+      </view>
+      <view class="style-section">
+        <view class="style-label">终点色</view>
+        <view class="swatch-row">
+          <view
+            class="swatch {{editGradTo === c ? 'active' : ''}}"
+            wx:for="{{accentColorPalette}}"
+            wx:for-item="c"
+            wx:key="*this"
+            style="background: {{c}};"
+            data-color="{{c}}"
+            bindtap="onPickGradTo"
+          ></view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 文字颜色 -->
+    <view class="style-section">
+      <view class="style-label">文字颜色</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editTextColor === c ? 'active' : ''}}"
+          wx:for="{{textColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickTextColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 标题颜色（仅非封面/落款卡有效） -->
+    <view class="style-section" wx:if="{{cardViews[current] && cardViews[current].type !== 'cover' && cardViews[current].type !== 'ending'}}">
+      <view class="style-label">标题颜色</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editTitleColor === c ? 'active' : ''}}"
+          wx:for="{{accentColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickTitleColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 字号 -->
+    <view class="style-section">
+      <view class="style-label">字号 <text class="style-value">{{editFontSizeScale}}x</text></view>
+      <slider
+        class="style-slider"
+        min="0"
+        max="4"
+        step="1"
+        value="{{fontScaleIndex}}"
+        bindchanging="onFontSizeChange"
+        bindchange="onFontSizeChange"
+        block-size="24"
+        activeColor="#D97A4A"
+      />
+    </view>
+
+    <!-- 文字对齐 -->
+    <view class="style-section" wx:if="{{cardViews[current] && cardViews[current].type !== 'cover' && cardViews[current].type !== 'ending'}}">
+      <view class="style-label">对齐</view>
+      <view class="seg-control">
+        <view
+          class="seg-btn {{editTextAlign === 'left' ? 'active' : ''}}"
+          data-align="left"
+          bindtap="onSwitchAlign"
+        >左</view>
+        <view
+          class="seg-btn {{editTextAlign === 'center' ? 'active' : ''}}"
+          data-align="center"
+          bindtap="onSwitchAlign"
+        >中</view>
+        <view
+          class="seg-btn {{editTextAlign === 'right' ? 'active' : ''}}"
+          data-align="right"
+          bindtap="onSwitchAlign"
+        >右</view>
+      </view>
+    </view>
+
+    <!-- 重置 -->
+    <view class="style-section">
+      <view class="reset-btn" bindtap="onResetCardStyle">重置为默认样式</view>
+    </view>
+
+  </scroll-view>
+</view>
+
+<!-- 主题套用弹层（S3 新增） -->
+<view class="sheet-mask {{showThemeSheet ? 'show' : ''}}" bindtap="onCloseThemeSheet"></view>
+<view class="sheet sheet-theme {{showThemeSheet ? 'show' : ''}}" wx:if="{{report}}" catchtap="">
+  <view class="sheet-header">
+    <view class="sheet-title">报告主题</view>
+    <view class="sheet-close" bindtap="onCloseThemeSheet">✕</view>
+  </view>
+  <view class="theme-tip">选择主题会一键应用到报告的所有卡片，可作为整体风格基调</view>
+  <view class="theme-grid">
+    <view
+      class="theme-card"
+      wx:for="{{themePresets}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onApplyTheme"
+    >
+      <view class="theme-swatch" style="background: {{item.swatch[0]}};">
+        <view class="theme-swatch-dot" style="background: {{item.swatch[1]}};"></view>
+      </view>
+      <view class="theme-name">{{item.name}}</view>
+    </view>
+  </view>
+  <view class="reset-btn" bindtap="onClearTheme">清除主题（恢复默认）</view>
+</view>
+
+<!-- 段落样式小弹层（富文本） -->
+<view class="sheet-mask {{showSegSheet ? 'show' : ''}}" bindtap="onCloseSegSheet"></view>
+<view class="sheet sheet-seg {{showSegSheet ? 'show' : ''}}" wx:if="{{report}}" catchtap="">
+  <view class="sheet-header">
+    <view class="sheet-title">第 {{editingSegIndex + 1}} 段样式</view>
+    <view class="sheet-close" bindtap="onCloseSegSheet">✕</view>
+  </view>
+
+  <scroll-view class="seg-body" scroll-y>
+    <view class="style-section">
+      <view class="style-label">文字颜色</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editSegColor === c ? 'active' : ''}}"
+          wx:for="{{segColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickSegColor"
+        ></view>
+      </view>
+    </view>
+
+    <view class="style-section">
+      <view class="style-label">字号 <text class="style-value">{{editSegFontSizeScale}}x</text></view>
+      <slider
+        class="style-slider"
+        min="0.6"
+        max="2"
+        step="0.05"
+        value="{{editSegFontSizeScale}}"
+        bindchanging="onSegFontSizeChange"
+        bindchange="onSegFontSizeChange"
+        block-size="24"
+        activeColor="#D97A4A"
+      />
+    </view>
+
+    <view class="style-section">
+      <view class="style-label">对齐</view>
+      <view class="seg-control">
+        <view
+          class="seg-btn {{editSegAlign === 'left' ? 'active' : ''}}"
+          data-align="left"
+          bindtap="onSwitchSegAlign"
+        >左</view>
+        <view
+          class="seg-btn {{editSegAlign === 'center' ? 'active' : ''}}"
+          data-align="center"
+          bindtap="onSwitchSegAlign"
+        >中</view>
+        <view
+          class="seg-btn {{editSegAlign === 'right' ? 'active' : ''}}"
+          data-align="right"
+          bindtap="onSwitchSegAlign"
+        >右</view>
+      </view>
+    </view>
+
+    <!-- 艺术字 -->
+    <view class="style-section">
+      <view class="style-label">艺术字</view>
+      <view class="art-grid">
+        <view class="art-chip {{editArtFont === 'none' ? 'active' : ''}}" data-art="none" bindtap="onSwitchArtFont">普通</view>
+        <view class="art-chip art-outline {{editArtFont === 'outline' ? 'active' : ''}}" data-art="outline" bindtap="onSwitchArtFont">描边</view>
+        <view class="art-chip art-shadow {{editArtFont === 'shadow' ? 'active' : ''}}" data-art="shadow" bindtap="onSwitchArtFont">阴影</view>
+        <view class="art-chip art-gradient {{editArtFont === 'gradient' ? 'active' : ''}}" data-art="gradient" bindtap="onSwitchArtFont">渐变</view>
+        <view class="art-chip art-handwritten {{editArtFont === 'handwritten' ? 'active' : ''}}" data-art="handwritten" bindtap="onSwitchArtFont">手写</view>
+        <view class="art-chip art-neon {{editArtFont === 'neon' ? 'active' : ''}}" data-art="neon" bindtap="onSwitchArtFont">霓虹</view>
+        <view class="art-chip art-glow {{editArtFont === 'glow' ? 'active' : ''}}" data-art="glow" bindtap="onSwitchArtFont">高光</view>
+        <view class="art-chip art-rainbow {{editArtFont === 'rainbow' ? 'active' : ''}}" data-art="rainbow" bindtap="onSwitchArtFont">彩虹</view>
+        <view class="art-chip art-metallic {{editArtFont === 'metallic' ? 'active' : ''}}" data-art="metallic" bindtap="onSwitchArtFont">金属</view>
+        <view class="art-chip art-relief {{editArtFont === 'relief' ? 'active' : ''}}" data-art="relief" bindtap="onSwitchArtFont">立体</view>
+        <view class="art-chip art-letterpress {{editArtFont === 'letterpress' ? 'active' : ''}}" data-art="letterpress" bindtap="onSwitchArtFont">凹陷</view>
+        <view class="art-chip art-vintage {{editArtFont === 'vintage' ? 'active' : ''}}" data-art="vintage" bindtap="onSwitchArtFont">做旧</view>
+        <view class="art-chip art-stamp {{editArtFont === 'stamp' ? 'active' : ''}}" data-art="stamp" bindtap="onSwitchArtFont">印章</view>
+      </view>
+    </view>
+
+    <!-- 字体档（PPT 化段落样式扩展） -->
+    <view class="style-section">
+      <view class="style-label">字体 <text class="style-hint">楷体依赖系统字体</text></view>
+      <view class="seg-control">
+        <view
+          class="seg-btn {{editSegFontFamily === 'sans' ? 'active' : ''}}"
+          data-ff="sans"
+          bindtap="onSwitchSegFontFamily"
+        >无衬线</view>
+        <view
+          class="seg-btn {{editSegFontFamily === 'serif' ? 'active' : ''}}"
+          data-ff="serif"
+          bindtap="onSwitchSegFontFamily"
+        >衬线</view>
+        <view
+          class="seg-btn {{editSegFontFamily === 'kai' ? 'active' : ''}}"
+          data-ff="kai"
+          bindtap="onSwitchSegFontFamily"
+        >楷体</view>
+        <view
+          class="seg-btn {{editSegFontFamily === 'mono' ? 'active' : ''}}"
+          data-ff="mono"
+          bindtap="onSwitchSegFontFamily"
+        >等宽</view>
+      </view>
+    </view>
+
+    <!-- 字间距（PPT 化段落样式扩展） -->
+    <view class="style-section">
+      <view class="style-label">字间距 <text class="style-value">{{editSegLetterSpacing}}x</text></view>
+      <slider
+        class="style-slider"
+        min="0.6"
+        max="2"
+        step="0.1"
+        value="{{editSegLetterSpacing}}"
+        bindchanging="onSegLetterSpacingChange"
+        bindchange="onSegLetterSpacingChange"
+        block-size="24"
+        activeColor="#D97A4A"
+      />
+    </view>
+
+    <!-- 旋转（PPT 化段落样式扩展） -->
+    <view class="style-section">
+      <view class="style-label">
+        旋转 <text class="style-value">{{editSegRotate}}°</text>
+        <text class="reset-mini" bindtap="onResetSegRotate" wx:if="{{editSegRotate !== 0}}">重置</text>
+      </view>
+      <slider
+        class="style-slider"
+        min="-180"
+        max="180"
+        step="5"
+        value="{{editSegRotate}}"
+        bindchanging="onSegRotateChange"
+        bindchange="onSegRotateChange"
+        block-size="24"
+        activeColor="#D97A4A"
+      />
+    </view>
+
+    <!-- 倾斜变形（PPT 化段落样式扩展；skew 平行四边形错切） -->
+    <view class="style-section">
+      <view class="style-label">
+        倾斜 <text class="style-value">{{editSegSkew}}°</text>
+        <text class="reset-mini" bindtap="onResetSegSkew" wx:if="{{editSegSkew !== 0}}">重置</text>
+      </view>
+      <slider
+        class="style-slider"
+        min="-45"
+        max="45"
+        step="3"
+        value="{{editSegSkew}}"
+        bindchanging="onSegSkewChange"
+        bindchange="onSegSkewChange"
+        block-size="24"
+        activeColor="#D97A4A"
+      />
+    </view>
+
+    <!-- 描边/高光色（outline 描边、glow 高光、vintage 做旧描边共用） -->
+    <view class="style-section" wx:if="{{editArtFont === 'outline' || editArtFont === 'glow' || editArtFont === 'vintage'}}">
+      <view class="style-label">{{editArtFont === 'glow' ? '高光色' : (editArtFont === 'vintage' ? '做旧描边色' : '描边色')}}</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editStrokeColor === c ? 'active' : ''}}"
+          wx:for="{{artColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickStrokeColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 阴影/发光/投影色（shadow 阴影、neon 发光、relief 立体投影共用） -->
+    <view class="style-section" wx:if="{{editArtFont === 'shadow' || editArtFont === 'neon' || editArtFont === 'relief'}}">
+      <view class="style-label">{{editArtFont === 'neon' ? '发光色' : (editArtFont === 'relief' ? '投影色' : '阴影色')}}</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editShadowColor === c ? 'active' : ''}}"
+          wx:for="{{artColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickShadowColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 渐变末端/金属深端色（gradient 渐变、metallic 金属共用） -->
+    <view class="style-section" wx:if="{{editArtFont === 'gradient' || editArtFont === 'metallic'}}">
+      <view class="style-label">{{editArtFont === 'metallic' ? '金属深端色' : '渐变末端色'}}</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editGradientTo === c ? 'active' : ''}}"
+          wx:for="{{artColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickGradientTo"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 印泥色（仅 stamp 时显示） -->
+    <view class="style-section" wx:if="{{editArtFont === 'stamp'}}">
+      <view class="style-label">印泥色</view>
+      <view class="swatch-row">
+        <view
+          class="swatch {{editStampColor === c ? 'active' : ''}}"
+          wx:for="{{artColorPalette}}"
+          wx:for-item="c"
+          wx:key="*this"
+          style="background: {{c}};"
+          data-color="{{c}}"
+          bindtap="onPickStampColor"
+        ></view>
+      </view>
+    </view>
+
+    <!-- P10 自由布局开关：开启后可在卡片上拖动该段、拖右下角改宽 -->
+    <view class="style-section">
+      <view class="style-label">
+        自由布局
+        <text class="style-value" wx:if="{{editSegFreePos}}">已开启</text>
+      </view>
+      <view class="seg-control">
+        <view class="seg-btn {{editSegFreePos ? 'active' : ''}}" bindtap="onToggleSegFreePos">
+          {{editSegFreePos ? '关闭' : '开启'}}
+        </view>
+      </view>
+      <view class="style-hint">开启后可在卡片上拖动该段、拖右下角手柄改宽；高度跟内容走</view>
+    </view>
+
+    <view class="style-section">
+      <view class="reset-btn" bindtap="onClearSegStyle">清除该段样式（回落到卡片）</view>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,55 @@
+<!--pages/templates/templates.wxml-->
+<navigation-bar title="{{isPickerMode ? '选择模板' : '模板管理'}}" back="{{true}}" color="{{navColor}}" background="{{navBg}}" bindback="onBack"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <view class="hint" wx:if="{{isPickerMode}}">选择一个模板风格，生成的报告可逐句修改</view>
+  <view class="hint" wx:else>在这里管理你的报告模板，可新建、复制、编辑卡片定义</view>
+
+  <!-- 模板列表 -->
+  <view class="template-list">
+    <view
+      class="template-card"
+      wx:for="{{templates}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTapTemplate"
+    >
+      <view class="template-header">
+        <view class="template-preview-icon">📖</view>
+        <view class="template-main">
+          <view class="template-name">{{item.name}}</view>
+          <view class="template-desc">{{item.description}}</view>
+        </view>
+        <view class="template-badge" wx:if="{{item.isBuiltIn}}">内置</view>
+        <view class="template-badge mine" wx:else>我的</view>
+      </view>
+      <view class="template-meta">
+        <text class="meta-text">{{item.cards.length}} 张卡片</text>
+      </view>
+
+      <!-- 管理模式：操作按钮 -->
+      <view class="template-actions" wx:if="{{!isPickerMode}}" catchtap="">
+        <view class="tpl-action" wx:if="{{item.isBuiltIn}}" data-id="{{item.id}}" catchtap="onCopyTemplate">
+          复制为我用
+        </view>
+        <view class="tpl-action" wx:else data-id="{{item.id}}" catchtap="onEditTemplate">
+          编辑
+        </view>
+        <view class="tpl-action danger" wx:if="{{!item.isBuiltIn}}" data-id="{{item.id}}" catchtap="onDeleteTemplate">
+          删除
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <empty-state wx:if="{{templates.length === 0}}" icon="📋" title="还没有模板" desc="内置模板会在首次使用时自动加载" />
+
+  <!-- 管理模式底部：新建按钮 -->
+  <view class="create-block" wx:if="{{!isPickerMode && templates.length > 0}}">
+    <view class="create-btn" bindtap="onCreateBlank">＋ 新建空白模板</view>
+  </view>
+
+  <view class="footer-tip" wx:if="{{templates.length > 0}}">更多模板风格开发中</view>
+</scroll-view>

@@ -1,0 +1,464 @@
+/**pages/inspiration/inspiration.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 160rpx;
+  position: relative;
+}
+
+/* ===== 顶部说明 ===== */
+.intro {
+  padding: @sp-6 0 @sp-2;
+}
+.intro-title {
+  font-family: var(--font-title);
+  font-size: 36rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.intro-sub {
+  margin-top: @sp-3;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+/* ===== B1 搜索 + 日期范围筛选 ===== */
+.search-area {
+  margin-top: @sp-4;
+}
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-pill;
+  padding: @sp-4 @sp-6;
+  box-shadow: @shadow-card;
+}
+.search-icon {
+  font-size: @fs-base;
+  margin-right: @sp-3;
+  opacity: 0.7;
+}
+.search-input {
+  flex: 1;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.4;
+  min-width: 0;
+}
+.search-placeholder {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.search-clear {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  padding: 0 @sp-2;
+  opacity: 0.7;
+}
+.date-filter-row {
+  display: flex;
+  align-items: center;
+  margin-top: @sp-4;
+  gap: @sp-3;
+}
+.date-chip {
+  padding: @sp-2 @sp-5;
+  border-radius: @radius-card-md;
+  background: @color-card;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  box-shadow: @shadow-card;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.date-chip.active {
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+.date-sep {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.date-clear {
+  margin-left: auto;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  padding: @sp-2 @sp-3;
+}
+
+/* ===== 分类筛选条 ===== */
+.filter-bar {
+  margin-top: @sp-4;
+  white-space: nowrap;
+  width: 100%;
+}
+.filter-chip {
+  display: inline-block;
+  padding: @sp-3 @sp-6;
+  margin-right: @sp-3;
+  border-radius: @radius-poster;
+  background: @color-card;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+  box-shadow: @shadow-card;
+}
+.filter-chip.active {
+  background: rgba(217, 122, 74, 0.12);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+
+/* ===== 添加灵感卡片 ===== */
+.add-card {
+  margin-top: @sp-5;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.add-textarea {
+  width: 100%;
+  padding: @sp-4 0;
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.5;
+  border-bottom: 1rpx solid @color-divider;
+  min-height: 80rpx;
+  box-sizing: border-box;
+}
+.add-row {
+  display: flex;
+  align-items: flex-start;
+  margin-top: @sp-5;
+  gap: @sp-4;
+}
+.add-cat-chips {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+  overflow: hidden;
+}
+.cat-chip {
+  padding: @sp-2 @sp-5;
+  border-radius: @radius-card-md;
+  background: @color-bg;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.cat-chip.active {
+  background: rgba(217, 122, 74, 0.12);
+  color: var(--color-accent, #D97A4A);
+  border-color: var(--color-accent, #D97A4A);
+}
+/* ＋新建分类 chip：虚线边框 + 强调色字，视觉上区别于实体分类，提示「可添加」 */
+.cat-chip.new-cat {
+  border: 2rpx dashed var(--color-accent, #D97A4A);
+  color: var(--color-accent, #D97A4A);
+  background: transparent;
+}
+.add-btn {
+  padding: @sp-3 @sp-7;
+  border-radius: @radius-poster;
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-base;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.add-btn.disabled {
+  opacity: 0.4;
+}
+
+/* ===== 标签输入（添加行 + 编辑 sheet 共用）===== */
+.tag-row {
+  display: flex;
+  align-items: center;
+  margin-top: @sp-4;
+  gap: @sp-3;
+}
+.tag-input {
+  flex: 1;
+  min-width: 0;
+  padding: @sp-2 @sp-5;
+  background: @color-bg;
+  border-radius: @radius-card-md;
+  font-size: @fs-s;
+  color: @color-text-primary;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+.tag-add-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-m;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.tag-add-btn.disabled {
+  opacity: 0.4;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-2;
+  margin-top: @sp-3;
+}
+/* 已暂存标签胶囊（添加行/编辑行）：点整颗可删 */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-pill;
+  background: rgba(217, 122, 74, 0.12);
+  gap: @sp-2;
+}
+.tag-pill-text {
+  font-size: @fs-xs;
+  color: var(--color-accent, #D97A4A);
+  line-height: 1.4;
+}
+.tag-pill-x {
+  font-size: @fs-xs;
+  color: var(--color-accent, #D97A4A);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* ===== 灵感列表 ===== */
+.note-list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-5;
+  margin-top: @sp-6;
+}
+.note-card {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-6 @sp-7;
+  box-shadow: @shadow-card;
+}
+.note-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: @sp-4;
+}
+.note-cat-tag {
+  display: inline-block;
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-sm;
+  font-size: @fs-xs;
+  color: var(--color-accent, #D97A4A);
+  line-height: 1.5;
+}
+.note-date {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+.note-content {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* P2-A：卡片底部标签条（有标签才显示），与内容拉开一点间距 */
+.note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-2;
+  margin-top: @sp-3;
+}
+.note-tag {
+  font-size: @fs-xs;
+  color: var(--color-text-secondary, #8B7D6E);
+  background: var(--color-bg, #FAF6F0);
+  padding: @sp-1 @sp-3;
+  border-radius: @radius-sm;
+  line-height: 1.4;
+}
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: @sp-4;
+  margin-top: @sp-5;
+  padding-top: @sp-4;
+  border-top: 1rpx solid @color-divider;
+}
+.note-action {
+  padding: @sp-2 @sp-6;
+  border-radius: @radius-card-md;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  background: @color-bg;
+  border: 2rpx solid @color-divider;
+  line-height: 1.4;
+}
+.note-action.danger {
+  color: #C04A4A;
+}
+
+/* ===== 空状态 ===== */
+/* B1：筛选无结果的轻量提示（比首空态紧凑） */
+.filtered-empty {
+  padding: @sp-12 0;
+}
+.filtered-empty .empty-icon {
+  font-size: 64rpx;
+}
+/* ===== 编辑灵感 sheet（底部弹层）===== */
+.sheet-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.sheet-mask.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.edit-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: @radius-poster 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+.edit-sheet.show {
+  transform: translateY(0);
+}
+.sheet-handle {
+  width: 64rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: @color-divider;
+  margin: 0 auto @sp-5;
+}
+.sheet-title {
+  font-size: @fs-l;
+  font-weight: 600;
+  color: @color-text-primary;
+  margin-bottom: @sp-5;
+}
+.sheet-textarea {
+  width: 100%;
+  padding: @sp-5 @sp-6;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  min-height: 160rpx;
+  margin-bottom: @sp-5;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.sheet-cat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-3;
+  margin-bottom: @sp-6;
+}
+.sheet-btn-row {
+  display: flex;
+  gap: @sp-4;
+}
+.sheet-btn {
+  flex: 1;
+  text-align: center;
+  padding: @sp-5 0;
+  border-radius: @radius-card-xs;
+  font-size: @fs-m;
+  font-weight: 600;
+}
+.sheet-btn.ghost {
+  background: @color-bg;
+  color: @color-text-secondary;
+}
+.sheet-btn.primary {
+  background: @color-accent;
+  color: #FFFFFF;
+}
+.sheet-btn.primary.disabled {
+  opacity: 0.4;
+}
+
+/* ===== 新建分类 sheet（P2-A；复用 .sheet-handle/.sheet-title/.sheet-btn-row/.sheet-btn 样式）===== */
+.newcat-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: @color-card;
+  border-radius: @radius-poster 28rpx 0 0;
+  padding: @sp-5 @sp-7 calc(40rpx + env(safe-area-inset-bottom));
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.28s ease;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+.newcat-sheet.show {
+  transform: translateY(0);
+}
+.newcat-input {
+  width: 100%;
+  padding: @sp-4 @sp-6;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  margin-bottom: @sp-6;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+.newcat-icon-label {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  margin-bottom: @sp-4;
+}
+.newcat-icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @sp-4;
+  margin-bottom: @sp-7;
+}
+.newcat-icon-cell {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: @radius-card-md;
+  background: @color-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  line-height: 1;
+  border: 2rpx solid transparent;
+}
+.newcat-icon-cell.active {
+  border-color: var(--color-accent, #D97A4A);
+  background: rgba(217, 122, 74, 0.12);
+}

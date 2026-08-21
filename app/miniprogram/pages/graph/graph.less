@@ -1,0 +1,124 @@
+// pages/graph/graph.less
+// P2-8 关系图谱样式：canvas 容器居中 + 图例网格。
+// 配色全部走 design-tokens 的 LESS 变量映射（在 app.less 顶部定义）。
+
+.page {
+  height: calc(100vh - 44px - env(safe-area-inset-top));
+  background: @color-bg;
+  box-sizing: border-box;
+}
+
+/* ===== 顶部标题区 ===== */
+.hero {
+  padding: @sp-7 @sp-7 @sp-4;
+  text-align: center;
+}
+.hero-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-title);
+  margin-bottom: @sp-2;
+}
+.hero-sub {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  font-family: var(--font-title);
+}
+
+/* ===== canvas 容器（居中） ===== */
+.canvas-wrap {
+  margin: @sp-4 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;  /* 给 loading 蒙层做定位参照 */
+}
+
+/* loading 蒙层：盖在 canvas 上方居中；绘制完成后由 wxml 条件移除 */
+.canvas-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: @sp-5;
+  background: var(--color-bg);
+  opacity: 0.85;
+}
+.canvas-loading-spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border: 4rpx solid var(--color-divider);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: graph-spin 0.8s linear infinite;
+}
+@keyframes graph-spin {
+  to { transform: rotate(360deg); }
+}
+.canvas-loading-text {
+  font-size: @fs-s;
+  color: var(--color-text-secondary);
+  letter-spacing: 1rpx;
+}
+
+.tip {
+  text-align: center;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  margin-bottom: @sp-2;
+}
+
+/* ===== 图例 ===== */
+.legend {
+  margin: @sp-6 @sp-6 0;
+  padding: @sp-6;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+}
+.legend-title {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  font-weight: 600;
+  margin-bottom: @sp-4;
+}
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @sp-4;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+}
+.legend-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-label {
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  flex: 1;
+}
+.legend-count {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 底部提示 ===== */
+.footer-tip {
+  text-align: center;
+  padding: @sp-7;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}

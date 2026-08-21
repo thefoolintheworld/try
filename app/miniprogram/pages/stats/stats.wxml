@@ -1,0 +1,213 @@
+<!--pages/stats/stats.wxml-->
+<!-- 数据回顾页：把 stats.ts 的统计结果可视化。
+     纯只读展示，所有数据来自当前年份的成就。 -->
+<navigation-bar title="数据回顾" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 年份切换 -->
+  <scroll-view class="year-bar" scroll-x wx:if="{{years.length > 0}}">
+    <view
+      class="year-chip {{currentYear === item ? 'active' : ''}}"
+      wx:for="{{years}}"
+      wx:key="*this"
+      data-year="{{item}}"
+      bindtap="onSwitchYear"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- 错误态：refresh 抛错时显示 -->
+  <empty-state wx:if="{{loadError}}" icon="⚠️" title="加载失败" desc="数据可能出了点问题，点下方按钮重试" btnText="重试" bind:btntap="onRetry" />
+
+  <!-- 首屏加载骨架 -->
+  <loading-skeleton wx:if="{{!loadError && loading}}" type="stats" />
+
+  <!-- 有数据：展示全部统计 -->
+  <block wx:if="{{!loadError && !loading && hasData}}">
+
+    <!-- ===== 0. 全年活动热力图（GitHub 式贡献墙）===== -->
+    <view class="section heatmap-section animate-fade-up">
+      <heatmap
+        title="全年活动"
+        days="{{heatmapDays}}"
+        bind:celltap="onHeatmapCellTap"
+        bind:celllongpress="onHeatmapCellLongPress"
+      ></heatmap>
+    </view>
+
+    <!-- ===== 1. 总览仪表盘 ===== -->
+    <view class="section">
+      <view class="section-title">📊 总览</view>
+      <view class="overview-grid">
+        <view class="overview-cell" wx:for="{{overviewCells}}" wx:key="label">
+          <text class="overview-icon">{{item.icon}}</text>
+          <text class="overview-value">{{item.value}}</text>
+          <text class="overview-label">{{item.label}}</text>
+        </view>
+      </view>
+      <!-- 平均分单独一行（星级展示更直观）-->
+      <view class="avg-row" wx:if="{{avgRatingText !== '0.0'}}">
+        <text class="avg-label">平均评分</text>
+        <text class="avg-stars">★ {{avgRatingText}}</text>
+      </view>
+    </view>
+
+    <!-- ===== 2. 月度分布柱状图 ===== -->
+    <view class="section" wx:if="{{monthBars.length > 0}}">
+      <view class="section-title">📅 月度分布</view>
+      <view class="peak-hint" wx:if="{{peakMonth}}">最投入的是 {{peakMonth}}</view>
+      <view class="month-chart">
+        <view class="month-col" wx:for="{{monthBars}}" wx:key="month">
+          <view class="month-bar-wrap">
+            <view class="month-bar {{item.isPeak ? 'peak' : ''}}" style="height:{{item.height}}%">
+              <text class="month-bar-count" wx:if="{{item.count > 0}}">{{item.count}}</text>
+            </view>
+          </view>
+          <text class="month-label">{{item.month}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 3. 评分分布 ===== -->
+    <view class="section" wx:if="{{ratingRows.length > 0}}">
+      <view class="section-title">⭐ 评分分布</view>
+      <view class="rating-row" wx:for="{{ratingRows}}" wx:key="ratingText">
+        <text class="rating-label">{{item.ratingText}}</text>
+        <view class="rating-track">
+          <view class="rating-fill" style="width:{{item.width}}%"></view>
+        </view>
+        <text class="rating-count">{{item.count}}</text>
+      </view>
+    </view>
+
+    <!-- ===== 4. 体裁 Top ===== -->
+    <view class="section" wx:if="{{genreBars.length > 0}}">
+      <view class="section-title">📚 体裁偏好</view>
+      <view class="genre-row" wx:for="{{genreBars}}" wx:key="name">
+        <text class="genre-name">{{item.name}}</text>
+        <view class="genre-track">
+          <view class="genre-fill" style="width:{{item.width}}%"></view>
+        </view>
+        <text class="genre-count">{{item.count}} · {{item.percent}}%</text>
+      </view>
+    </view>
+
+    <!-- ===== 5. 书影占比 + 分类占比 ===== -->
+    <view class="section" wx:if="{{typePills.length > 0}}">
+      <view class="section-title">🔖 分类构成</view>
+      <!-- 书 vs 影 双胶囊 -->
+      <view class="type-pills">
+        <view class="type-pill" wx:for="{{typePills}}" wx:key="label" style="background:{{item.color}}1A;color:{{item.color}};">
+          <text class="type-pill-label">{{item.label}}</text>
+          <text class="type-pill-num">{{item.count}} · {{item.percent}}%</text>
+        </view>
+      </view>
+      <!-- 全分类占比堆叠条 + 明细 -->
+      <view class="cat-stack" wx:if="{{categoryShares.length > 0}}">
+        <view class="cat-stack-bar">
+          <view
+            class="cat-stack-seg"
+            wx:for="{{categoryShares}}"
+            wx:key="id"
+            style="width:{{item.percent}}%;background:{{item.color}};"
+          ></view>
+        </view>
+        <view class="cat-share-list">
+          <view class="cat-share-item" wx:for="{{categoryShares}}" wx:key="id">
+            <text class="cat-share-dot" style="background:{{item.color}};"></text>
+            <text class="cat-share-icon">{{item.icon}}</text>
+            <text class="cat-share-label">{{item.label}}</text>
+            <text class="cat-share-count">{{item.count}}（{{item.percent}}%）</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 6. 阅读足迹 ===== -->
+    <view class="section" wx:if="{{footprints.length > 0}}">
+      <view class="section-title">👣 阅读足迹</view>
+      <view class="footprint-row" wx:for="{{footprints}}" wx:key="place">
+        <view class="footprint-head">
+          <text class="footprint-place">{{item.place}}</text>
+          <text class="footprint-count">{{item.count}} 本</text>
+        </view>
+        <text class="footprint-sample" wx:if="{{item.sampleTitles}}">{{item.sampleTitles}}</text>
+      </view>
+    </view>
+
+    <!-- ===== 6.5 P2-5 阅读节律洞察（基于录入时刻的 createdAt）===== -->
+    <view class="section insight-section" wx:if="{{insights.length > 0}}">
+      <view class="section-title">🌙 阅读节律</view>
+      <view class="insight-list">
+        <view class="insight-row" wx:for="{{insights}}" wx:key="key">
+          <text class="insight-emoji">{{item.emoji}}</text>
+          <text class="insight-text">{{item.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 7. 金句墙 ===== -->
+    <view class="section" wx:if="{{quotes.length > 0}}">
+      <view class="section-title">💬 金句精选</view>
+      <view class="quote-wall">
+        <view class="quote-card" wx:for="{{quotes}}" wx:key="index">
+          <text class="quote-text">「{{item.text}}」</text>
+          <text class="quote-source">— 《{{item.bookTitle}}》</text>
+        </view>
+      </view>
+      <view class="section-more" bindtap="onGoQuotes">查看全部金句 ›</view>
+    </view>
+
+    <!-- ===== 8. 高分榜 ===== -->
+    <view class="section" wx:if="{{topItems.length > 0}}">
+      <view class="section-title">🏆 高分榜</view>
+      <view class="rank-list">
+        <view class="rank-item" wx:for="{{topItems}}" wx:key="id">
+          <text class="rank-num">{{index + 1}}</text>
+          <view class="rank-badge" style="background:{{item.categoryColor}}22;color:{{item.categoryColor}};">{{item.categoryIcon}}</view>
+          <view class="rank-main">
+            <text class="rank-title">{{item.title}}</text>
+            <text class="rank-date">{{item.finishedDate}}</text>
+          </view>
+          <view class="rank-rating">★ {{item.rating}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- P2-8 关系图谱入口：从数据回顾页跳转到关系图谱（书↔作者↔分类可视化） -->
+    <view class="graph-entry" bindtap="onTapGraph">
+      <text class="graph-entry-icon">🕸️</text>
+      <view class="graph-entry-text">
+        <view class="graph-entry-title">阅读关系图谱</view>
+        <view class="graph-entry-sub">看看谁在你的阅读宇宙里发光</view>
+      </view>
+      <text class="graph-entry-arrow">›</text>
+    </view>
+
+    <!-- P3 勋章墙入口：集中查看所有勋章的解锁状态与进度 -->
+    <view class="graph-entry" bindtap="onTapMedals">
+      <text class="graph-entry-icon">🏅</text>
+      <view class="graph-entry-text">
+        <view class="graph-entry-title">勋章墙</view>
+        <view class="graph-entry-sub">你点亮的每一枚勋章都在这里</view>
+      </view>
+      <text class="graph-entry-arrow">›</text>
+    </view>
+
+    <!-- P3 养成树入口：把成就画成节点树（中心=总数 / 分支=分类 / 叶子=具体成就） -->
+    <view class="graph-entry" bindtap="onTapTree">
+      <text class="graph-entry-icon">🌳</text>
+      <view class="graph-entry-text">
+        <view class="graph-entry-title">成长养成树</view>
+        <view class="graph-entry-sub">看看你的每一片叶子都长在哪根枝上</view>
+      </view>
+      <text class="graph-entry-arrow">›</text>
+    </view>
+
+    <view class="footer-tip">— 数据来自你的本地记录 —</view>
+  </block>
+
+  <!-- 空状态：该年份无成就 -->
+  <empty-state wx:if="{{!loadError && !loading && !hasData}}" icon="📊" title="{{currentYear}} 年还没有记录" desc="录入成就后，这里会出现你的数据画像" btnText="＋ 记录第一个成就" bind:btntap="onTapAdd" />
+
+</scroll-view>

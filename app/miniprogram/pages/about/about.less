@@ -1,0 +1,140 @@
+/**pages/about/about.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 @sp-12;
+}
+
+/* ===== Logo 区 ===== */
+.logo-area {
+  text-align: center;
+  padding: @sp-10 0 @sp-8;
+}
+.logo-circle {
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: @radius-card;
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: 44rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: @shadow-cta;
+}
+.app-name {
+  margin-top: @sp-6;
+  font-family: var(--font-title);
+  font-size: @fs-xl;
+  font-weight: 600;
+  color: @color-text-primary;
+}
+.app-slogan {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.version {
+  margin-top: @sp-3;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+
+/* ===== 分区 ===== */
+.section {
+  margin-top: @sp-8;
+}
+.section-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-secondary;
+  margin-bottom: @sp-5;
+  padding-left: @sp-2;
+}
+
+/* ===== 功能列表 ===== */
+.feature-list {
+  background: @color-card;
+  border-radius: @radius-card;
+  overflow: hidden;
+  box-shadow: @shadow-card;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-7 @sp-7;
+  border-bottom: 1rpx solid @color-divider;
+}
+.feature-item:last-child {
+  border-bottom: none;
+}
+.feature-icon {
+  font-size: 48rpx;
+  width: 80rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.feature-main {
+  flex: 1;
+  margin-left: @sp-4;
+}
+.feature-title {
+  font-size: @fs-l;
+  color: @color-text-primary;
+  font-weight: 500;
+}
+.feature-desc {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  line-height: 1.5;
+}
+
+/* ===== 理念 ===== */
+.philosophy {
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7;
+  box-shadow: @shadow-card;
+}
+.philo-text {
+  font-size: 27rpx;
+  color: @color-text-primary;
+  line-height: 1.85;
+}
+
+/* ===== 链接 ===== */
+.link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7;
+  box-shadow: @shadow-card;
+}
+.link-text {
+  font-size: @fs-l;
+  color: @color-text-primary;
+}
+.link-arrow {
+  font-size: 36rpx;
+  color: @color-text-secondary;
+}
+
+/* ===== 版权 ===== */
+.copyright {
+  text-align: center;
+  margin-top: @sp-10;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.8;
+}
+.copyright-sub {
+  opacity: 0.7;
+}

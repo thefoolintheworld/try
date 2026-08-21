@@ -1,0 +1,46 @@
+/* components/empty-state/empty-state.less */
+/* 通用空态样式：统一各页面重复的「无数据」展示。
+   收纳了 tree/medals/quotes/graph 等 21 个页面的空态样式，
+   改这里全部跟随。配色走 design-tokens（通过各页面 @import app.less 间接引入）。*/
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 140rpx @sp-8;
+  gap: @sp-4;
+}
+.empty-state-icon {
+  font-size: 96rpx;
+  opacity: 0.6;
+  line-height: 1;
+}
+.empty-state-title {
+  font-size: 30rpx;
+  color: #3D3530;
+  color: var(--color-text-primary, #3D3530);
+  text-align: center;
+}
+.empty-state-desc {
+  font-size: 24rpx;
+  color: #8B7D6E;
+  color: var(--color-text-secondary, #8B7D6E);
+  text-align: center;
+  line-height: 1.6;
+  white-space: pre-wrap;   /* 支持多行（\n 换行）*/
+  word-break: break-word;
+}
+.empty-state-btn {
+  margin-top: @sp-4;
+  padding: @sp-5 @sp-10;
+  font-size: 28rpx;
+  color: #FFFFFF;
+  background: #D97A4A;
+  background: var(--color-accent, #D97A4A);
+  border-radius: @radius-btn;
+  line-height: 1.4;
+  box-shadow: 0 4rpx 16rpx rgba(217, 122, 74, 0.25);
+}
+.empty-state-btn:active {
+  opacity: 0.85;
+}

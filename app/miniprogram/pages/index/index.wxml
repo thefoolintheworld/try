@@ -1,0 +1,244 @@
+<!--pages/index/index.wxml-->
+<navigation-bar title="" back="{{false}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 错误态：refresh 抛错时显示（覆盖在内容区最上方）-->
+  <empty-state wx:if="{{loadError}}" icon="⚠️" title="加载失败" desc="数据可能出了点问题，点下方按钮重试" btnText="重试" bind:btntap="onRetry" />
+
+  <!-- 顶部年度大标题区 + 紧凑数据胶囊条（替代原年度目标卡 + 勋章墙卡） -->
+  <view class="hero animate-fade-up" wx:if="{{!loadError}}">
+    <!-- 搜索入口：右上角放大镜，跨成就/愿望/灵感/打卡全文搜索 -->
+    <view class="hero-search" bindtap="onTapSearch">
+      <text class="hero-search-icon">🔍</text>
+    </view>
+    <view class="hero-year">{{year}}</view>
+    <view class="hero-divider"></view>
+    <view class="hero-sub">我的年度记录</view>
+    <!-- 数据胶囊条：一行紧凑数字，把核心指标压在一行。
+         每颗胶囊可点（跳数据回顾页详查）；全为 0 时整条隐藏（首次使用不轰炸用户）。 -->
+    <view class="capsule-bar" wx:if="{{capsule.streak > 0 || capsule.books > 0 || capsule.films > 0 || capsule.medalText || capsule.goalText}}">
+      <view class="capsule-chip" bindtap="onTapStats" wx:if="{{capsule.streak > 0}}">
+        <text class="capsule-chip-icon">🔥</text>
+        <text class="capsule-chip-num">{{capsule.streak}}</text>
+        <text class="capsule-chip-unit">天</text>
+      </view>
+      <view class="capsule-chip" bindtap="onTapStats" wx:if="{{capsule.books > 0}}">
+        <text class="capsule-chip-icon">📚</text>
+        <text class="capsule-chip-num">{{capsule.books}}</text>
+        <text class="capsule-chip-unit">本</text>
+      </view>
+      <view class="capsule-chip" bindtap="onTapStats" wx:if="{{capsule.films > 0}}">
+        <text class="capsule-chip-icon">🎬</text>
+        <text class="capsule-chip-num">{{capsule.films}}</text>
+        <text class="capsule-chip-unit">部</text>
+      </view>
+      <view class="capsule-chip" bindtap="onTapEditMedals" wx:if="{{capsule.medalText}}">
+        <text class="capsule-chip-icon">🏅</text>
+        <text class="capsule-chip-num">{{capsule.medalText}}</text>
+      </view>
+      <view class="capsule-chip" bindtap="onTapEditGoals" wx:if="{{capsule.goalText}}">
+        <text class="capsule-chip-icon">🎯</text>
+        <text class="capsule-chip-num">{{capsule.goalText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 有数据：成就墙 + 主入口 -->
+  <block wx:if="{{!loadError && hasData}}">
+
+    <!-- 成就墙展示区（默认最新 6 条，可自定义置顶） -->
+    <view class="section animate-fade-up" wx:if="{{wallItems.length > 0}}">
+      <view class="section-header">
+        <text class="section-title">成就墙</text>
+        <view class="section-header-right">
+          <!-- 列数切换：当前模式图标高亮，点一下切到另一种 -->
+          <view class="layout-toggle" bindtap="onToggleWallLayout">
+            <text class="layout-toggle-item {{wallLayout === 'double' ? 'active' : ''}}">▦</text>
+            <text class="layout-toggle-item {{wallLayout === 'single' ? 'active' : ''}}">▤</text>
+          </view>
+          <text class="section-more" bindtap="onTapEditWall">编辑展示 ›</text>
+        </view>
+      </view>
+      <view class="wall-grid {{wallLayout}}">
+        <view class="wall-card" wx:for="{{wallItems}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapWallItem">
+          <!-- 图片区：预设用 cssPreview / 真实图用 url / 无图用分类 emoji 占位 -->
+          <view class="wall-card-img"
+            style="{{item.imageKind === 'preset' ? item.presetCss : ''}}{{item.imageKind === 'image' ? 'background-image:url(' + item.image + ');background-size:cover;background-position:center;' : ''}}">
+            <text wx:if="{{item.imageKind === 'none'}}" class="wall-card-placeholder">{{item.categoryIcon}}</text>
+          </view>
+          <view class="wall-card-body">
+            <view class="wall-card-title">{{item.title}}</view>
+            <view class="wall-card-date">{{item.finishedDate}}</view>
+            <!-- 里程碑进度条：仅当成就挂了 progress 时显示（横条 + 百分比），高度紧凑避免破坏卡片比例 -->
+            <view class="wall-progress" wx:if="{{item.hasProgress}}">
+              <view class="wall-progress-track">
+                <view class="wall-progress-fill" style="width:{{item.progressPercent}}%"></view>
+              </view>
+              <text class="wall-progress-text">{{item.progressCurrent}}/{{item.progressTarget}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <!-- 查看更多：跳成就墙完整列表页（文字链，右对齐，与「编辑展示 ›」同风格） -->
+      <view class="wall-more" bindtap="onTapList">查看更多 ›</view>
+    </view>
+
+    <!-- 主行动区：录入新成就 + 生成报告 + 文案海报 + 我的报告 -->
+    <view class="actions animate-fade-up">
+      <view class="action-btn primary" bindtap="onTapAdd">
+        <view class="action-icon">＋</view>
+        <view class="action-text">继续记录</view>
+      </view>
+      <view class="action-btn" bindtap="onTapReport">
+        <view class="action-icon">✦</view>
+        <view class="action-text">生成报告</view>
+      </view>
+      <view class="action-btn" bindtap="onTapPosterFromText">
+        <view class="action-icon">📝</view>
+        <view class="action-text">文案海报</view>
+      </view>
+      <view class="action-btn" bindtap="onTapReports">
+        <view class="action-icon">✎</view>
+        <view class="action-text">我的报告</view>
+        <view class="action-badge" wx:if="{{hasReports}}">{{reportCount}}</view>
+      </view>
+    </view>
+
+    <view class="footer-tip">— 记录每一个值得纪念的瞬间 —</view>
+  </block>
+
+  <!-- 无数据：首次使用引导 -->
+  <block wx:if="{{!loadError && !hasData}}">
+    <empty-state icon="🏆" title="记录你的第一个成就" desc="读完一本书、学会一项技能、一次难忘的旅行……每一个值得纪念的瞬间，都值得被认真记下" btnText="＋ 记录第一个成就" bind:btntap="onTapAdd" />
+  </block>
+
+  <!-- 三入口：许愿星（管理愿望）+ 灵感抽屉（记录闪念）+ 每日打卡（养成习惯）。
+       放 block 外，无成就时也可见，引导首次使用。
+       布局：第一行 2 卡（许愿星 + 灵感抽屉），第二行 1 卡居中（打卡，作为习惯入口强调）。 -->
+  <view class="entry-grid">
+    <view class="entry-row">
+      <!-- 许愿星：原灵感抽屉，管理待达成的愿望 -->
+      <view class="entry-card" bindtap="onTapWishlist">
+        <text class="entry-icon">⭐</text>
+        <view class="entry-text">
+          <view class="entry-title">许愿星</view>
+          <view class="entry-sub" wx:if="{{wishPendingCount > 0}}">{{wishPendingCount}} 个愿望待实现</view>
+          <view class="entry-sub" wx:else>记下想读、想做、想达成的事</view>
+        </view>
+        <text class="entry-arrow">›</text>
+      </view>
+      <!-- 灵感抽屉：自由记录闪念想法（带分类笔记） -->
+      <view class="entry-card" bindtap="onTapInspiration">
+        <text class="entry-icon">🌱</text>
+        <view class="entry-text">
+          <view class="entry-title">灵感抽屉</view>
+          <view class="entry-sub" wx:if="{{inspirationCount > 0}}">{{inspirationCount}} 条灵感</view>
+          <view class="entry-sub" wx:else>随手记下一个闪念</view>
+        </view>
+        <text class="entry-arrow">›</text>
+      </view>
+    </view>
+    <!-- 每日打卡：单独一行居中，强调"习惯养成"的仪式感 -->
+    <view class="entry-card checkin-entry" bindtap="onTapCheckin">
+      <text class="entry-icon">🔥</text>
+      <view class="entry-text">
+        <view class="entry-title">每日打卡</view>
+        <view class="entry-sub" wx:if="{{todayChecked && todayCheckinCount > 1}}">今日已打卡 {{todayCheckinCount}} 项 · 连续 {{checkinStreak}} 天</view>
+        <view class="entry-sub" wx:elif="{{todayChecked}}">今日已打卡 · 连续 {{checkinStreak}} 天</view>
+        <view class="entry-sub" wx:elif="{{checkinStreak > 0}}">连续 {{checkinStreak}} 天 · 今天还没打卡</view>
+        <view class="entry-sub" wx:else>连续打卡，养成习惯</view>
+      </view>
+      <text class="entry-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 回顾 · 珍藏区：把往年今日 / 年度回顾 / 陈列柜 / 金句墙四张条件卡片统一收纳在一个分组里，
+       给它们一个共同的视觉锚点（分组标题 + 统一上间距），避免和上方入口区/下方页脚连成一片。 -->
+  <view class="recap-group" wx:if="{{hasRecap}}">
+    <view class="recap-group-header">
+      <text class="recap-group-title">回顾 · 珍藏</text>
+      <text class="recap-group-sub">回望来路与高光</text>
+    </view>
+
+    <!-- 往年今日入口：条件出现，仅当天有往年记录时才显示这张卡片。
+         副标题预览最近一条（X 年前的今天：…），点击进入完整页面。 -->
+    <view class="memory-entry" wx:if="{{onThisDayCount > 0}}" bindtap="onTapOnThisDay">
+      <text class="memory-entry-icon">🕰️</text>
+      <view class="memory-entry-text">
+        <view class="memory-entry-title">往年今日 · {{onThisDayCount}} 条</view>
+        <view class="memory-entry-sub">{{onThisDayPreview}}</view>
+      </view>
+      <text class="memory-entry-arrow">›</text>
+    </view>
+
+    <!-- 年度回顾入口：有可看的历史年份（或当年 12 月解锁）时才显示。
+         副标题带人格标签做情绪钩子；点击跳 wrapped 页并带目标年份。 -->
+    <view class="memory-entry wrapped-entry" wx:if="{{wrappedHasYear}}" bindtap="onTapWrapped">
+      <text class="memory-entry-icon">✨</text>
+      <view class="memory-entry-text">
+        <view class="memory-entry-title">{{wrappedYear}} 年度回顾</view>
+        <view class="memory-entry-sub">{{wrappedHeadline}}</view>
+      </view>
+      <text class="memory-entry-arrow">›</text>
+    </view>
+
+    <!-- P2-2 陈列柜入口：用户置顶过 ≥1 条成就时显示（与首页 pin 流程共享数据源） -->
+    <view class="memory-entry showcase-entry" wx:if="{{pinnedCount > 0}}" bindtap="onTapProfile">
+      <text class="memory-entry-icon">🖼️</text>
+      <view class="memory-entry-text">
+        <view class="memory-entry-title">我的陈列柜 · {{pinnedCount}} 精选</view>
+        <view class="memory-entry-sub">把最得意的作品摆进展柜</view>
+      </view>
+      <text class="memory-entry-arrow">›</text>
+    </view>
+
+    <!-- P3-1 金句墙入口：用户有 ≥1 条金句时显示 -->
+    <view class="memory-entry quotes-entry" wx:if="{{quotesCount > 0}}" bindtap="onTapQuotes">
+      <text class="memory-entry-icon">💬</text>
+      <view class="memory-entry-text">
+        <view class="memory-entry-title">金句墙 · {{quotesCount}} 句</view>
+        <view class="memory-entry-sub">{{quotesPreview}}</view>
+      </view>
+      <text class="memory-entry-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 底部小入口（两种状态都显示） -->
+  <view class="footer-links">
+    <text class="footer-link" bindtap="onTapStats">数据回顾</text>
+    <text class="footer-link" bindtap="onTapSettings">设置</text>
+    <text class="footer-link" bindtap="onTapAbout">关于</text>
+  </view>
+</scroll-view>
+
+<!-- 成就墙勾选 sheet：底部弹层，多选哪些成就上首页（最多 6 条） -->
+<view class="pin-mask {{showPinSheet ? 'show' : ''}}" bindtap="onClosePinSheet"></view>
+<view class="pin-sheet {{showPinSheet ? 'show' : ''}}">
+  <view class="pin-sheet-header">
+    <text class="pin-sheet-title">选择展示的成就</text>
+    <text class="pin-sheet-close" bindtap="onClosePinSheet">✕</text>
+  </view>
+  <view class="pin-sheet-sub">
+    勾选要在首页成就墙展示的成就，最多 6 条。已选 {{pinSelectedCount}}/6
+  </view>
+  <scroll-view class="pin-list" scroll-y>
+    <view
+      class="pin-item {{item.checked ? 'checked' : ''}}"
+      wx:for="{{pinCandidates}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTogglePin"
+    >
+      <view class="pin-item-icon">{{item.categoryIcon}}</view>
+      <view class="pin-item-main">
+        <view class="pin-item-title">{{item.title}}</view>
+        <view class="pin-item-date">{{item.finishedDate}}</view>
+      </view>
+      <view class="pin-item-check">{{item.checked ? '✓' : ''}}</view>
+    </view>
+  </scroll-view>
+  <view class="pin-sheet-actions">
+    <view class="pin-sheet-btn confirm" bindtap="onConfirmPin">确定</view>
+  </view>
+</view>

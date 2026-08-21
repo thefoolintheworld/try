@@ -1,0 +1,255 @@
+// pages/quotes/quotes.less
+// 金句墙独立页样式：瀑布流文学化排版。
+// 配色全部走 design-tokens 的 LESS 变量映射（在 app.less 顶部定义）。
+
+.page {
+  height: calc(100vh - 44px - env(safe-area-inset-top));
+  background: @color-bg;
+  box-sizing: border-box;
+}
+
+/* ===== 空状态 ===== */
+/* ===== 顶部摘要 ===== */
+.hero {
+  margin: @sp-6 @sp-6 0;
+  padding: @sp-8 @sp-7 @sp-7;
+  background: linear-gradient(135deg, color-mix(in srgb, @color-accent 8%, transparent) 0%, color-mix(in srgb, @color-book 8%, transparent) 100%);
+  border-radius: @radius-card-md;
+}
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-title);
+  line-height: 1.3;
+}
+.hero-stats {
+  margin-top: @sp-4;
+  display: flex;
+  align-items: baseline;
+  gap: @sp-2;
+}
+.stat-num {
+  font-family: var(--font-numeric);
+  font-size: @fs-xxl;
+  font-weight: 300;
+  color: @color-accent;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-unit {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+}
+.stat-sep {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  opacity: 0.5;
+  margin: 0 @sp-2;
+}
+.hero-sub {
+  margin-top: @sp-3;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  font-family: var(--font-title);
+  opacity: 0.85;
+}
+
+/* ===== 排序切换条 ===== */
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+  padding: @sp-5 @sp-6 @sp-2;
+}
+.sort-chip {
+  padding: @sp-3 @sp-6;
+  border-radius: @radius-card-md;
+  background: @color-card;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  border: 2rpx solid transparent;
+  box-shadow: @shadow-card;
+}
+.sort-chip.active {
+  color: var(--color-accent, @color-accent);
+  border-color: var(--color-accent, @color-accent);
+  background: color-mix(in srgb, @color-accent 10%, transparent);
+}
+.reshuffle-btn {
+  margin-left: auto;
+  padding: @sp-3 @sp-5;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.8;
+}
+
+/* ===== 瀑布流金句墙（最近/随机模式）===== */
+.quote-wall {
+  column-count: 2;
+  column-gap: @sp-4;
+  padding: @sp-4 @sp-6 @sp-6;
+}
+
+/* ===== 金句卡片（通用：瀑布流 + 按书分组内都用）===== */
+.quote-card {
+  break-inside: avoid;
+  position: relative;
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  padding: @sp-7 @sp-6 @sp-5;
+  margin-bottom: @sp-4;
+  box-shadow: @shadow-card;
+}
+.quote-card.in-group {
+  margin-bottom: @sp-3;
+}
+/* 大引号装饰（左上角浅色，文学感）*/
+.quote-mark {
+  position: absolute;
+  top: 8rpx;
+  left: 16rpx;
+  font-size: @fs-xxl;
+  font-family: var(--font-serif);
+  color: @color-accent;
+  opacity: 0.2;
+  line-height: 1;
+  font-weight: 700;
+}
+.quote-text {
+  display: block;
+  position: relative;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.7;
+  font-family: var(--font-serif);
+  /* 与上方引号装饰错开一点 */
+  padding-top: @sp-2;
+}
+/* 上下文批注（quoteNotes；小字斜体灰色）*/
+.quote-context {
+  margin-top: @sp-3;
+  padding-top: @sp-3;
+  border-top: 1rpx dashed @color-divider;
+}
+.quote-context-text {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  line-height: 1.5;
+  font-family: var(--font-title);
+  font-style: italic;
+  opacity: 0.85;
+}
+/* 出处行 */
+.quote-source {
+  margin-top: @sp-4;
+  display: flex;
+  align-items: center;
+  gap: @sp-2;
+  flex-wrap: wrap;
+}
+.quote-cat-icon {
+  font-size: @fs-xs;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.quote-source-main {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-title);
+}
+.quote-source-author {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== 按书分组模式 ===== */
+.book-groups {
+  padding: @sp-4 @sp-6 @sp-6;
+}
+.book-group {
+  margin-bottom: @sp-7;
+}
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: @sp-3;
+  padding: @sp-3 @sp-4;
+  background: @color-card;
+  border-radius: @radius-card-xs;
+  margin-bottom: @sp-3;
+  box-shadow: @shadow-card;
+}
+.group-cat-icon {
+  font-size: @fs-sm;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.group-title-area {
+  flex: 1;
+  min-width: 0;
+}
+.group-title {
+  font-size: @fs-m;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-title);
+  display: block;
+  line-height: 1.3;
+}
+.group-author {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  display: block;
+  margin-top: 2rpx;
+}
+.group-count {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  background: @color-bg;
+  padding: @sp-1 @sp-4;
+  border-radius: @radius-card-xs;
+  flex-shrink: 0;
+}
+.group-quotes {
+  padding-left: @sp-4;
+  /* 组内卡片缩进一点，视觉上属于该书 */
+}
+
+/* ===== 底部提示 ===== */
+.footer-tip {
+  text-align: center;
+  padding: @sp-7 @sp-6 60rpx;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.6;
+  font-family: var(--font-title);
+}
+
+/* ===== 上拉加载更多 ===== */
+.load-more,
+.load-end {
+  text-align: center;
+  padding: @sp-6 @sp-4;
+}
+.load-more-text,
+.load-end-text {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.load-end-text {
+  opacity: 0.6;
+}

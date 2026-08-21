@@ -1,0 +1,573 @@
+/**pages/list/list.less**/
+@import "../../app.less";
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 @sp-7 160rpx;
+  position: relative;
+}
+
+/* ===== B2 关键词搜索框 ===== */
+.search-area {
+  padding: @sp-4 0 @sp-1;
+}
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: @color-card;
+  border-radius: @radius-pill;
+  padding: @sp-4 @sp-6;
+  box-shadow: @shadow-card;
+}
+.search-icon {
+  font-size: @fs-base;
+  margin-right: @sp-3;
+  opacity: 0.7;
+}
+.search-input {
+  flex: 1;
+  font-size: @fs-base;
+  color: @color-text-primary;
+  line-height: 1.4;
+  min-width: 0;
+}
+.search-placeholder {
+  color: @color-text-secondary;
+  opacity: 0.6;
+}
+.search-clear {
+  font-size: @fs-m;
+  color: @color-text-secondary;
+  padding: 0 @sp-2;
+  opacity: 0.7;
+}
+
+/* ===== 年份切换条 ===== */
+.year-bar {
+  white-space: nowrap;
+  padding: @sp-6 0;
+}
+.year-chip {
+  display: inline-block;
+  padding: @sp-3 @sp-7;
+  margin-right: @sp-4;
+  border-radius: @radius-card;
+  background: @color-card;
+  font-family: var(--font-numeric);
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-variant-numeric: tabular-nums;
+}
+.year-chip.active {
+  background: @color-accent;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* ===== 分类筛选条 ===== */
+.category-bar {
+  white-space: nowrap;
+  padding: 0 0 @sp-6;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: @sp-3 @sp-6;
+  margin-right: @sp-4;
+  border-radius: @radius-card;
+  background: @color-card;
+  border: 2rpx solid @color-divider;
+  font-size: @fs-sm;
+  color: @color-text-primary;
+  line-height: 1.4;
+}
+.filter-chip.active {
+  color: #FFFFFF;
+  font-weight: 600;
+  border: 2rpx solid transparent;
+}
+.filter-icon {
+  font-size: @fs-base;
+  margin-right: @sp-2;
+}
+.filter-label {
+  margin-right: @sp-2;
+}
+.filter-count {
+  font-size: @fs-xs;
+  opacity: 0.85;
+}
+.filter-chip.active .filter-count {
+  opacity: 0.9;
+}
+
+/* ===== 状态筛选条（三态状态机 P1-5；复用 .filter-chip） ===== */
+.status-bar {
+  white-space: nowrap;
+  padding: 0 0 @sp-6;
+}
+.status-bar .filter-chip {
+  /* 状态 chip 用中性灰强调态区分（不像分类 chip 用分类色）；active 用设计令牌 accent */
+}
+.status-bar .filter-chip.active {
+  background: @color-accent;
+  border-color: @color-accent;
+}
+
+/* ===== P2-7 视图切换 segmented control ===== */
+.view-switcher {
+  display: flex;
+  margin: @sp-4 @sp-6 @sp-2;
+  background: @color-divider;
+  border-radius: @radius-pill;
+  padding: @sp-1;
+}
+.view-option {
+  flex: 1;
+  text-align: center;
+  padding: @sp-3 0;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  border-radius: @radius-pill;
+  transition: all 0.2s;
+}
+.view-option.active {
+  background: @color-card;
+  color: @color-text-primary;
+  font-weight: 600;
+  box-shadow: @shadow-subtle;
+}
+
+/* ===== 条目卡片 ===== */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: @sp-6;
+  margin-top: @sp-2;
+}
+.item-card {
+  display: flex;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7;
+  box-shadow: @shadow-card;
+}
+/* 分类图标徽章（左侧圆形 icon 底，替代旧的色条） */
+.item-badge {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: @radius-chip;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.item-badge-icon {
+  font-size: 36rpx;
+  line-height: 1;
+}
+.item-main {
+  flex: 1;
+  margin-left: @sp-6;
+  min-width: 0;
+}
+.item-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.item-title {
+  /* 成就标题走标题字族（衬线模式下更文学）*/
+  font-family: var(--font-title);
+  font-size: @fs-lg;
+  font-weight: 600;
+  color: @color-text-primary;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: @sp-4;
+}
+.item-rating {
+  font-family: var(--font-numeric);
+  font-size: @fs-m;
+  color: @color-text-primary;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.item-rating .star {
+  color: @color-star;
+  margin-right: @sp-1;
+}
+
+/* 状态角标（在读/搁置）：插在标题和评分之间的小标签 */
+.status-pin {
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  background: @color-card-soft;
+  padding: @sp-1 @sp-3;
+  border-radius: @radius-pill;
+  margin-right: @sp-3;
+  flex-shrink: 0;
+  line-height: 1.4;
+  letter-spacing: 0.5rpx;
+}
+
+/* 三态状态机的卡片整体态：在读项左侧加一条暖色边、搁置项整体降饱和 */
+.item-card.is-reading {
+  border-left: 6rpx solid @color-accent;
+}
+.item-card.is-abandoned {
+  opacity: 0.6;
+}
+.item-card.is-abandoned .item-title {
+  text-decoration: line-through;
+  text-decoration-color: @color-text-secondary;
+}
+.item-row2 {
+  margin-top: @sp-2;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+.item-row3 {
+  margin-top: @sp-2;
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+/* 分类标签（成就墙每条目底部小 tag） */
+.item-cat-tag {
+  display: inline-block;
+  padding: 2rpx @sp-3;
+  border-radius: @radius-xs;
+  background: @color-divider;
+  color: @color-text-secondary;
+  font-size: @fs-xs;
+  opacity: 1;
+  margin-right: @sp-1;
+}
+/* P2-4 作者入口 chip：可点击跳作者聚合页 */
+.item-author-chip {
+  display: inline-block;
+  margin-top: @sp-3;
+  padding: @sp-2 @sp-4;
+  border-radius: @radius-pill;
+  background: color-mix(in srgb, @color-accent 10%, transparent);
+  color: @color-accent;
+  font-size: @fs-s;
+  font-family: var(--font-title);
+}
+.item-author-chip:active {
+  background: color-mix(in srgb, @color-accent 18%, transparent);
+}
+.item-place {
+  opacity: 0.9;
+}
+.item-meta {
+  margin-top: @sp-3;
+  font-size: @fs-s;
+  color: @color-accent;
+  opacity: 0.8;
+}
+.item-note {
+  margin-top: @sp-4;
+  padding: @sp-4 @sp-5;
+  background: @color-bg;
+  border-radius: @radius-sm;
+  font-size: @fs-base;
+  color: @color-text-secondary;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* ===== 灵感抽屉（愿望灰显区）===== */
+.wish-section {
+  margin-top: @sp-8;
+}
+.wish-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 @sp-1 @sp-4;
+}
+.wish-section-title {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-secondary;
+}
+.wish-section-more {
+  font-size: @fs-sm;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+/* 灰显愿望卡：整体降透明度，强调「未达成」语义 */
+.wish-card-grey {
+  opacity: 0.6;
+  position: relative;
+}
+.wish-tap-hint {
+  position: absolute;
+  right: 24rpx;
+  bottom: 20rpx;
+  font-size: @fs-xs;
+  color: @color-accent;
+  opacity: 0.8;
+}
+
+/* ===== 数据彩蛋（列表底部趣味统计）===== */
+.viz-egg {
+  margin-top: @sp-8;
+  background: @color-card;
+  border-radius: @radius-card;
+  padding: @sp-7 @sp-7;
+  box-shadow: @shadow-card;
+}
+.viz-egg-head {
+  margin-bottom: @sp-5;
+}
+.viz-egg-title {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-accent;
+  display: block;
+}
+.viz-egg-sub {
+  margin-top: @sp-2;
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  opacity: 0.7;
+  display: block;
+}
+.viz-egg-item {
+  display: flex;
+  align-items: center;
+  padding: @sp-4 0;
+  border-top: 1rpx solid @color-divider;
+}
+.viz-egg-icon {
+  font-size: @fs-lg;
+  margin-right: @sp-4;
+  width: 40rpx;
+  text-align: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.viz-egg-body {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-width: 0;
+}
+.viz-egg-label {
+  font-size: @fs-base;
+  color: @color-text-secondary;
+}
+.viz-egg-value {
+  font-size: @fs-base;
+  font-weight: 600;
+  color: @color-text-primary;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== 空状态 ===== */
+/* ===== 浮动添加按钮 ===== */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 80rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: @color-accent;
+  color: #FFFFFF;
+  font-size: @fs-xxl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: @shadow-cta;
+  line-height: 1;
+}
+
+/* ===== P2-7 网格视图（紧凑 2 列） ===== */
+.grid-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @sp-5;
+  margin: @sp-4 @sp-6 0;
+}
+.grid-card {
+  background: @color-card;
+  border-radius: @radius-card-xs;
+  overflow: hidden;
+  box-shadow: @shadow-subtle;
+}
+.grid-card:active { opacity: 0.85; }
+.grid-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.grid-cover-preset, .grid-cover-image {
+  width: 100%;
+  height: 100%;
+}
+.grid-cover-emoji {
+  font-size: 64rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+.grid-rating {
+  position: absolute;
+  bottom: 8rpx;
+  right: 8rpx;
+  padding: 2rpx @sp-3;
+  background: rgba(0, 0, 0, 0.45);
+  color: #FFFFFF;
+  border-radius: @radius-pill;
+  font-size: 18rpx;
+  font-family: var(--font-numeric);
+}
+.grid-status {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  font-size: @fs-sm;
+}
+.grid-body {
+  padding: @sp-4;
+}
+.grid-title {
+  font-size: @fs-base;
+  color: @color-text-primary;
+  font-weight: 600;
+  font-family: var(--font-title);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.grid-meta {
+  margin-top: @sp-2;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+
+/* ===== P2-7 画廊视图（大封面 2 列） ===== */
+.gallery-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @sp-6;
+  margin: @sp-4 @sp-6 0;
+}
+.gallery-card {
+  background: @color-card;
+  border-radius: @radius-card-sm;
+  overflow: hidden;
+  box-shadow: @shadow-card;
+}
+.gallery-card:active { opacity: 0.85; }
+.gallery-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.gallery-cover-preset, .gallery-cover-image {
+  width: 100%;
+  height: 100%;
+}
+.gallery-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: @sp-7 @sp-6;
+  box-sizing: border-box;
+  gap: @sp-4;
+}
+.gallery-cover-emoji {
+  font-size: 80rpx;
+  color: rgba(255, 255, 255, 0.6);
+}
+.gallery-cover-title {
+  font-size: @fs-m;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: var(--font-title);
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+.gallery-rating {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  padding: @sp-1 @sp-4;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+  border-radius: @radius-pill;
+  font-size: @fs-s;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+}
+.gallery-body {
+  padding: @sp-5;
+  display: flex;
+  flex-direction: column;
+  gap: @sp-2;
+}
+.gallery-title {
+  font-size: @fs-m;
+  color: @color-text-primary;
+  font-weight: 600;
+  font-family: var(--font-title);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gallery-author {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+  font-family: var(--font-title);
+}
+.gallery-meta {
+  display: flex;
+  align-items: center;
+  font-size: @fs-xs;
+  color: @color-text-secondary;
+  opacity: 0.7;
+}
+/* 分类标签：走标题字族，与 .gallery-author 同思路（画廊视图偏文学感）*/
+.gallery-cat {
+  font-family: var(--font-title);
+}
+.gallery-date {
+  font-family: var(--font-numeric);
+}
+
+/* ===== 上拉加载更多 ===== */
+.load-more,
+.load-end {
+  text-align: center;
+  padding: @sp-6 @sp-4;
+}
+.load-more-text,
+.load-end-text {
+  font-size: @fs-s;
+  color: @color-text-secondary;
+}
+.load-end-text {
+  opacity: 0.6;
+}

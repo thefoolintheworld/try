@@ -1,0 +1,54 @@
+<!--pages/on-this-day/on-this-day.wxml-->
+<!-- 往年今日：展示历史上今天（同月同日，但早于今年）的所有记录。
+     覆盖四类实体：成就 / 打卡 / 灵感 / 愿望，按年份分组（最近的往年最在上）。
+     情感价值型页面：让用户在某个普通的日子被"X 年前的自己"打动。 -->
+<navigation-bar title="往年今日" back="{{true}}" color="{{navColor}}" background="{{navBg}}"></navigation-bar>
+
+<scroll-view class="page {{themeClass}}" scroll-y type="list">
+
+  <!-- 顶部"今天"卡片 -->
+  <view class="hero">
+    <view class="hero-date">{{todayDateText}}</view>
+    <view class="hero-divider"></view>
+    <view class="hero-title">{{totalText}}</view>
+    <view class="hero-sub" wx:if="{{total > 0}}">历史上这一天你留下的足迹</view>
+    <view class="hero-sub" wx:else>继续记录，未来的某一年这一天会有回忆</view>
+  </view>
+
+  <!-- 有记录：按年份分组列表 -->
+  <block wx:if="{{total > 0}}">
+    <view class="year-group" wx:for="{{groups}}" wx:for-item="group" wx:key="year">
+      <view class="year-header">
+        <text class="year-badge">{{group.yearsAgoText}}</text>
+        <text class="year-num">{{group.year}}</text>
+      </view>
+      <view class="memory-list">
+        <view
+          class="memory-card"
+          wx:for="{{group.entries}}"
+          wx:for-item="entry"
+          wx:key="id"
+          data-type="{{entry.type}}"
+          data-id="{{entry.id}}"
+          bindtap="onTapMemory"
+        >
+          <view class="memory-icon">{{entry.icon}}</view>
+          <view class="memory-body">
+            <view class="memory-title">{{entry.title}}</view>
+            <view class="memory-sub">{{entry.subtitle}}</view>
+            <!-- P3-1 往年今日增强：成就的金句预览（文学感回忆钩子）-->
+            <view class="memory-quote" wx:if="{{entry.quotePreview}}">{{entry.quotePreview}}</view>
+            <!-- P3-1 心境 + 标签预览 -->
+            <view class="memory-mood" wx:if="{{entry.moodPreview}}">{{entry.moodPreview}}</view>
+          </view>
+          <text class="memory-type-tag">{{entry.typeLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer-tip">— 岁月不语，记录让回忆有处安放 —</view>
+  </block>
+
+  <!-- 空状态：还没有往年今日 -->
+  <empty-state wx:else icon="🕰️" title="还没有往年今日" desc="今年记下的成就、灵感、打卡，明年今日就会在这里等你" btnText="＋ 记下今天" bind:btntap="onTapAdd" />
+</scroll-view>
